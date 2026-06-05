@@ -31,7 +31,7 @@ pub mod timer;
 ///
 /// Swap these (and the `repository` field in `Cargo.toml` + the install
 /// scripts) to point at your own fork.
-pub const REPO_OWNER: &str = "leuchtturm";
+pub const REPO_OWNER: &str = "j-pfalzgraf";
 pub const REPO_NAME: &str = "coffeebreak";
 /// The installed command / release asset name (distinct from the crate name
 /// `coffeebreak-cli`).

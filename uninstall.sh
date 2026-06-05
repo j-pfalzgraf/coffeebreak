@@ -4,7 +4,7 @@
 # Removes the coffeebreak binary plus its config and data directories.
 #
 # Usage (one-liner):
-#   curl -fsSL https://raw.githubusercontent.com/leuchtturm/coffeebreak/main/uninstall.sh | sh
+#   curl -fsSL https://raw.githubusercontent.com/j-pfalzgraf/coffeebreak/main/uninstall.sh | sh
 #
 # Environment overrides:
 #   COFFEEBREAK_INSTALL_DIR   directory the binary lives in (default: $HOME/.local/bin)

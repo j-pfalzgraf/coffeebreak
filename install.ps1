@@ -8,7 +8,7 @@
     binary into the per-user programs directory and adds it to the user PATH.
 
     Intended to be run as:
-        irm https://raw.githubusercontent.com/leuchtturm/coffeebreak/main/install.ps1 | iex
+        irm https://raw.githubusercontent.com/j-pfalzgraf/coffeebreak/main/install.ps1 | iex
 
 .NOTES
     Environment overrides:
@@ -38,7 +38,7 @@ catch {
 
 # --- Constants --------------------------------------------------------------
 # GitHub repo coordinates (deliberate placeholder owner/name — do not change).
-$Owner = 'leuchtturm'
+$Owner = 'j-pfalzgraf'
 $Repo  = 'coffeebreak'
 
 # Install location: %LOCALAPPDATA%\Programs\coffeebreak\coffeebreak.exe

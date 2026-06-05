@@ -34,7 +34,7 @@ resolved version and source URL first, and abort on any mismatch.
 ### Unix (Linux / macOS)
 
 ```sh
-curl -fsSL https://raw.githubusercontent.com/leuchtturm/coffeebreak/main/install.sh | sh
+curl -fsSL https://raw.githubusercontent.com/j-pfalzgraf/coffeebreak/main/install.sh | sh
 ```
 
 This installs to `~/.local/bin/coffeebreak`. Override the location with
@@ -42,7 +42,7 @@ This installs to `~/.local/bin/coffeebreak`. Override the location with
 
 ```sh
 COFFEEBREAK_INSTALL_DIR="$HOME/bin" COFFEEBREAK_VERSION=v0.1.0 \
-  curl -fsSL https://raw.githubusercontent.com/leuchtturm/coffeebreak/main/install.sh | sh
+  curl -fsSL https://raw.githubusercontent.com/j-pfalzgraf/coffeebreak/main/install.sh | sh
 ```
 
 If the install directory isn't on your `PATH`, the script prints a hint to add it.
@@ -50,7 +50,7 @@ If the install directory isn't on your `PATH`, the script prints a hint to add i
 ### Windows (PowerShell)
 
 ```powershell
-irm https://raw.githubusercontent.com/leuchtturm/coffeebreak/main/install.ps1 | iex
+irm https://raw.githubusercontent.com/j-pfalzgraf/coffeebreak/main/install.ps1 | iex
 ```
 
 This installs to `%LOCALAPPDATA%\Programs\coffeebreak\coffeebreak.exe` and adds
@@ -68,7 +68,7 @@ The published crate is `coffeebreak-cli`; the installed command is `coffeebreak`
 ### Homebrew
 
 ```sh
-brew install leuchtturm/tap/coffeebreak
+brew install j-pfalzgraf/tap/coffeebreak
 ```
 
 > Note: the Homebrew tap may not exist yet — if the formula isn't published,
@@ -81,24 +81,24 @@ brew install leuchtturm/tap/coffeebreak
 Run `coffeebreak` with no arguments for a classic 25-minute focus / 5-minute
 break, one cycle.
 
-| Command | Description |
-| --- | --- |
-| `coffeebreak` | Default 25 min focus / 5 min break, 1 cycle |
-| `coffeebreak -w 50 -b 10` | Custom focus / break minutes |
-| `coffeebreak --cycles 4` | Run multiple focus→break rounds |
-| `coffeebreak --long` | Enable a long break after every N focus blocks |
-| `coffeebreak --long-break 20` | Long-break length in minutes (implies `--long`) |
-| `coffeebreak --long-every 4` | Focus blocks before a long break (default 4) |
-| `coffeebreak -l "label"` | Session label in the status line (alias `--label`) |
-| `coffeebreak --git-label` | Use the current git branch as the label |
-| `coffeebreak --stats` | Show today / all-time / current streak / best day |
-| `coffeebreak --no-sound` | Mute the audible cue |
-| `coffeebreak --no-notify` | No desktop notification |
-| `coffeebreak --no-color` | Disable coloured output |
-| `coffeebreak --version` | Print the version |
-| `coffeebreak self update` | Update to the latest GitHub release |
-| `coffeebreak self update --check` | Only check whether a newer version exists |
-| `coffeebreak self uninstall` | Remove binary + config dir + data dir (asks first; `-y` to skip) |
+| Command                           | Description                                                      |
+| --------------------------------- | ---------------------------------------------------------------- |
+| `coffeebreak`                     | Default 25 min focus / 5 min break, 1 cycle                      |
+| `coffeebreak -w 50 -b 10`         | Custom focus / break minutes                                     |
+| `coffeebreak --cycles 4`          | Run multiple focus→break rounds                                  |
+| `coffeebreak --long`              | Enable a long break after every N focus blocks                   |
+| `coffeebreak --long-break 20`     | Long-break length in minutes (implies `--long`)                  |
+| `coffeebreak --long-every 4`      | Focus blocks before a long break (default 4)                     |
+| `coffeebreak -l "label"`          | Session label in the status line (alias `--label`)               |
+| `coffeebreak --git-label`         | Use the current git branch as the label                          |
+| `coffeebreak --stats`             | Show today / all-time / current streak / best day                |
+| `coffeebreak --no-sound`          | Mute the audible cue                                             |
+| `coffeebreak --no-notify`         | No desktop notification                                          |
+| `coffeebreak --no-color`          | Disable coloured output                                          |
+| `coffeebreak --version`           | Print the version                                                |
+| `coffeebreak self update`         | Update to the latest GitHub release                              |
+| `coffeebreak self update --check` | Only check whether a newer version exists                        |
+| `coffeebreak self uninstall`      | Remove binary + config dir + data dir (asks first; `-y` to skip) |
 
 ### Examples
 
@@ -209,7 +209,7 @@ coffeebreak self uninstall
 You can also uninstall via the standalone script (handy if the binary won't run):
 
 ```sh
-curl -fsSL https://raw.githubusercontent.com/leuchtturm/coffeebreak/main/uninstall.sh | sh
+curl -fsSL https://raw.githubusercontent.com/j-pfalzgraf/coffeebreak/main/uninstall.sh | sh
 ```
 
 ---
@@ -217,7 +217,7 @@ curl -fsSL https://raw.githubusercontent.com/leuchtturm/coffeebreak/main/uninsta
 ## Build from source
 
 ```sh
-git clone https://github.com/leuchtturm/coffeebreak
+git clone https://github.com/j-pfalzgraf/coffeebreak
 cd coffeebreak
 cargo build --release          # binary at target/release/coffeebreak
 cargo test                     # run the test suite
@@ -236,7 +236,7 @@ Add `--features sound` to either command to enable the rodio chime.
 - Updates run **only on explicit command** (`coffeebreak self update`); the tool
   never updates itself silently in the background.
 
-> **Forking?** The repository owner/name `leuchtturm/coffeebreak` is a
+> **Forking?** The repository owner/name `j-pfalzgraf/coffeebreak` is a
 > placeholder used throughout the installers, release workflow, and self-update
 > logic. Swap it for your own `owner/name` everywhere before publishing releases.
 

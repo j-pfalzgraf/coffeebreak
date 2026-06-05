@@ -2,7 +2,7 @@
 # coffeebreak installer for Unix (Linux / macOS).
 #
 # Usage:
-#   curl -fsSL https://raw.githubusercontent.com/leuchtturm/coffeebreak/main/install.sh | sh
+#   curl -fsSL https://raw.githubusercontent.com/j-pfalzgraf/coffeebreak/main/install.sh | sh
 #
 # Environment overrides:
 #   COFFEEBREAK_VERSION       Release tag to install (e.g. v0.1.0). Default: latest.
@@ -22,7 +22,7 @@ set -eu
 # ----------------------------------------------------------------------------
 # Constants
 # ----------------------------------------------------------------------------
-REPO_OWNER="leuchtturm"
+REPO_OWNER="j-pfalzgraf"
 REPO_NAME="coffeebreak"
 BIN_NAME="coffeebreak"
 GH_RELEASES="https://github.com/${REPO_OWNER}/${REPO_NAME}/releases"
