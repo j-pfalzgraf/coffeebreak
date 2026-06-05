@@ -112,56 +112,38 @@ impl Stats {
             .max_by_key(|(_, d)| d.completed_pomodoros)
     }
 
-    /// Render the human-facing report to stdout.
-    pub fn print_summary(&self, color: bool) {
-        use owo_colors::OwoColorize;
+    /// Render the human-facing report to stdout, styled via `theme`.
+    pub fn print_summary(&self, theme: &crate::theme::Theme) {
+        let p = &theme.palette;
 
-        macro_rules! field {
-            ($label:expr, $value:expr) => {
-                if color {
-                    println!("  {:<16} {}", $label.bold(), $value);
-                } else {
-                    println!("  {:<16} {}", $label, $value);
-                }
-            };
-        }
+        let field = |label: &str, value: String| {
+            println!("  {:<16} {}", theme.bold(label, p.accent), value);
+        };
 
-        let title = "☕ coffeebreak — statistics";
-        if color {
-            println!("\n{}\n", title.bold().yellow());
-        } else {
-            println!("\n{title}\n");
-        }
+        println!("\n{}\n", theme.bold("☕ coffeebreak — statistics", p.accent));
 
         let (pomos, minutes, days) = self.totals();
         if pomos == 0 {
-            println!("  No pomodoros completed yet — run `coffeebreak` to start! ☕\n");
+            println!("  {}\n", theme.dim("No pomodoros completed yet — run `coffeebreak` to start! ☕"));
             return;
         }
 
         let today_key = today();
         let today_stat = self.days.get(&today_key).copied().unwrap_or_default();
-        field!(
+        field(
             "Today:",
             format!(
                 "{} pomodoros · {} min focus",
                 today_stat.completed_pomodoros, today_stat.focus_minutes
-            )
+            ),
         );
-        field!(
-            "All time:",
-            format!("{pomos} pomodoros · {minutes} min focus over {days} days")
-        );
+        field("All time:", format!("{pomos} pomodoros · {minutes} min focus over {days} days"));
 
         if let Ok(today_date) = NaiveDate::parse_from_str(&today_key, "%Y-%m-%d") {
-            field!("Current streak:", format!("{} days", self.streak(today_date)));
+            field("Current streak:", format!("{} days", self.streak(today_date)));
         }
-
         if let Some((date, stat)) = self.best_day() {
-            field!(
-                "Best day:",
-                format!("{date} ({} pomodoros)", stat.completed_pomodoros)
-            );
+            field("Best day:", format!("{date} ({} pomodoros)", stat.completed_pomodoros));
         }
         println!();
     }

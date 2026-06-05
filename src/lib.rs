@@ -1,31 +1,50 @@
 //! coffeebreak — a Pomodoro focus timer for your terminal.
 //!
 //! The binary is thin (see `main.rs`); all behaviour lives here so it can be
-//! unit-tested. Modules are deliberately small and loosely coupled:
+//! unit-tested. The codebase is organised into small, single-purpose modules:
 //!
-//! * [`cli`]     — argument parsing (clap derive) and subcommands.
-//! * [`config`]  — persisted defaults (`config.toml`) merged with CLI flags.
-//! * [`session`] — the resolved, ready-to-run plan (durations, cycles, flags).
-//! * [`timer`]   — the core countdown loop, progress bar and live rendering.
-//! * [`art`]     — the ASCII coffee cup whose steam tracks the remaining time.
-//! * [`quotes`]  — developer quotes shown when a break begins.
-//! * [`notify`]  — desktop notification + bell/sound on phase change.
+//! **Domain**
+//! * [`cli`]     — argument parsing (clap derive), subcommands, styled help.
+//! * [`config`]  — persisted defaults (`config.toml`).
+//! * [`session`] — the resolved run plan: durations, presets, display prefs.
 //! * [`stats`]   — daily statistics persisted to `~/.coffeebreak/stats.json`.
+//! * [`quotes`]  — developer quotes shown when a break begins.
 //! * [`paths`]   — XDG-aware locations for config and data.
 //! * [`git`]     — best-effort current-branch detection for session labels.
-//! * [`selfcmd`] — `self update` / `self uninstall` lifecycle commands.
+//!
+//! **Runtime / UI**
+//! * [`app`]      — the orchestrator: animated TUI plus a plain fallback.
+//! * [`clock`]    — [`clock::Clock`] and a pause-aware, testable phase timer.
+//! * [`theme`]    — truecolour palettes and the one styling entry point.
+//! * [`render`]   — a flicker-free, line-diffing frame renderer.
+//! * [`widgets`]  — the coffee cup, big-digit clock, progress bar, confetti.
+//! * [`term`]     — RAII alternate-screen / raw-mode terminal session.
+//! * [`input`]    — keyboard controls (pause / skip / quit / adjust).
+//! * [`feedback`] — [`feedback::Notifier`] / [`feedback::SoundPlayer`] backends.
+//!
+//! **Commands**
+//! * [`commands`]    — `stats`, `config`, `themes`, `presets` handlers.
+//! * [`completions`] — shell completions and the man page.
+//! * [`selfcmd`]     — `self update` / `self uninstall` lifecycle commands.
 
-pub mod art;
+pub mod app;
 pub mod cli;
+pub mod clock;
+pub mod commands;
+pub mod completions;
 pub mod config;
+pub mod feedback;
 pub mod git;
-pub mod notify;
+pub mod input;
 pub mod paths;
 pub mod quotes;
+pub mod render;
 pub mod selfcmd;
 pub mod session;
 pub mod stats;
-pub mod timer;
+pub mod term;
+pub mod theme;
+pub mod widgets;
 
 /// GitHub coordinates used by `self update` and the install scripts.
 ///

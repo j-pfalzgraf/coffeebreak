@@ -26,24 +26,32 @@ path = "src/lib.rs"
 anyhow = "1.0.102"
 chrono = { version = "0.4.45", default-features = false, features = ["clock", "serde"] }
 clap = { version = "4.6.1", features = ["derive"] }
+clap_complete = "4.6.5"
+clap_mangen = "0.3.0"
 crossterm = "0.29.0"
 ctrlc = "3.5.2"
 directories = "6.0.0"
-indicatif = "0.18.4"
 notify-rust = "4.17.0"
-owo-colors = "4.3.0"
 rand = "0.10.1"
 rodio = { version = "0.22.2", optional = true }
 self_update = { version = "0.44.0", default-features = false, features = ["reqwest", "rustls", "archive-tar", "archive-zip", "compression-flate2"] }
 serde = { version = "1.0.228", features = ["derive"] }
 serde_json = "1.0.150"
+textwrap = "0.16.2"
 toml = "1.1.2"
+unicode-width = "0.2.2"
 
 [features]
 default = []
 # Enable rich audio playback (chime) via rodio. Without it, coffeebreak falls
 # back to the terminal bell (\a). Enable with: cargo build --features sound
 sound = ["dep:rodio"]
+
+# Unix only: used to reset the SIGPIPE disposition so that piping coffeebreak's
+# output into a program that closes early (e.g. `coffeebreak man | head`) exits
+# quietly instead of panicking on a broken pipe.
+[target.'cfg(unix)'.dependencies]
+libc = "0.2"
 
 [profile.release]
 opt-level = "z"

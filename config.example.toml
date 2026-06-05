@@ -1,39 +1,34 @@
-# coffeebreak example configuration
+# coffeebreak configuration (OPTIONAL)
 #
-# This file is OPTIONAL. coffeebreak works fine with no config at all,
-# falling back to the built-in defaults shown below. To customise behaviour,
-# copy this file to (the same location on Linux, macOS, and Windows):
+# coffeebreak works fine with NO config file at all, falling back to the
+# built-in defaults shown below. This file just lets you change those defaults
+# without typing flags every time.
+#
+# Where it goes (same path on Linux, macOS, and Windows):
 #
 #     $HOME/.config/coffeebreak/config.toml
 #     # or, if set:  $XDG_CONFIG_HOME/coffeebreak/config.toml
 #
-# and edit the values you care about. Any key you omit keeps its default.
-# Command-line flags (e.g. -w / -b / --cycles) override the values here.
+# You can generate this file automatically with:
+#
+#     coffeebreak config init
+#
+# and find or inspect it with:
+#
+#     coffeebreak config path
+#     coffeebreak config show
+#
+# Any key you omit keeps its default. Command-line flags (e.g. -w/--work,
+# -b/--break, --cycles, --theme) ALWAYS override the values set here.
 
-# Length of a focus block, in minutes.
-work_minutes = 25
-
-# Length of a short break, in minutes.
-break_minutes = 5
-
-# Length of a long break, in minutes (used only when long breaks are enabled).
-long_break_minutes = 15
-
-# Number of focus->break rounds to run.
-cycles = 1
-
-# Number of focus blocks to complete before taking a long break.
-long_break_every = 4
-
-# Enable a long break after every `long_break_every` focus blocks.
-long_break = false
-
-# Play an audible cue when a block ends (terminal bell, or rodio chime if
-# the binary was built with `--features sound`).
-sound = true
-
-# Show a desktop notification when a block ends.
-notifications = true
-
-# Use the current git branch name as the session label.
-git_label = false
+work_minutes = 25           # length of a focus block, in minutes
+break_minutes = 5           # length of a short break, in minutes
+long_break_minutes = 15     # length of a long break, in minutes
+cycles = 1                  # number of focus -> break rounds to run
+long_break_every = 4        # take a long break after this many focus blocks
+long_break = false          # enable long breaks
+sound = true                # audible cue on phase change (terminal bell, or chime if built with sound)
+notifications = true        # show a desktop notification on phase change
+git_label = false           # use the current git branch name as the session label
+theme = "coffee"            # one of: coffee, ocean, forest, grape, mono
+fps = 15                    # animation frames per second, 2..=60

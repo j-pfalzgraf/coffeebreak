@@ -1,27 +1,86 @@
 # coffeebreak ☕
 
-A Pomodoro focus timer that lives in your terminal — an ASCII coffee cup whose
-**steam fades** as the timer counts down, a live progress bar, phase-change
-notifications, and a fresh developer quote with every break.
+**A Pomodoro focus timer for your terminal — with a live, animated coffee cup that *drains* while you focus and *refills* on your break, behind big block-digit countdowns.**
 
-> The cup steams when you start a focus block and the wisps thin out the closer
-> you get to your break — by the time it's empty, so is the timer.
+Start a focus block and watch the cup empty cup by cup, steam curling off the surface, the liquid shimmering, a gradient progress bar filling at the bottom — all in a full-screen terminal UI. When the break comes, the cup pours back full. No window, no browser, no distraction. Just you, the terminal, and the next cup.
+
+---
+
+## What it looks like
+
+coffeebreak takes over the alternate screen and renders a single, living frame:
+
+- a **coffee cup that drains during focus and refills during a break**, the liquid level tracking the time left;
+- **animated steam** rising off the top and a **shimmering liquid surface** that ripples frame to frame;
+- a **large block-digit countdown** of the time remaining in the current phase;
+- a **gradient progress bar** showing how far through the phase you are;
+- the active **theme colours**, session label, cycle counter, and a status line for controls.
+
+When stdout/stdin aren't TTYs (pipes, CI) — or with `--plain` — it drops to clean, line-based output instead.
+
+```text
+  ╭──────────────────────────────────────────────╮
+  │  coffeebreak · FOCUS · "refactor-auth" · 2/4  │
+  │                                                │
+  │            ~  ~~   ~                           │
+  │             ~   ~~    ~      ████  ████        │
+  │            (  steam  )       █  █  █  █        │
+  │           .-=========-.      █  █     █        │
+  │           |~~~~~~~~~~~|      █  █  █  █        │
+  │           |▓▓▓▓▓▓▓▓▓▓▓|      ████  ████        │
+  │           |▓▓▓▓▓▓▓▓▓▓▓|                        │
+  │           |░░░░░░░░░░░|      1 8 : 0 7         │
+  │           |░░░░░░░░░░░|                        │
+  │           '-_________-'                        │
+  │                                                │
+  │  ▰▰▰▰▰▰▰▰▰▰▰▰▱▱▱▱▱▱▱▱▱▱▱▱▱▱▱▱▱▱▱▱▱▱  28%       │
+  │                                                │
+  │  space pause · s skip · ±1 min · q quit        │
+  ╰──────────────────────────────────────────────╯
+```
+
+> Representative mock — the real UI is in truecolour, animates every frame, and the cup level moves continuously as time passes.
 
 ---
 
 ## Features
 
-- **Configurable Pomodoro cycles** — set focus length, break length, and how many focus→break rounds to run.
-- **Live countdown + progress bar** — a smooth, in-place rendering of time remaining.
-- **Steaming ASCII coffee cup** — the steam fades as the current phase winds down.
-- **Phase-change cues** — a desktop notification plus a terminal bell (or an optional rodio chime) when focus or break ends.
-- **Dev quote at each break** — a little programming wisdom to enjoy while you step away.
-- **Daily statistics with streaks** — track today, all-time, your current streak, and your best day.
-- **Long breaks** — automatically take a longer break after every N focus blocks.
-- **Git-branch session labels** — tag a session with the current branch name so your status line reflects what you're working on.
-- **Near-zero idle CPU** — the timer sleeps between frames instead of spinning.
-- **Clean Ctrl+C** — interrupt at any time; your stats are still saved before exit.
-- **Self update / uninstall** — pull the latest release or remove everything with a single command.
+**Animated UI, with a plain fallback**
+- Full-screen animated coffee cup on the alternate screen: drains on focus, refills on break.
+- Animated steam, a shimmering liquid surface, big block-digit countdown, and a gradient progress bar.
+- Automatic **plain line output** when stdout/stdin aren't TTYs (pipes/CI), or force it with `--plain`.
+- Tunable frame rate with `--fps N` (2–60, default 15); near-zero idle CPU between frames.
+
+**Interactive keyboard controls**
+- Pause / resume, skip a phase, add or remove a minute on the fly, and quit — all without leaving the session.
+
+**Themes**
+- Five truecolour themes: `coffee` (default), `ocean`, `forest`, `grape`, `mono`. Preview them with `coffeebreak themes`.
+
+**Presets**
+- Four built-in cadences via `--preset NAME`: `classic`, `deep`, `short`, `sprint`. List them with `coffeebreak presets`.
+
+**Statistics & streaks**
+- Daily stats in `~/.coffeebreak/stats.json`: today, all-time, current streak, and best day. View with `coffeebreak stats` or `--stats`.
+
+**Long breaks**
+- Automatically take a longer break after every N focus blocks, with configurable length.
+
+**Git labels**
+- Tag a session with `-l/--label TEXT`, or use the current git branch with `--git-label`.
+
+**Notifications & sound**
+- Desktop notification on each phase change (`--no-notify` to disable).
+- Terminal bell by default; build with `--features sound` for a rodio chime. `--no-sound` mutes.
+
+**Completions & man page**
+- Shell completions for bash, zsh, fish, PowerShell, and elvish; a generated man page.
+
+**Self-update lifecycle**
+- `coffeebreak self update [--check]` and `coffeebreak self uninstall [-y]` — updates only ever run on an explicit command.
+
+**Solid by default**
+- Near-zero idle CPU, clean Ctrl+C / quit that always saves your stats, and works with no config file at all.
 
 ---
 
@@ -78,39 +137,76 @@ brew install j-pfalzgraf/tap/coffeebreak
 
 ## Usage
 
-Run `coffeebreak` with no arguments for a classic 25-minute focus / 5-minute
-break, one cycle.
+Run `coffeebreak` with no arguments for a 25-minute focus / 5-minute break, one
+cycle, in the full-screen animated UI. Command-line flags always take precedence
+over the config file.
 
-| Command                           | Description                                                      |
-| --------------------------------- | ---------------------------------------------------------------- |
-| `coffeebreak`                     | Default 25 min focus / 5 min break, 1 cycle                      |
-| `coffeebreak -w 50 -b 10`         | Custom focus / break minutes                                     |
-| `coffeebreak --cycles 4`          | Run multiple focus→break rounds                                  |
-| `coffeebreak --long`              | Enable a long break after every N focus blocks                   |
-| `coffeebreak --long-break 20`     | Long-break length in minutes (implies `--long`)                  |
-| `coffeebreak --long-every 4`      | Focus blocks before a long break (default 4)                     |
-| `coffeebreak -l "label"`          | Session label in the status line (alias `--label`)               |
-| `coffeebreak --git-label`         | Use the current git branch as the label                          |
-| `coffeebreak --stats`             | Show today / all-time / current streak / best day                |
-| `coffeebreak --no-sound`          | Mute the audible cue                                             |
-| `coffeebreak --no-notify`         | No desktop notification                                          |
-| `coffeebreak --no-color`          | Disable coloured output                                          |
-| `coffeebreak --version`           | Print the version                                                |
-| `coffeebreak self update`         | Update to the latest GitHub release                              |
-| `coffeebreak self update --check` | Only check whether a newer version exists                        |
-| `coffeebreak self uninstall`      | Remove binary + config dir + data dir (asks first; `-y` to skip) |
+### Flags
+
+| Flag                    | Description                                              |
+| ----------------------- | ------------------------------------------------------- |
+| `-w, --work MIN`        | Focus block length, in minutes                          |
+| `-b, --break MIN`       | Short break length, in minutes                          |
+| `--cycles N`            | Number of focus→break rounds                            |
+| `--long`                | Enable a long break after every N focus blocks          |
+| `--long-break MIN`      | Long-break length, in minutes (implies `--long`)        |
+| `--long-every N`        | Focus blocks before a long break (default 4)            |
+| `--preset NAME`         | Use a built-in cadence: `classic`, `deep`, `short`, `sprint` |
+| `--theme NAME`          | Colour theme: `coffee`, `ocean`, `forest`, `grape`, `mono`   |
+| `-l, --label TEXT`      | Session label shown in the status line                  |
+| `--git-label`           | Use the current git branch as the label                 |
+| `--plain`               | Force plain line output (no animated UI)                |
+| `--fps N`               | Animation frame rate, 2–60 (default 15)                 |
+| `--stats`               | Show today / all-time / current streak / best day       |
+| `--no-sound`            | Mute the audible cue                                     |
+| `--no-notify`           | Disable desktop notifications                           |
+| `--no-color`            | Disable coloured output (also honours `NO_COLOR`)       |
+| `--version`             | Print the version                                       |
+
+### Subcommands
+
+| Subcommand                              | Description                                                      |
+| --------------------------------------- | ---------------------------------------------------------------- |
+| `coffeebreak stats`                     | Show today / all-time / current streak / best day               |
+| `coffeebreak config init`               | Write a starter config file with all defaults                    |
+| `coffeebreak config path`               | Print the resolved config file path                              |
+| `coffeebreak config show`              | Print the effective configuration                                |
+| `coffeebreak themes`                    | Preview the five colour themes                                   |
+| `coffeebreak presets`                   | List the built-in presets and their timings                     |
+| `coffeebreak completions <shell>`       | Emit completions for `bash`, `zsh`, `fish`, `powershell`, `elvish` |
+| `coffeebreak man`                       | Emit the man page                                               |
+| `coffeebreak self update [--check]`     | Update to the latest release (`--check` only checks)            |
+| `coffeebreak self uninstall [-y]`       | Remove binary + config dir + data dir (`-y` skips the prompt)   |
+
+### Interactive controls
+
+During a session in the animated UI:
+
+| Key(s)                  | Action                                |
+| ----------------------- | ------------------------------------- |
+| `space` / `p`           | Pause / resume                        |
+| `s` / `n`               | Skip to the next phase                |
+| `+` / `=` / `Up`        | Add a minute to the current phase     |
+| `-` / `_` / `Down`      | Remove a minute from the current phase|
+| `q` / `Esc` / `Ctrl+C`  | Quit (stats are saved)                |
 
 ### Examples
 
 ```sh
-# A deep-work session: 50/10, four rounds, labelled by git branch
-coffeebreak -w 50 -b 10 --cycles 4 --git-label
+# Classic Pomodoro cadence via a preset
+coffeebreak --preset classic
 
-# Classic flow with a 20-minute long break after every 3 focus blocks
-coffeebreak --cycles 8 --long-break 20 --long-every 3
+# Deep-work session in the ocean theme, labelled by git branch
+coffeebreak --preset deep --theme ocean --git-label
 
-# Quiet mode: no sound, no desktop notification
-coffeebreak --no-sound --no-notify
+# Custom deep work: 50/10, four rounds, with a long break
+coffeebreak -w 50 -b 10 --cycles 4 --long --long-break 20 --long-every 3
+
+# Run inside a pipe / CI with plain line output, no sound
+coffeebreak --plain --no-sound
+
+# Try the forest theme at a smoother frame rate
+coffeebreak --theme forest --fps 30
 
 # Peek at your progress without starting a timer
 coffeebreak --stats
@@ -118,49 +214,80 @@ coffeebreak --stats
 
 ---
 
+## Themes
+
+Five truecolour themes are built in. Preview them all with `coffeebreak themes`,
+then select one with `--theme NAME` or the `theme` config key.
+
+- **coffee** — warm browns and creams (default)
+- **ocean** — cool blues and teals
+- **forest** — greens and earth tones
+- **grape** — purples and magentas
+- **mono** — grayscale, minimal
+
+---
+
+## Presets
+
+Four cadences are built in. Use them with `--preset NAME`, or list them with
+`coffeebreak presets`.
+
+| Preset    | Cadence                                           |
+| --------- | ------------------------------------------------- |
+| `classic` | 4 × 25/5, finishing with a 15 min long break      |
+| `deep`    | 3 × 50/10, finishing with a 20 min long break     |
+| `short`   | 6 × 15/3, with a 10 min long break every 4 blocks |
+| `sprint`  | 1 × 20/5 (no long break)                          | 1 × 20 min focus / 5 min break (no long break)                    |
+
+---
+
 ## Configuration
 
 coffeebreak works with no config file at all. To set your own defaults, create
 `~/.config/coffeebreak/config.toml` (or `$XDG_CONFIG_HOME/coffeebreak/config.toml`
-if that variable is set). This location is the same on Linux, macOS, and Windows.
-Command-line flags always take precedence over the file.
+if that variable is set). This location is the **same on Linux, macOS, and
+Windows**. Generate a starter file with all defaults using:
 
-All keys, with their built-in defaults:
+```sh
+coffeebreak config init
+```
+
+The file is validated strictly — only the keys below are accepted, and any key
+you omit falls back to its default. Command-line flags always override the file.
 
 ```toml
 # ~/.config/coffeebreak/config.toml
 
-work_minutes      = 25     # focus block length, in minutes
-break_minutes     = 5      # short break length, in minutes
-long_break_minutes = 15    # long break length, in minutes
-cycles            = 1      # number of focus->break rounds
-long_break_every  = 4      # focus blocks before a long break
-long_break        = false  # enable long breaks
-sound             = true   # play the audible cue at phase changes
-notifications     = true   # send a desktop notification at phase changes
-git_label         = false  # label the session with the current git branch
+work_minutes       = 25       # focus block length, in minutes
+break_minutes      = 5        # short break length, in minutes
+long_break_minutes = 15       # long break length, in minutes
+cycles             = 1        # number of focus->break rounds
+long_break_every   = 4        # focus blocks before a long break
+long_break         = false    # enable long breaks
+sound              = true      # play the audible cue at phase changes
+notifications      = true      # send a desktop notification at phase changes
+git_label          = false    # label the session with the current git branch
+theme              = "coffee" # colour theme: coffee, ocean, forest, grape, mono
+fps                = 15        # animation frame rate, 2-60
 ```
 
-The file is optional — any key you omit falls back to the default shown above.
+Use `coffeebreak config path` to see where the file is resolved, and
+`coffeebreak config show` to print the effective configuration.
 
 ---
 
 ## Statistics
 
-coffeebreak records completed focus blocks to `~/.coffeebreak/stats.json`. Run:
-
-```sh
-coffeebreak --stats
-```
-
-to see:
+coffeebreak records completed focus blocks to `~/.coffeebreak/stats.json`. Run
+`coffeebreak stats` (or `coffeebreak --stats`) to see:
 
 - **Today** — focus time logged so far today
 - **All-time** — your cumulative total
 - **Current streak** — consecutive days with at least one completed focus block
 - **Best day** — your most productive day on record
 
-Stats are saved even if you interrupt a session with Ctrl+C.
+Stats are saved even if you interrupt a session — quitting with `q`, `Esc`, or
+Ctrl+C still writes your progress before exit.
 
 ---
 
@@ -219,11 +346,10 @@ curl -fsSL https://raw.githubusercontent.com/j-pfalzgraf/coffeebreak/main/uninst
 ```sh
 git clone https://github.com/j-pfalzgraf/coffeebreak
 cd coffeebreak
-cargo build --release          # binary at target/release/coffeebreak
-cargo test                     # run the test suite
+cargo build --release             # binary at target/release/coffeebreak
+cargo test                        # run the test suite
+cargo build --release --features sound   # enable the rodio chime
 ```
-
-Add `--features sound` to either command to enable the rodio chime.
 
 ---
 

@@ -34,6 +34,10 @@ pub struct Config {
     pub notifications: bool,
     /// Use the current git branch as the session label when none is given.
     pub git_label: bool,
+    /// Colour theme name (see `coffeebreak themes`).
+    pub theme: String,
+    /// Animation frames per second for the live UI (2..=60).
+    pub fps: u32,
 }
 
 impl Default for Config {
@@ -48,7 +52,27 @@ impl Default for Config {
             sound: true,
             notifications: true,
             git_label: false,
+            theme: crate::theme::DEFAULT_THEME.to_string(),
+            fps: 15,
         }
+    }
+}
+
+impl Config {
+    /// The path the config would be written to (for `config path`).
+    pub fn path() -> anyhow::Result<std::path::PathBuf> {
+        paths::config_file()
+    }
+
+    /// Write the built-in defaults to the config file if it does not already
+    /// exist. Returns the path and whether a new file was created.
+    pub fn init() -> anyhow::Result<(std::path::PathBuf, bool)> {
+        let path = paths::config_file()?;
+        if path.exists() {
+            return Ok((path, false));
+        }
+        Config::default().save()?;
+        Ok((path, true))
     }
 }
 
