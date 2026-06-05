@@ -1,0 +1,53 @@
+[package]
+name = "coffeebreak-cli"
+version = "0.1.0"
+edition = "2024"
+rust-version = "1.85"
+description = "A Pomodoro focus timer for your terminal — ASCII coffee cup, live countdown, and dev quotes."
+authors = ["coffeebreak contributors"]
+license = "MIT OR Apache-2.0"
+repository = "https://github.com/leuchtturm/coffeebreak"
+homepage = "https://github.com/leuchtturm/coffeebreak"
+documentation = "https://github.com/leuchtturm/coffeebreak"
+readme = "README.md"
+keywords = ["pomodoro", "timer", "cli", "productivity", "focus"]
+categories = ["command-line-utilities"]
+
+# The published crate is `coffeebreak-cli`, but the installed command is `coffeebreak`.
+[[bin]]
+name = "coffeebreak"
+path = "src/main.rs"
+
+[lib]
+name = "coffeebreak"
+path = "src/lib.rs"
+
+[dependencies]
+anyhow = "1.0.102"
+chrono = { version = "0.4.45", default-features = false, features = ["clock", "serde"] }
+clap = { version = "4.6.1", features = ["derive"] }
+crossterm = "0.29.0"
+ctrlc = "3.5.2"
+directories = "6.0.0"
+indicatif = "0.18.4"
+notify-rust = "4.17.0"
+owo-colors = "4.3.0"
+rand = "0.10.1"
+rodio = { version = "0.22.2", optional = true }
+self_update = { version = "0.44.0", default-features = false, features = ["reqwest", "rustls", "archive-tar", "archive-zip", "compression-flate2"] }
+serde = { version = "1.0.228", features = ["derive"] }
+serde_json = "1.0.150"
+toml = "1.1.2"
+
+[features]
+default = []
+# Enable rich audio playback (chime) via rodio. Without it, coffeebreak falls
+# back to the terminal bell (\a). Enable with: cargo build --features sound
+sound = ["dep:rodio"]
+
+[profile.release]
+opt-level = "z"
+lto = true
+codegen-units = 1
+strip = true
+panic = "abort"

@@ -1,0 +1,39 @@
+# coffeebreak example configuration
+#
+# This file is OPTIONAL. coffeebreak works fine with no config at all,
+# falling back to the built-in defaults shown below. To customise behaviour,
+# copy this file to (the same location on Linux, macOS, and Windows):
+#
+#     $HOME/.config/coffeebreak/config.toml
+#     # or, if set:  $XDG_CONFIG_HOME/coffeebreak/config.toml
+#
+# and edit the values you care about. Any key you omit keeps its default.
+# Command-line flags (e.g. -w / -b / --cycles) override the values here.
+
+# Length of a focus block, in minutes.
+work_minutes = 25
+
+# Length of a short break, in minutes.
+break_minutes = 5
+
+# Length of a long break, in minutes (used only when long breaks are enabled).
+long_break_minutes = 15
+
+# Number of focus->break rounds to run.
+cycles = 1
+
+# Number of focus blocks to complete before taking a long break.
+long_break_every = 4
+
+# Enable a long break after every `long_break_every` focus blocks.
+long_break = false
+
+# Play an audible cue when a block ends (terminal bell, or rodio chime if
+# the binary was built with `--features sound`).
+sound = true
+
+# Show a desktop notification when a block ends.
+notifications = true
+
+# Use the current git branch name as the session label.
+git_label = false
