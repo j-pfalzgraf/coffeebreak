@@ -71,7 +71,14 @@ fn cmd(home: &TempHome, args: &[&str]) -> Command {
         // so pin it too to keep these tests hermetic there.
         .env("USERPROFILE", home.path())
         .env("XDG_CONFIG_HOME", home.path().join(".config"))
-        .env_remove("NO_COLOR");
+        .env_remove("NO_COLOR")
+        // Clear the locale environment so output is deterministic (English)
+        // regardless of the developer's/CI's locale; tests that need another
+        // language pass `--lang` explicitly, which overrides this.
+        .env_remove("LANG")
+        .env_remove("LANGUAGE")
+        .env_remove("LC_ALL")
+        .env_remove("LC_MESSAGES");
     c
 }
 
@@ -413,4 +420,34 @@ fn german_run_writes_stats_and_localizes_footer() {
         "expected stats written\n{}",
         describe(&args, &out)
     );
+}
+
+// --- Dashboard & doctor -----------------------------------------------------
+
+#[test]
+fn doctor_reports_environment() {
+    let home = TempHome::new("doctor");
+    let args = ["doctor", "--no-color"];
+    let out = run(&home, &args);
+    assert!(out.status.success(), "{}", describe(&args, &out));
+    let s = stdout(&out);
+    for needle in ["Language", "Config file", "Data directory", "Sound"] {
+        assert!(s.contains(needle), "doctor output missing `{needle}`\n{}", describe(&args, &out));
+    }
+}
+
+#[test]
+fn stats_dashboard_renders_charts_after_a_run() {
+    let home = TempHome::new("dash");
+    // Complete one focus block so there is data, then view the dashboard.
+    let run_args = ["--plain", "--seconds", "-w", "1", "--cycles", "1", "--no-sound", "--no-notify"];
+    assert!(run(&home, &run_args).status.success());
+
+    let args = ["--goal", "4", "stats", "--no-color"];
+    let out = run(&home, &args);
+    assert!(out.status.success(), "{}", describe(&args, &out));
+    let s = stdout(&out);
+    for needle in ["Daily goal:", "Last 14 days", "Last 12 weeks"] {
+        assert!(s.contains(needle), "dashboard missing `{needle}`\n{}", describe(&args, &out));
+    }
 }

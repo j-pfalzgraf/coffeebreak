@@ -63,6 +63,10 @@ pub struct Cli {
     #[arg(long, value_name = "N", help_heading = "Timer options")]
     pub cycles: Option<u64>,
 
+    /// Daily pomodoro goal shown in stats (0 = off).
+    #[arg(long, value_name = "N", help_heading = "Timer options")]
+    pub goal: Option<u64>,
+
     /// Start from a named preset: classic, deep, short, sprint.
     #[arg(
         long,
@@ -171,6 +175,9 @@ pub enum Command {
     /// List the available interface languages.
     Languages,
 
+    /// Run environment diagnostics (terminal, locale, config, …).
+    Doctor,
+
     /// Generate a shell completion script (bash, zsh, fish, …).
     Completions {
         /// The shell to generate completions for.
@@ -256,6 +263,7 @@ fn localized_command(i18n: &I18n) -> clap::Command {
         ("work", Msg::HelpWork),
         ("brk", Msg::HelpBreak),
         ("cycles", Msg::HelpCycles),
+        ("goal", Msg::HelpGoal),
         ("preset", Msg::HelpPreset),
         ("long", Msg::HelpLong),
         ("long_break", Msg::HelpLongBreak),
@@ -281,6 +289,7 @@ fn localized_command(i18n: &I18n) -> clap::Command {
         ("themes", Msg::HelpThemes),
         ("presets", Msg::HelpPresets),
         ("languages", Msg::HelpLanguages),
+        ("doctor", Msg::HelpDoctor),
         ("man", Msg::HelpMan),
     ];
     for (name, msg) in subs {

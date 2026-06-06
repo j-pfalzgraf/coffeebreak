@@ -43,6 +43,12 @@ impl Line {
     pub fn width(&self) -> usize {
         self.width
     }
+
+    /// The styled text (may contain ANSI escapes). Useful for printing a line
+    /// outside the [`Renderer`], e.g. the inline statistics dashboard.
+    pub fn as_str(&self) -> &str {
+        &self.text
+    }
 }
 
 /// A logical frame: an ordered stack of lines, not yet positioned on screen.
@@ -105,7 +111,7 @@ impl Frame {
 /// passing escape sequences through without counting them. Appends a reset if
 /// the string was actually cut, so a clipped colour can't bleed onto the rest
 /// of the screen.
-fn clip_to_width(s: &str, max: usize) -> String {
+pub fn clip_to_width(s: &str, max: usize) -> String {
     let mut out = String::with_capacity(s.len());
     let mut width = 0usize;
     let mut chars = s.chars().peekable();

@@ -148,6 +148,7 @@ over the config file.
 | `-w, --work MIN`        | Focus block length, in minutes                          |
 | `-b, --break MIN`       | Short break length, in minutes                          |
 | `--cycles N`            | Number of focus→break rounds                            |
+| `--goal N`              | Daily pomodoro goal shown in the stats dashboard        |
 | `--long`                | Enable a long break after every N focus blocks          |
 | `--long-break MIN`      | Long-break length, in minutes (implies `--long`)        |
 | `--long-every N`        | Focus blocks before a long break (default 4)            |
@@ -175,6 +176,7 @@ over the config file.
 | `coffeebreak themes`                    | Preview the five colour themes                                   |
 | `coffeebreak presets`                   | List the built-in presets and their timings                     |
 | `coffeebreak languages`                 | List the interface languages (marks the active one)             |
+| `coffeebreak doctor`                    | Environment diagnostics (terminal, colour, locale, config, …)   |
 | `coffeebreak completions <shell>`       | Emit completions for `bash`, `zsh`, `fish`, `powershell`, `elvish` |
 | `coffeebreak man`                       | Emit the man page                                               |
 | `coffeebreak self update [--check]`     | Update to the latest release (`--check` only checks)            |
@@ -298,6 +300,7 @@ git_label          = false    # label the session with the current git branch
 theme              = "coffee" # colour theme: coffee, ocean, forest, grape, mono
 fps                = 15        # animation frame rate, 2-60
 language           = ""       # interface language: en, de, es, fr, it, pt ("" = auto-detect)
+daily_goal         = 0        # daily pomodoro goal shown in the stats dashboard (0 = off)
 ```
 
 Use `coffeebreak config path` to see where the file is resolved, and
@@ -308,15 +311,32 @@ Use `coffeebreak config path` to see where the file is resolved, and
 ## Statistics
 
 coffeebreak records completed focus blocks to `~/.coffeebreak/stats.json`. Run
-`coffeebreak stats` (or `coffeebreak --stats`) to see:
+`coffeebreak stats` (or `coffeebreak --stats`) for an animated dashboard:
 
-- **Today** — focus time logged so far today
-- **All-time** — your cumulative total
-- **Current streak** — consecutive days with at least one completed focus block
+- **Today / All-time** — pomodoros and focus minutes
+- **Current streak** & **Longest streak** — consecutive active days
 - **Best day** — your most productive day on record
+- **Daily goal** — a progress bar toward `--goal N` (or the `daily_goal` config key)
+- **Last 14 days** — a vertical bar chart
+- **Last 12 weeks** — a GitHub-style contribution heatmap
 
-Stats are saved even if you interrupt a session — quitting with `q`, `Esc`, or
-Ctrl+C still writes your progress before exit.
+On a colour terminal the charts grow in with a short reveal animation; piped or
+with `--no-color` it prints the final dashboard once. Stats are saved even if you
+interrupt a session — quitting with `q`, `Esc`, or Ctrl+C still writes your
+progress before exit.
+
+```sh
+coffeebreak --goal 8 stats   # dashboard with a goal of 8 pomodoros/day
+```
+
+---
+
+## Diagnostics
+
+`coffeebreak doctor` prints a quick, localised environment report — whether the
+terminal is interactive, truecolour support, the active language, the config and
+data paths, notification availability, and the sound backend — so you can see at
+a glance how coffeebreak will behave on your machine.
 
 ---
 

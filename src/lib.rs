@@ -28,6 +28,7 @@
 //! * [`selfcmd`]     — `self update` / `self uninstall` lifecycle commands.
 
 pub mod app;
+pub mod charts;
 pub mod cli;
 pub mod clock;
 pub mod commands;

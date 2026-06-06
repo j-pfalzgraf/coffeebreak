@@ -40,6 +40,8 @@ pub struct Config {
     pub fps: u32,
     /// Interface language code (see `coffeebreak languages`); empty = auto-detect.
     pub language: String,
+    /// Daily pomodoro goal shown in the stats dashboard (0 = disabled).
+    pub daily_goal: u64,
 }
 
 impl Default for Config {
@@ -58,6 +60,7 @@ impl Default for Config {
             fps: 15,
             // Empty means "auto-detect from the environment, default English".
             language: String::new(),
+            daily_goal: 0,
         }
     }
 }

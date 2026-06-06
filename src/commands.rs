@@ -3,6 +3,8 @@
 //! [`crate::app`] and the lifecycle commands in [`crate::selfcmd`]. All output is
 //! localised via [`I18n`].
 
+use std::io::IsTerminal;
+
 use anyhow::{Context, Result};
 
 use crate::cli::ConfigAction;
@@ -13,8 +15,100 @@ use crate::stats::Stats;
 use crate::theme::{THEME_NAMES, Theme};
 
 /// `coffeebreak stats` / `coffeebreak --stats`.
-pub fn stats(theme: &Theme, i18n: &I18n) {
-    Stats::load_or_default(i18n).print_summary(theme, i18n);
+pub fn stats(theme: &Theme, i18n: &I18n, goal: u64) {
+    Stats::load_or_default(i18n).print_summary(theme, i18n, goal);
+}
+
+/// `coffeebreak doctor` — print localised environment diagnostics.
+pub fn doctor(theme: &Theme, i18n: &I18n) {
+    let p = &theme.palette;
+    println!("\n{}\n", theme.bold(i18n.t(Msg::DoctorTitle), p.accent));
+
+    // Gather all rows first so the label column can be sized to the widest
+    // (localised) label rather than a fixed width that long words overflow.
+    let mut rows: Vec<(Msg, bool, String)> = Vec::new();
+
+    let tty = std::io::stdout().is_terminal() && std::io::stdin().is_terminal();
+    rows.push((Msg::DoctorTerminal, tty, i18n.t(if tty { Msg::DoctorTtyYes } else { Msg::DoctorTtyNo }).to_string()));
+
+    let truecolor = std::env::var("COLORTERM")
+        .map(|v| v.contains("truecolor") || v.contains("24bit"))
+        .unwrap_or(false);
+    rows.push((
+        Msg::DoctorColor,
+        truecolor,
+        i18n.t(if truecolor { Msg::DoctorColorYes } else { Msg::DoctorColorNo }).to_string(),
+    ));
+
+    rows.push((Msg::DoctorLang, true, format!("{} ({})", i18n.code(), i18n.name())));
+
+    let cfg_path = Config::path().ok();
+    let cfg_exists = cfg_path.as_ref().map(|p| p.exists()).unwrap_or(false);
+    rows.push((
+        Msg::DoctorConfig,
+        cfg_exists,
+        format!(
+            "{} {}",
+            i18n.t(if cfg_exists { Msg::DoctorConfigExists } else { Msg::DoctorConfigMissing }),
+            cfg_path.map(|p| theme.dim(p.display().to_string())).unwrap_or_default(),
+        ),
+    ));
+
+    let data_dir = crate::paths::data_dir().ok();
+    let writable = data_dir.as_ref().map(|d| dir_is_writable(d)).unwrap_or(false);
+    rows.push((
+        Msg::DoctorData,
+        writable,
+        format!(
+            "{} {}",
+            i18n.t(if writable { Msg::DoctorDataOk } else { Msg::DoctorDataNo }),
+            data_dir.map(|d| theme.dim(d.display().to_string())).unwrap_or_default(),
+        ),
+    ));
+
+    let notify_ok = notifications_available();
+    rows.push((
+        Msg::DoctorNotify,
+        notify_ok,
+        i18n.t(if notify_ok { Msg::DoctorNotifyYes } else { Msg::DoctorNotifyNo }).to_string(),
+    ));
+
+    let chime = cfg!(feature = "sound");
+    rows.push((
+        Msg::DoctorSound,
+        true,
+        i18n.t(if chime { Msg::DoctorSoundChime } else { Msg::DoctorSoundBell }).to_string(),
+    ));
+
+    let label_w = rows.iter().map(|(m, _, _)| i18n.t(*m).chars().count()).max().unwrap_or(16);
+    for (label, ok, detail) in rows {
+        let (glyph, color) = if ok { ("✓", p.success) } else { ("!", p.warn) };
+        let padded = format!("{:<label_w$}", i18n.t(label));
+        println!("  {} {} {}", theme.bold(padded, p.accent), theme.paint(glyph, color), detail);
+    }
+    println!();
+}
+
+/// Whether `dir` can actually be written to: ensures it exists, then probes with
+/// a temporary file (so a pre-existing read-only directory reports correctly).
+fn dir_is_writable(dir: &std::path::Path) -> bool {
+    if std::fs::create_dir_all(dir).is_err() {
+        return false;
+    }
+    let probe = dir.join(".coffeebreak-doctor-probe");
+    let ok = std::fs::write(&probe, b"").is_ok();
+    let _ = std::fs::remove_file(&probe);
+    ok
+}
+
+/// Best-effort check for a desktop notification service.
+fn notifications_available() -> bool {
+    if cfg!(target_os = "linux") {
+        std::env::var_os("DBUS_SESSION_BUS_ADDRESS").is_some()
+    } else {
+        // macOS and Windows provide a system notification centre.
+        cfg!(any(target_os = "macos", target_os = "windows"))
+    }
 }
 
 /// `coffeebreak config <action>`.

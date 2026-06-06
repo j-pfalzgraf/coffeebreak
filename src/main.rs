@@ -32,9 +32,17 @@ fn main() -> ExitCode {
 }
 
 fn run() -> Result<()> {
+    // Install the panic hook first so the terminal cursor/screen is restored on a
+    // panic from ANY path (the animated stats reveal hides the cursor too, not
+    // just the timer).
+    install_panic_hook();
+
     // Resolve the locale *before* parsing, so even `--help`/errors are localised.
     // Config is loaded leniently here (a bad config must not block --help).
-    let cfg_lang = Config::load().ok().map(|c| c.language).filter(|s| !s.is_empty());
+    // Load config leniently for pre-parse locale/theme/goal (a bad config must
+    // not block --help or meta commands; the timer path re-loads it strictly).
+    let cfg = Config::load().ok();
+    let cfg_lang = cfg.as_ref().map(|c| c.language.clone()).filter(|s| !s.is_empty());
     let help_i18n = I18n::detect(scan_lang_arg().as_deref(), cfg_lang.as_deref());
 
     let cli = Cli::parse_localized(&help_i18n);
@@ -49,16 +57,21 @@ fn run() -> Result<()> {
     let theme_name = cli
         .theme
         .clone()
-        .or_else(|| Config::load().ok().map(|c| c.theme))
+        .or_else(|| cfg.as_ref().map(|c| c.theme.clone()))
         .filter(|t| !t.is_empty())
         .unwrap_or_else(|| DEFAULT_THEME.to_string());
     let meta_theme = Theme::resolve(&theme_name, color);
+    let goal = cli.goal.or_else(|| cfg.as_ref().map(|c| c.daily_goal)).unwrap_or(0);
 
     // Subcommands (none of these run the timer).
     if let Some(cmd) = &cli.command {
         return match cmd {
             Command::Stats => {
-                commands::stats(&meta_theme, &i18n);
+                commands::stats(&meta_theme, &i18n, goal);
+                Ok(())
+            }
+            Command::Doctor => {
+                commands::doctor(&meta_theme, &i18n);
                 Ok(())
             }
             Command::Config { action } => commands::config(action, &meta_theme, &i18n),
@@ -88,7 +101,7 @@ fn run() -> Result<()> {
 
     // `--stats` shortcut works even with a malformed config file.
     if cli.stats {
-        commands::stats(&meta_theme, &i18n);
+        commands::stats(&meta_theme, &i18n, goal);
         return Ok(());
     }
 
@@ -96,8 +109,6 @@ fn run() -> Result<()> {
     let config = Config::load()?;
     let session = Session::resolve(&cli, &config);
     let mut stats = Stats::load_or_default(&i18n);
-
-    install_panic_hook();
 
     // Ctrl+C flag for the plain (non-raw) fallback; the animated UI reads Ctrl+C
     // as a keypress instead.

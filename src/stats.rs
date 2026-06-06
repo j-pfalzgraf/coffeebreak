@@ -6,13 +6,36 @@
 
 use std::collections::BTreeMap;
 use std::fs;
+use std::io::{IsTerminal, Write};
+use std::time::Duration;
 
 use anyhow::{Context, Result};
-use chrono::{Local, NaiveDate};
+use chrono::{Datelike, Local, NaiveDate};
+use crossterm::terminal::{Clear, ClearType};
+use crossterm::{cursor, execute};
 use serde::{Deserialize, Serialize};
 
+use crate::charts;
 use crate::i18n::{I18n, Msg, Noun};
 use crate::paths;
+use crate::theme::Theme;
+
+/// Hides the terminal cursor for the duration of the animated dashboard reveal
+/// and restores it on drop (normal return or panic-unwind).
+struct CursorGuard;
+
+impl CursorGuard {
+    fn hide() -> CursorGuard {
+        let _ = execute!(std::io::stdout(), cursor::Hide);
+        CursorGuard
+    }
+}
+
+impl Drop for CursorGuard {
+    fn drop(&mut self) {
+        let _ = execute!(std::io::stdout(), cursor::Show);
+    }
+}
 
 /// One day's tally.
 #[derive(Debug, Default, Clone, Copy, Serialize, Deserialize, PartialEq, Eq)]
@@ -113,36 +136,135 @@ impl Stats {
             .max_by_key(|(_, d)| d.completed_pomodoros)
     }
 
-    /// Render the human-facing report to stdout, styled via `theme` and
-    /// localised via `i18n`.
-    pub fn print_summary(&self, theme: &crate::theme::Theme, i18n: &I18n) {
+    /// The stats for a specific date (zeroed if absent).
+    pub fn day(&self, date: NaiveDate) -> DayStat {
+        self.days.get(&date.format("%Y-%m-%d").to_string()).copied().unwrap_or_default()
+    }
+
+    /// The last `n` days up to and including `today`, oldest first, with absent
+    /// days filled as zero — ready to feed the charts.
+    pub fn last_n_days(&self, n: usize, today: NaiveDate) -> Vec<(NaiveDate, DayStat)> {
+        let mut out = Vec::with_capacity(n);
+        for i in (0..n).rev() {
+            if let Some(d) = today.checked_sub_days(chrono::Days::new(i as u64)) {
+                out.push((d, self.day(d)));
+            }
+        }
+        out
+    }
+
+    /// The longest run of consecutive days with at least one pomodoro, anywhere
+    /// in the history.
+    pub fn longest_streak(&self) -> u64 {
+        let mut dates: Vec<NaiveDate> = self
+            .days
+            .iter()
+            .filter(|(_, s)| s.completed_pomodoros > 0)
+            .filter_map(|(k, _)| NaiveDate::parse_from_str(k, "%Y-%m-%d").ok())
+            .collect();
+        dates.sort_unstable();
+
+        let mut best = 0u64;
+        let mut current = 0u64;
+        let mut prev: Option<NaiveDate> = None;
+        for d in dates {
+            current = match prev {
+                Some(p) if p.succ_opt() == Some(d) => current + 1,
+                Some(p) if p == d => current, // de-dup guard
+                _ => 1,
+            };
+            best = best.max(current);
+            prev = Some(d);
+        }
+        best
+    }
+
+    /// Render the statistics dashboard to stdout, styled via `theme`, localised
+    /// via `i18n`, with an optional daily `goal`.
+    ///
+    /// On a colour-capable, wide-enough terminal the charts "grow in" with a
+    /// short reveal animation; otherwise the final dashboard is printed once.
+    pub fn print_summary(&self, theme: &Theme, i18n: &I18n, goal: u64) {
         let p = &theme.palette;
-
-        let field = |label: &str, value: String| {
-            println!("  {} {}", theme.bold(format!("{label:<16}"), p.accent), value);
-        };
-
-        println!("\n{}\n", theme.bold(i18n.t(Msg::StatsTitle), p.accent));
-
-        let (pomos, minutes, days) = self.totals();
+        let (pomos, _, _) = self.totals();
         if pomos == 0 {
+            println!("\n{}\n", theme.bold(i18n.t(Msg::StatsTitle), p.accent));
             println!("  {}\n", theme.dim(i18n.t(Msg::StatsEmpty)));
             return;
         }
 
-        let min_focus = i18n.t(Msg::MinFocus);
-        let today_key = today();
-        let today_stat = self.days.get(&today_key).copied().unwrap_or_default();
+        let today_date = Local::now().date_naive();
+        let width = crossterm::terminal::size().map(|(w, _)| w).unwrap_or(80);
+        let animate = theme.color() && std::io::stdout().is_terminal() && width >= 60;
 
-        field(
+        if !animate {
+            for line in self.dashboard_lines(theme, i18n, goal, today_date, 1.0) {
+                println!("{line}");
+            }
+            return;
+        }
+
+        let mut out = std::io::stdout();
+        // RAII: the cursor is restored on every exit path (normal end, an early
+        // return, or a panic-unwind), not just at the end of the loop.
+        let _cursor = CursorGuard::hide();
+        const FRAMES: u16 = 16;
+        let cols = width as usize;
+        for frame in 0..=FRAMES {
+            let reveal = f64::from(frame) / f64::from(FRAMES);
+            // Clip every line to the terminal width: a wrapped line would print as
+            // two physical rows and desync the MoveToPreviousLine repaint.
+            let lines: Vec<String> = self
+                .dashboard_lines(theme, i18n, goal, today_date, reveal)
+                .into_iter()
+                .map(|l| crate::render::clip_to_width(&l, cols))
+                .collect();
+            if frame > 0 {
+                let _ = execute!(out, cursor::MoveToPreviousLine(lines.len() as u16));
+            }
+            for line in &lines {
+                let _ = execute!(out, Clear(ClearType::CurrentLine));
+                let _ = writeln!(out, "{line}");
+            }
+            let _ = out.flush();
+            std::thread::sleep(Duration::from_millis(28));
+        }
+    }
+
+    /// Build the dashboard as styled lines. `reveal` in `0.0..=1.0` scales the
+    /// chart data so the charts can animate from empty to full; the textual
+    /// summary is always shown in full. The line count is constant across
+    /// `reveal` values so the animation can repaint in place.
+    fn dashboard_lines(
+        &self,
+        theme: &Theme,
+        i18n: &I18n,
+        goal: u64,
+        today_date: NaiveDate,
+        reveal: f64,
+    ) -> Vec<String> {
+        let p = &theme.palette;
+        let accent = p.accent;
+        let scale = |v: u64| (v as f64 * reveal.clamp(0.0, 1.0)).round() as u64;
+        let field = |label: &str, value: String| {
+            format!("  {} {}", theme.bold(format!("{label:<16}"), accent), value)
+        };
+
+        let mut lines = vec![String::new(), theme.bold(i18n.t(Msg::StatsTitle), accent), String::new()];
+
+        // --- textual summary (shown in full from the first frame) ---
+        let (pomos, minutes, days) = self.totals();
+        let min_focus = i18n.t(Msg::MinFocus);
+        let today_stat = self.day(today_date);
+        lines.push(field(
             i18n.t(Msg::StatsToday),
             format!(
                 "{} · {} {min_focus}",
                 i18n.count(today_stat.completed_pomodoros, Noun::Pomodoro),
                 today_stat.focus_minutes
             ),
-        );
-        field(
+        ));
+        lines.push(field(
             i18n.t(Msg::StatsAllTime),
             format!(
                 "{} · {} {min_focus} {} {}",
@@ -151,18 +273,59 @@ impl Stats {
                 i18n.t(Msg::Over),
                 i18n.count(days as u64, Noun::Day),
             ),
-        );
-
-        if let Ok(today_date) = NaiveDate::parse_from_str(&today_key, "%Y-%m-%d") {
-            field(i18n.t(Msg::StatsStreak), i18n.count(self.streak(today_date), Noun::Day));
-        }
+        ));
+        lines.push(field(i18n.t(Msg::StatsStreak), i18n.count(self.streak(today_date), Noun::Day)));
+        lines.push(field(i18n.t(Msg::StatsLongestStreak), i18n.count(self.longest_streak(), Noun::Day)));
         if let Some((date, stat)) = self.best_day() {
-            field(
+            lines.push(field(
                 i18n.t(Msg::StatsBestDay),
                 format!("{date} ({})", i18n.count(stat.completed_pomodoros, Noun::Pomodoro)),
-            );
+            ));
         }
-        println!();
+
+        // --- daily goal (optional) ---
+        if goal > 0 {
+            let done = scale(today_stat.completed_pomodoros);
+            let bar = charts::goal_bar(theme, done, goal, 20, accent);
+            let mut value = format!("{} {}/{}", bar.as_str(), done, goal);
+            if reveal >= 1.0 && today_stat.completed_pomodoros >= goal {
+                value.push_str(&format!("  {}", theme.bold(i18n.t(Msg::GoalReached), p.success)));
+            }
+            lines.push(String::new());
+            lines.push(field(i18n.t(Msg::StatsGoal), value));
+        }
+
+        // --- last 14 days bar chart ---
+        let last14: Vec<u64> =
+            self.last_n_days(14, today_date).iter().map(|(_, d)| scale(d.completed_pomodoros)).collect();
+        lines.push(String::new());
+        lines.push(format!("  {}", theme.dim(i18n.t(Msg::StatsLast14))));
+        for bar in charts::bar_chart(theme, &last14, 5, p.focus, accent) {
+            lines.push(format!("  {}", bar.as_str()));
+        }
+
+        // --- last 12 weeks contribution heatmap ---
+        let series = self.last_n_days(84, today_date);
+        let counts: Vec<u64> = series.iter().map(|(_, d)| scale(d.completed_pomodoros)).collect();
+        let first_wd = series.first().map(|(d, _)| d.weekday().num_days_from_monday() as usize).unwrap_or(0);
+        let empty_cell = p.muted.shade(0.3);
+        lines.push(String::new());
+        lines.push(format!("  {}", theme.dim(i18n.t(Msg::StatsHeatmap))));
+        for row in charts::heatmap(theme, &counts, first_wd, accent, empty_cell) {
+            lines.push(format!("  {}", row.as_str()));
+        }
+
+        // legend: less ▢▢▢▢ more
+        let mut legend = format!("  {} ", theme.dim(i18n.t(Msg::HeatLess)));
+        for i in 0..5 {
+            let c = empty_cell.lerp(accent, f64::from(i) / 4.0);
+            legend.push_str(&theme.paint("■", c));
+        }
+        legend.push_str(&format!(" {}", theme.dim(i18n.t(Msg::HeatMore))));
+        lines.push(legend);
+        lines.push(String::new());
+
+        lines
     }
 }
 
@@ -193,5 +356,30 @@ mod tests {
         // A gap breaks the streak.
         let today_gap = NaiveDate::from_ymd_opt(2026, 6, 7).unwrap();
         assert_eq!(s.streak(today_gap), 0);
+    }
+
+    #[test]
+    fn last_n_days_fills_gaps_and_is_chronological() {
+        let mut s = Stats::default();
+        s.record_pomodoro(25, "2026-06-05"); // today
+        s.record_pomodoro(25, "2026-06-03"); // two days ago
+        let today = NaiveDate::from_ymd_opt(2026, 6, 5).unwrap();
+        let series = s.last_n_days(3, today);
+        let counts: Vec<u64> = series.iter().map(|(_, d)| d.completed_pomodoros).collect();
+        // oldest first: 06-03=1, 06-04=0 (gap filled), 06-05=1
+        assert_eq!(counts, vec![1, 0, 1]);
+        assert_eq!(series.first().unwrap().0, NaiveDate::from_ymd_opt(2026, 6, 3).unwrap());
+        assert_eq!(series.last().unwrap().0, today);
+    }
+
+    #[test]
+    fn longest_streak_finds_the_longest_run() {
+        let mut s = Stats::default();
+        // A run of 3, a gap, then a run of 2.
+        for d in ["2026-05-01", "2026-05-02", "2026-05-03", "2026-05-10", "2026-05-11"] {
+            s.record_pomodoro(25, d);
+        }
+        assert_eq!(s.longest_streak(), 3);
+        assert_eq!(Stats::default().longest_streak(), 0);
     }
 }

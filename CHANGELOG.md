@@ -13,6 +13,15 @@ themes and presets — all on top of a refactored, modular codebase.
 
 ### Added
 
+- **Animated statistics dashboard.** `coffeebreak stats` now renders a daily-goal
+  progress bar, a 14-day vertical bar chart, and a GitHub-style 12-week
+  contribution heatmap (plus current/longest streak), with a short grow-in reveal
+  animation on a colour terminal. New `charts` module (`sparkline`, `bar_chart`,
+  `heatmap`, `goal_bar`).
+- **Daily goal**: `--goal N` flag and `daily_goal` config key, shown in the
+  dashboard.
+- **`coffeebreak doctor`** — localised environment diagnostics (terminal,
+  truecolour, language, config/data paths, notifications, sound backend).
 - **Full internationalisation**, defaulting to English. Every user-facing
   string — the live UI, status line, statistics, command output, notifications,
   footers, and even the `--help`/man text — is localised. Ships English,
