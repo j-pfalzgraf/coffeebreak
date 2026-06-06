@@ -62,7 +62,17 @@ fn run() -> Result<()> {
         .or_else(|| cfg.as_ref().map(|c| c.theme.clone()))
         .filter(|t| !t.is_empty())
         .unwrap_or_else(|| DEFAULT_THEME.to_string());
-    let meta_theme = Theme::resolve(&theme_name, color);
+    // Build the optional `custom` palette from config once; reused for both the
+    // meta-command theme and the timer theme.
+    let custom_palette = cfg
+        .as_ref()
+        .filter(|c| !c.custom_theme.is_empty())
+        .map(|c| {
+            coffeebreak::theme::custom_palette(
+                c.custom_theme.iter().map(|(k, v)| (k.as_str(), v.as_str())),
+            )
+        });
+    let meta_theme = Theme::build(&theme_name, color, custom_palette);
     let goal = cli
         .goal
         .or_else(|| cfg.as_ref().map(|c| c.daily_goal))
@@ -128,7 +138,8 @@ fn run() -> Result<()> {
         }
     }
 
-    let mut app = App::new(&session);
+    let run_theme = Theme::build(&session.theme, session.color, custom_palette);
+    let mut app = App::new(&session, run_theme);
     let outcome = app.run(&session, &mut stats, shutdown);
 
     if let Err(e) = stats.save() {
@@ -139,7 +150,8 @@ fn run() -> Result<()> {
     }
 
     let outcome = outcome?;
-    print_summary(&session, &outcome, &i18n);
+    // `run_theme` is `Copy`, so it's still valid after `App::new` took a copy.
+    print_summary(&run_theme, &outcome, &i18n);
     Ok(())
 }
 
@@ -185,8 +197,7 @@ fn install_panic_hook() {
 }
 
 /// Concise, localised post-run summary on the normal screen.
-fn print_summary(session: &Session, outcome: &Outcome, i18n: &I18n) {
-    let theme = Theme::resolve(&session.theme, session.color);
+fn print_summary(theme: &Theme, outcome: &Outcome, i18n: &I18n) {
     let p = &theme.palette;
     let count = i18n.count(outcome.completed_focus, Noun::Pomodoro);
     let (msg, color) = if outcome.interrupted {

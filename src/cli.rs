@@ -12,7 +12,7 @@ use clap_complete::Shell;
 
 use crate::i18n::{I18n, LANG_CODES, Msg};
 use crate::session::PRESET_NAMES;
-use crate::theme::THEME_NAMES;
+use crate::theme::THEME_CHOICES;
 
 /// Colour styling for help output.
 fn help_styles() -> Styles {
@@ -123,7 +123,7 @@ pub struct Cli {
         global = true,
         value_name = "NAME",
         ignore_case = true,
-        value_parser = PossibleValuesParser::new(THEME_NAMES),
+        value_parser = PossibleValuesParser::new(THEME_CHOICES),
         help_heading = "Display"
     )]
     pub theme: Option<String>,

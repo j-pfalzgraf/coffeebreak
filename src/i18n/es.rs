@@ -312,7 +312,7 @@ pub static ENTRIES: super::Table = &[
     ),
     (
         super::Msg::HelpTheme,
-        "Tema de color: coffee, ocean, forest, grape, mono",
+        "Tema de color: coffee, ocean, forest, grape, mono, custom",
     ),
     (
         super::Msg::HelpFps,

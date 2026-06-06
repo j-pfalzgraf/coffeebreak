@@ -255,6 +255,23 @@ then select one with `--theme NAME` or the `theme` config key.
 - **grape** — purples and magentas
 - **mono** — grayscale, minimal
 
+### Custom theme
+
+Define your own palette in the config under `[custom_theme]` and select it with
+`--theme custom` (or `theme = "custom"`). Each key is an optional `#RRGGBB`
+colour; anything you omit falls back to the `coffee` palette:
+
+```toml
+theme = "custom"
+
+[custom_theme]
+focus      = "#E67E22"   # focus accent / progress
+accent     = "#F1C40F"   # highlights, headings
+coffee_top = "#8B5A2B"   # liquid surface
+# also: short_break, long_break, text, muted, cup, coffee_bottom,
+#       steam, bar_start, bar_end, success, warn
+```
+
 ---
 
 ## Presets

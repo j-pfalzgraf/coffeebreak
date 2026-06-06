@@ -4,6 +4,7 @@
 //! missing values fall back to [`Config::default`]. A first run with no config
 //! file works immediately (one of the project's success criteria).
 
+use std::collections::BTreeMap;
 use std::fs;
 
 use anyhow::{Context, Result};
@@ -45,6 +46,10 @@ pub struct Config {
     /// Automatically start the next phase. When false (or with `--wait`), the
     /// timer waits for a keypress between phases.
     pub auto_advance: bool,
+    /// Palette overrides for `--theme custom`: a map of palette-field name to a
+    /// `#RRGGBB` hex colour (see `coffeebreak themes` / the docs for the keys).
+    /// Unset fields fall back to the `coffee` palette.
+    pub custom_theme: BTreeMap<String, String>,
 }
 
 impl Default for Config {
@@ -65,6 +70,7 @@ impl Default for Config {
             language: String::new(),
             daily_goal: 0,
             auto_advance: true,
+            custom_theme: BTreeMap::new(),
         }
     }
 }

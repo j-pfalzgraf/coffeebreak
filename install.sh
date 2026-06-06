@@ -180,8 +180,10 @@ main() {
 			: # already on PATH, nothing to do
 			;;
 		*)
-			# Pick a sensible rc file line based on the user's shell.
+			# Pick a sensible rc file line based on the user's shell. These are
+			# literal paths shown to the user (not expanded), so the `~` is fine.
 			shell_name="$(basename "${SHELL:-sh}")"
+			# shellcheck disable=SC2088
 			case "$shell_name" in
 				zsh) rc_file="~/.zshrc" ;;
 				bash) rc_file="~/.bashrc" ;;

@@ -71,8 +71,30 @@ pub struct Theme {
 /// All built-in theme names, in display order.
 pub const THEME_NAMES: &[&str] = &["coffee", "ocean", "forest", "grape", "mono"];
 
+/// Theme names accepted on the CLI — the built-ins plus the config-defined
+/// `custom` palette.
+pub const THEME_CHOICES: &[&str] = &["coffee", "ocean", "forest", "grape", "mono", "custom"];
+
 /// The default theme name.
 pub const DEFAULT_THEME: &str = "coffee";
+
+/// The palette-field names a user may override in a `[custom_theme]` config.
+pub const PALETTE_KEYS: &[&str] = &[
+    "focus",
+    "short_break",
+    "long_break",
+    "accent",
+    "text",
+    "muted",
+    "cup",
+    "coffee_top",
+    "coffee_bottom",
+    "steam",
+    "bar_start",
+    "bar_end",
+    "success",
+    "warn",
+];
 
 impl Theme {
     /// Resolve a theme by name (case-insensitive), falling back to the default
@@ -90,6 +112,23 @@ impl Theme {
             palette,
             enabled,
         }
+    }
+
+    /// Resolve a theme, supporting the config-defined `custom` palette.
+    ///
+    /// When `name` is `"custom"` and `custom` is `Some`, that palette is used;
+    /// otherwise this behaves like [`Theme::resolve`].
+    pub fn build(name: &str, enabled: bool, custom: Option<Palette>) -> Theme {
+        if name.eq_ignore_ascii_case("custom") {
+            if let Some(palette) = custom {
+                return Theme {
+                    name: "custom",
+                    palette,
+                    enabled,
+                };
+            }
+        }
+        Theme::resolve(name, enabled)
     }
 
     /// Whether colour output is on.
@@ -143,6 +182,59 @@ impl Theme {
             format!("{text}")
         }
     }
+}
+
+/// Parse a `#RRGGBB` or `RRGGBB` hex colour. Returns `None` if malformed.
+pub fn parse_hex(s: &str) -> Option<Rgb> {
+    let h = s.trim().strip_prefix('#').unwrap_or(s.trim());
+    if h.len() != 6 || !h.bytes().all(|b| b.is_ascii_hexdigit()) {
+        return None;
+    }
+    let byte = |i: usize| u8::from_str_radix(&h[i..i + 2], 16).ok();
+    Some(Rgb(byte(0)?, byte(2)?, byte(4)?))
+}
+
+impl Palette {
+    /// Return a copy with the given fields overridden from a map of
+    /// `palette-field-name -> hex`. Unknown keys and malformed values are
+    /// ignored, so a partial or slightly wrong custom theme still works.
+    pub fn with_overrides<'a, I>(mut self, overrides: I) -> Palette
+    where
+        I: IntoIterator<Item = (&'a str, &'a str)>,
+    {
+        for (key, value) in overrides {
+            let Some(rgb) = parse_hex(value) else {
+                continue;
+            };
+            match key {
+                "focus" => self.focus = rgb,
+                "short_break" => self.short_break = rgb,
+                "long_break" => self.long_break = rgb,
+                "accent" => self.accent = rgb,
+                "text" => self.text = rgb,
+                "muted" => self.muted = rgb,
+                "cup" => self.cup = rgb,
+                "coffee_top" => self.coffee_top = rgb,
+                "coffee_bottom" => self.coffee_bottom = rgb,
+                "steam" => self.steam = rgb,
+                "bar_start" => self.bar_start = rgb,
+                "bar_end" => self.bar_end = rgb,
+                "success" => self.success = rgb,
+                "warn" => self.warn = rgb,
+                _ => {}
+            }
+        }
+        self
+    }
+}
+
+/// Build a custom palette from hex overrides, starting from the `coffee` base
+/// (so any field the user omits keeps a sensible default).
+pub fn custom_palette<'a, I>(overrides: I) -> Palette
+where
+    I: IntoIterator<Item = (&'a str, &'a str)>,
+{
+    COFFEE.with_overrides(overrides)
 }
 
 // ---------------------------------------------------------------------------
@@ -261,5 +353,40 @@ mod tests {
         let t = Theme::resolve("coffee", false);
         assert_eq!(t.paint("hi", Rgb(1, 2, 3)), "hi");
         assert_eq!(t.dim("hi"), "hi");
+    }
+
+    #[test]
+    fn parse_hex_handles_valid_and_invalid() {
+        assert_eq!(parse_hex("#FF8800"), Some(Rgb(0xFF, 0x88, 0x00)));
+        assert_eq!(parse_hex("00ff00"), Some(Rgb(0, 255, 0)));
+        assert_eq!(parse_hex("  #1a2b3c "), Some(Rgb(0x1A, 0x2B, 0x3C)));
+        assert_eq!(parse_hex("xyz"), None);
+        assert_eq!(parse_hex("#12345"), None); // wrong length
+        assert_eq!(parse_hex("#gg0000"), None); // non-hex
+    }
+
+    #[test]
+    fn custom_palette_overrides_only_named_fields() {
+        let p = custom_palette([
+            ("focus", "#010203"),
+            ("warn", "0a0b0c"),
+            ("bogus", "#ffffff"),
+        ]);
+        assert_eq!(p.focus, Rgb(1, 2, 3));
+        assert_eq!(p.warn, Rgb(0x0A, 0x0B, 0x0C));
+        // Unset fields keep the coffee base; malformed/unknown keys are ignored.
+        assert_eq!(p.accent, COFFEE.accent);
+    }
+
+    #[test]
+    fn build_uses_custom_palette_when_named() {
+        let custom = custom_palette([("focus", "#112233")]);
+        let t = Theme::build("custom", true, Some(custom));
+        assert_eq!(t.name, "custom");
+        assert_eq!(t.palette.focus, Rgb(0x11, 0x22, 0x33));
+        // Without a custom palette, "custom" falls back to the default.
+        assert_eq!(Theme::build("custom", true, None).name, "coffee");
+        // A built-in name ignores any provided custom palette.
+        assert_eq!(Theme::build("ocean", true, Some(custom)).name, "ocean");
     }
 }

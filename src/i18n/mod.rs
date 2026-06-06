@@ -360,7 +360,7 @@ impl Msg {
             HelpLongEvery => "How many focus blocks before a long break (default 4)",
             HelpLabel => "Optional label for this session (shown in the status line)",
             HelpGitLabel => "Use the current git branch as the session label",
-            HelpTheme => "Colour theme: coffee, ocean, forest, grape, mono",
+            HelpTheme => "Colour theme: coffee, ocean, forest, grape, mono, custom",
             HelpFps => "Animation frames per second (2–60; default 15)",
             HelpPlain => "Plain, non-animated line output (also used automatically when piped)",
             HelpNoColor => "Disable coloured output",

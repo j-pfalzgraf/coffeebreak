@@ -1,0 +1,52 @@
+# Lint the install/uninstall shell scripts and the PowerShell installer.
+name: Scripts
+
+on:
+  push:
+    paths:
+      - "install.sh"
+      - "uninstall.sh"
+      - "install.ps1"
+      - ".github/workflows/scripts.yml"
+  pull_request:
+    paths:
+      - "install.sh"
+      - "uninstall.sh"
+      - "install.ps1"
+  workflow_dispatch: {}
+
+permissions:
+  contents: read
+
+concurrency:
+  group: scripts-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  shellcheck:
+    name: shellcheck
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      # shellcheck is preinstalled on GitHub's Ubuntu runners.
+      - name: ShellCheck
+        run: shellcheck install.sh uninstall.sh
+
+  powershell:
+    name: PSScriptAnalyzer
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Analyze install.ps1
+        shell: pwsh
+        run: |
+          Set-PSRepository -Name PSGallery -InstallationPolicy Trusted
+          Install-Module -Name PSScriptAnalyzer -Scope CurrentUser -Force
+          $results = Invoke-ScriptAnalyzer -Path install.ps1
+          if ($results) { $results | Format-Table -AutoSize }
+          # Fail only on errors; warnings are reported but non-blocking.
+          if ($results | Where-Object { $_.Severity -eq 'Error' }) {
+            Write-Error 'PSScriptAnalyzer found errors.'
+            exit 1
+          }
+          Write-Host 'PSScriptAnalyzer: no errors.'

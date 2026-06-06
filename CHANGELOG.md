@@ -17,6 +17,9 @@ themes and presets — all on top of a refactored, modular codebase.
   config) pauses between phases on an animated "press any key to continue"
   screen instead of auto-starting the next phase. Piped/non-interactive runs
   still auto-advance so scripts never block.
+- **Custom colour themes.** Define your own palette under `[custom_theme]` in the
+  config (per-field `#RRGGBB` overrides on top of the `coffee` base) and select it
+  with `--theme custom`.
 - **Machine-readable stats export.** `coffeebreak stats --format json|csv` prints
   a structured summary + per-day history (JSON) or rows (CSV) — no colour, no
   animation, pipe-friendly for scripts and dashboards. `text` (the animated
@@ -87,6 +90,9 @@ themes and presets — all on top of a refactored, modular codebase.
 - **Code coverage** with `cargo-llvm-cov`
   ([`coverage.yml`](.github/workflows/coverage.yml)); lcov uploaded as an artifact.
 - **Spell checking** with `typos` ([`spellcheck.yml`](.github/workflows/spellcheck.yml)).
+- **Install-script linting** ([`scripts.yml`](.github/workflows/scripts.yml)):
+  shellcheck for the shell installers and PSScriptAnalyzer for `install.ps1`.
+- **API docs published to GitHub Pages** ([`docs.yml`](.github/workflows/docs.yml)).
 - **Dependabot** ([`dependabot.yml`](.github/dependabot.yml)) for Cargo and
   GitHub Actions updates.
 - **Hardened release pipeline**: a pre-release gate (tag↔`Cargo.toml` version

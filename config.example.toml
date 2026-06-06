@@ -30,8 +30,18 @@ long_break = false          # enable long breaks
 sound = true                # audible cue on phase change (terminal bell, or chime if built with sound)
 notifications = true        # show a desktop notification on phase change
 git_label = false           # use the current git branch name as the session label
-theme = "coffee"            # one of: coffee, ocean, forest, grape, mono
+theme = "coffee"            # one of: coffee, ocean, forest, grape, mono, custom
 fps = 15                    # animation frames per second, 2..=60
 language = ""               # interface language: en, de, es, fr, it, pt ("" = auto-detect from $LANG)
 daily_goal = 0              # daily pomodoro goal shown in the stats dashboard (0 = off)
 auto_advance = true         # start the next phase automatically (false / --wait waits for a keypress)
+
+# Define your own palette, used when `theme = "custom"` (or `--theme custom`).
+# Every key is optional and takes a "#RRGGBB" hex colour; unset keys fall back
+# to the `coffee` palette. Available keys:
+#   focus, short_break, long_break, accent, text, muted, cup,
+#   coffee_top, coffee_bottom, steam, bar_start, bar_end, success, warn
+# [custom_theme]
+# focus      = "#E67E22"
+# accent     = "#F1C40F"
+# coffee_top = "#8B5A2B"

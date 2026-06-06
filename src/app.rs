@@ -42,9 +42,9 @@ pub struct App {
 }
 
 impl App {
-    /// Build the app from resolved session preferences.
-    pub fn new(session: &Session) -> App {
-        let theme = Theme::resolve(&session.theme, session.color);
+    /// Build the app from resolved session preferences and a prepared theme
+    /// (resolved by the caller, which has access to any config `custom_theme`).
+    pub fn new(session: &Session, theme: Theme) -> App {
         let i18n = I18n::new(&session.lang);
         let feedback = Feedback::new(session.notifications, session.sound, i18n);
         let fps = session.fps.clamp(2, 60);
