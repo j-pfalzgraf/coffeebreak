@@ -34,7 +34,7 @@ jobs:
     name: pre-release checks
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - uses: dtolnay/rust-toolchain@stable
         with:
           components: rustfmt, clippy
@@ -92,7 +92,7 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       # Pinned stable Rust toolchain; install the requested target triple too.
       - name: Install Rust toolchain
@@ -102,7 +102,7 @@ jobs:
 
       # Cache cargo registry/git and the target dir to speed up rebuilds.
       - name: Cache cargo
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: |
             ~/.cargo/registry
@@ -154,7 +154,7 @@ jobs:
       # Upload the single archive produced by this job for the release step.
       # Unix produces .tar.gz, Windows produces .zip; the glob captures whichever.
       - name: Upload build artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: coffeebreak-${{ matrix.target }}
           path: |
@@ -173,12 +173,12 @@ jobs:
     steps:
       # Checkout so we can read CHANGELOG.md for the release notes.
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       # Download every build job's artifact into ./dist, flattening the
       # per-artifact subdirectories so all archives sit side by side.
       - name: Download all artifacts
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           path: dist
           merge-multiple: true
@@ -222,7 +222,7 @@ jobs:
       # archive plus the checksums file. github.ref_name is the tag (e.g. v0.1.0)
       # on tag pushes; on workflow_dispatch it is the branch/tag chosen.
       - name: Publish GitHub Release
-        uses: softprops/action-gh-release@v2
+        uses: softprops/action-gh-release@v3
         with:
           tag_name: ${{ github.ref_name }}
           name: ${{ github.ref_name }}
