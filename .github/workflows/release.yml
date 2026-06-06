@@ -170,6 +170,10 @@ jobs:
     name: publish release
     needs: build
     runs-on: ubuntu-latest
+    permissions:
+      contents: write # create the release & upload assets
+      id-token: write # build provenance attestation (Sigstore)
+      attestations: write
     steps:
       # Checkout so we can read CHANGELOG.md for the release notes.
       - name: Checkout
@@ -201,6 +205,23 @@ jobs:
           fi
           echo "path=$out" >> "$GITHUB_OUTPUT"
 
+      # Generate shell completions and a man page from the freshly built Linux
+      # binary, and bundle them as an extra release asset (useful for packagers).
+      - name: Generate completions and man page
+        working-directory: dist
+        run: |
+          set -euo pipefail
+          tar xzf coffeebreak-x86_64-unknown-linux-gnu.tar.gz
+          chmod +x coffeebreak
+          mkdir -p completions
+          for sh in bash zsh fish powershell elvish; do
+            ./coffeebreak completions "$sh" > "completions/coffeebreak.$sh"
+          done
+          ./coffeebreak man > coffeebreak.1
+          tar czf coffeebreak-completions.tar.gz completions coffeebreak.1
+          # Don't leave the loose binary/dir around to be globbed/attached.
+          rm -rf coffeebreak completions
+
       # Generate a single SHA256SUMS file in `sha256sum` format. We cd into the
       # dist dir so the filenames recorded are bare (no `dist/` prefix), which
       # is what the install scripts grep for.
@@ -218,6 +239,14 @@ jobs:
           echo "----- SHA256SUMS -----"
           cat SHA256SUMS
 
+      # Cryptographically attest that these archives were built by this workflow.
+      - name: Attest build provenance
+        uses: actions/attest-build-provenance@v1
+        with:
+          subject-path: |
+            dist/coffeebreak-*.tar.gz
+            dist/coffeebreak-*.zip
+
       # Create (or update) the GitHub Release for this tag and attach every
       # archive plus the checksums file. github.ref_name is the tag (e.g. v0.1.0)
       # on tag pushes; on workflow_dispatch it is the branch/tag chosen.
@@ -234,4 +263,5 @@ jobs:
           files: |
             dist/coffeebreak-*.tar.gz
             dist/coffeebreak-*.zip
+            dist/coffeebreak.1
             dist/SHA256SUMS

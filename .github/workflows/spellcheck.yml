@@ -1,0 +1,23 @@
+# Spell-check source, docs, and comments with `typos`.
+name: Spell check
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch: {}
+
+permissions:
+  contents: read
+
+concurrency:
+  group: spellcheck-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  typos:
+    name: typos
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check spelling
+        uses: crate-ci/typos@master

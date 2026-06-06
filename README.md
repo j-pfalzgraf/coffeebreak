@@ -49,41 +49,57 @@ When stdout/stdin aren't TTYs (pipes, CI) — or with `--plain` — it drops to 
 
 ## Features
 
-**Animated UI, with a plain fallback**
+#### Animated UI, with a plain fallback
+
 - Full-screen animated coffee cup on the alternate screen: drains on focus, refills on break.
 - Animated steam, a shimmering liquid surface, big block-digit countdown, and a gradient progress bar.
 - Automatic **plain line output** when stdout/stdin aren't TTYs (pipes/CI), or force it with `--plain`.
 - Tunable frame rate with `--fps N` (2–60, default 15); near-zero idle CPU between frames.
 
-**Interactive keyboard controls**
-- Pause / resume, skip a phase, add or remove a minute on the fly, and quit — all without leaving the session.
+#### Interactive keyboard controls
 
-**Themes**
+- Pause / resume, skip a phase, add or remove a minute on the fly, and quit — all without leaving the session.
+- With `--wait`, pause on an animated "press any key to continue" screen between phases.
+
+#### Themes
+
 - Five truecolour themes: `coffee` (default), `ocean`, `forest`, `grape`, `mono`. Preview them with `coffeebreak themes`.
 
-**Presets**
+#### Presets
+
 - Four built-in cadences via `--preset NAME`: `classic`, `deep`, `short`, `sprint`. List them with `coffeebreak presets`.
 
-**Statistics & streaks**
-- Daily stats in `~/.coffeebreak/stats.json`: today, all-time, current streak, and best day. View with `coffeebreak stats` or `--stats`.
+#### Statistics & streaks
 
-**Long breaks**
+- An animated dashboard: today, all-time, current & longest streak, a daily-goal bar, a 14-day bar chart, and a 12-week heatmap. View with `coffeebreak stats` or `--stats` (`~/.coffeebreak/stats.json`).
+
+#### Long breaks
+
 - Automatically take a longer break after every N focus blocks, with configurable length.
 
-**Git labels**
+#### Git labels
+
 - Tag a session with `-l/--label TEXT`, or use the current git branch with `--git-label`.
 
-**Notifications & sound**
+#### Notifications & sound
+
 - Desktop notification on each phase change (`--no-notify` to disable).
 - Terminal bell by default; build with `--features sound` for a rodio chime. `--no-sound` mutes.
 
-**Completions & man page**
-- Shell completions for bash, zsh, fish, PowerShell, and elvish; a generated man page.
+#### Fully internationalised
 
-**Self-update lifecycle**
+- English by default, with German, Spanish, French, Italian, and Portuguese translations (`--lang`, auto-detected from your locale).
+
+#### Diagnostics, completions & man page
+
+- `coffeebreak doctor` for a localised environment report; shell completions for bash, zsh, fish, PowerShell, and elvish; a generated man page.
+
+#### Self-update lifecycle
+
 - `coffeebreak self update [--check]` and `coffeebreak self uninstall [-y]` — updates only ever run on an explicit command.
 
-**Solid by default**
+#### Solid by default
+
 - Near-zero idle CPU, clean Ctrl+C / quit that always saves your stats, and works with no config file at all.
 
 ---

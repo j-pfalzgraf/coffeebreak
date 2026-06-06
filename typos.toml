@@ -1,0 +1,18 @@
+# Configuration for `typos` (https://github.com/crate-ci/typos).
+# Run locally with `typos`; enforced in CI (.github/workflows/spellcheck.yml).
+
+[files]
+# The localized message tables are not English — exclude them from the English
+# spell checker. (English is canonical in src/i18n/mod.rs, which IS checked.)
+extend-exclude = [
+    "src/i18n/de.rs",
+    "src/i18n/es.rs",
+    "src/i18n/fr.rs",
+    "src/i18n/it.rs",
+    "src/i18n/pt.rs",
+    "Cargo.lock",
+]
+
+[default.extend-words]
+# Project-specific terms / proper nouns that are not typos are listed here.
+# (Populated as needed; empty by default.)
