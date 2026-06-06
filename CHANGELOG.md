@@ -17,6 +17,10 @@ themes and presets — all on top of a refactored, modular codebase.
   config) pauses between phases on an animated "press any key to continue"
   screen instead of auto-starting the next phase. Piped/non-interactive runs
   still auto-advance so scripts never block.
+- **Machine-readable stats export.** `coffeebreak stats --format json|csv` prints
+  a structured summary + per-day history (JSON) or rows (CSV) — no colour, no
+  animation, pipe-friendly for scripts and dashboards. `text` (the animated
+  dashboard) remains the default.
 - **Animated statistics dashboard.** `coffeebreak stats` now renders a daily-goal
   progress bar, a 14-day vertical bar chart, and a GitHub-style 12-week
   contribution heatmap (plus current/longest streak), with a short grow-in reveal
@@ -78,15 +82,18 @@ themes and presets — all on top of a refactored, modular codebase.
   links. Cargo caching throughout.
 - **Security audit** ([`audit.yml`](.github/workflows/audit.yml)) scanning for
   RustSec advisories on every dependency change and weekly.
-- **Supply-chain policy** via cargo-deny ([`deny.yml`](.github/workflows/deny.yml)
-  + [`deny.toml`](deny.toml)): advisory, license, banned-crate, and source checks.
+- **Supply-chain policy** via cargo-deny ([`deny.yml`](.github/workflows/deny.yml),
+  [`deny.toml`](deny.toml)): advisory, license, banned-crate, and source checks.
+- **Code coverage** with `cargo-llvm-cov`
+  ([`coverage.yml`](.github/workflows/coverage.yml)); lcov uploaded as an artifact.
 - **Spell checking** with `typos` ([`spellcheck.yml`](.github/workflows/spellcheck.yml)).
 - **Dependabot** ([`dependabot.yml`](.github/dependabot.yml)) for Cargo and
   GitHub Actions updates.
 - **Hardened release pipeline**: a pre-release gate (tag↔`Cargo.toml` version
   match plus fmt/clippy/tests), release notes drawn from `CHANGELOG.md`,
-  **shell completions + a man page** as release assets, and **build-provenance
-  attestations** for the published archives.
+  **shell completions and a man page** as release assets, **build-provenance
+  attestations** for the published archives, and an optional **crates.io publish**
+  (gated on a `CARGO_REGISTRY_TOKEN` secret).
 - Added issue forms, a pull-request template, and `CONTRIBUTING.md`.
 
 ## [0.1.0] - TBD

@@ -201,6 +201,7 @@ pub enum Msg {
     HelpNoNotify,
     HelpStatsFlag,
     HelpLang,
+    HelpFormat,
 }
 
 impl Msg {
@@ -367,6 +368,7 @@ impl Msg {
             HelpNoNotify => "Do not send desktop notifications",
             HelpStatsFlag => "Show today's and all-time statistics, then exit",
             HelpLang => "Interface language: en, de, es, fr, it, pt",
+            HelpFormat => "Output format: text (dashboard), json, or csv",
         }
     }
 }

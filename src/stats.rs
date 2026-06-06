@@ -183,6 +183,69 @@ impl Stats {
         best
     }
 
+    /// A machine-readable JSON report: a computed summary plus the full per-day
+    /// history. Stable shape for scripts and dashboards.
+    pub fn to_json(&self) -> String {
+        #[derive(Serialize)]
+        struct BestDay {
+            date: String,
+            pomodoros: u64,
+            focus_minutes: u64,
+        }
+        #[derive(Serialize)]
+        struct Summary {
+            today_pomodoros: u64,
+            today_focus_minutes: u64,
+            total_pomodoros: u64,
+            total_focus_minutes: u64,
+            active_days: usize,
+            current_streak: u64,
+            longest_streak: u64,
+            best_day: Option<BestDay>,
+        }
+        #[derive(Serialize)]
+        struct Report<'a> {
+            generated: String,
+            summary: Summary,
+            days: &'a BTreeMap<String, DayStat>,
+        }
+
+        let today = Local::now().date_naive();
+        let (total_pomodoros, total_focus_minutes, active_days) = self.totals();
+        let today_stat = self.day(today);
+        let report = Report {
+            generated: today.format("%Y-%m-%d").to_string(),
+            summary: Summary {
+                today_pomodoros: today_stat.completed_pomodoros,
+                today_focus_minutes: today_stat.focus_minutes,
+                total_pomodoros,
+                total_focus_minutes,
+                active_days,
+                current_streak: self.streak(today),
+                longest_streak: self.longest_streak(),
+                best_day: self.best_day().map(|(date, s)| BestDay {
+                    date: date.clone(),
+                    pomodoros: s.completed_pomodoros,
+                    focus_minutes: s.focus_minutes,
+                }),
+            },
+            days: &self.days,
+        };
+        serde_json::to_string_pretty(&report).unwrap_or_else(|_| "{}".to_string())
+    }
+
+    /// A CSV report, one row per recorded day (chronological), with a header.
+    pub fn to_csv(&self) -> String {
+        let mut out = String::from("date,completed_pomodoros,focus_minutes\n");
+        for (date, s) in &self.days {
+            out.push_str(&format!(
+                "{date},{},{}\n",
+                s.completed_pomodoros, s.focus_minutes
+            ));
+        }
+        out
+    }
+
     /// Render the statistics dashboard to stdout, styled via `theme`, localised
     /// via `i18n`, with an optional daily `goal`.
     ///

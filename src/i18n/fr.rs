@@ -343,4 +343,8 @@ pub static ENTRIES: super::Table = &[
         super::Msg::HelpWait,
         "Attendre une touche entre les phases au lieu d'enchaîner automatiquement",
     ),
+    (
+        super::Msg::HelpFormat,
+        "Format de sortie : text (tableau de bord), json ou csv",
+    ),
 ];

@@ -355,6 +355,14 @@ progress before exit.
 coffeebreak --goal 8 stats   # dashboard with a goal of 8 pomodoros/day
 ```
 
+For scripts and dashboards, export machine-readable stats (no colour, no
+animation — pipe-friendly):
+
+```sh
+coffeebreak stats --format json   # summary + full per-day history as JSON
+coffeebreak stats --format csv    # date,completed_pomodoros,focus_minutes
+```
+
 ---
 
 ## Diagnostics
@@ -438,10 +446,14 @@ Continuous integration runs on every push and pull request
 - **tests** — on Linux, macOS, and Windows
 - **MSRV** — `cargo check` on Rust 1.85
 - **docs** — `cargo doc` with `-D warnings` (catches broken doc links)
+- **coverage** — `cargo-llvm-cov` ([`coverage.yml`](.github/workflows/coverage.yml)), lcov uploaded as an artifact
 
-A weekly [security audit](.github/workflows/audit.yml) scans dependencies for
-RustSec advisories, and [Dependabot](.github/dependabot.yml) keeps crates and
-Actions up to date. Pushing a `v*` tag runs the
+Supply-chain and hygiene checks run too:
+[cargo-deny](.github/workflows/deny.yml) (advisories, licenses, bans, sources),
+a weekly [RustSec audit](.github/workflows/audit.yml),
+[`typos`](.github/workflows/spellcheck.yml) spell-checking, and
+[Dependabot](.github/dependabot.yml) for crate and Action updates. Pushing a
+`v*` tag runs the
 [release pipeline](.github/workflows/release.yml) (cross-builds, checksums,
 GitHub Release). See [CONTRIBUTING.md](CONTRIBUTING.md) for the full workflow.
 

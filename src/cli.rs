@@ -7,7 +7,7 @@
 
 use clap::builder::PossibleValuesParser;
 use clap::builder::styling::{AnsiColor, Effects, Styles};
-use clap::{CommandFactory, FromArgMatches, Parser, Subcommand};
+use clap::{CommandFactory, FromArgMatches, Parser, Subcommand, ValueEnum};
 use clap_complete::Shell;
 
 use crate::i18n::{I18n, LANG_CODES, Msg};
@@ -173,10 +173,26 @@ pub struct Cli {
     pub command: Option<Command>,
 }
 
+/// Output format for `coffeebreak stats`.
+#[derive(ValueEnum, Clone, Copy, Debug, Default, PartialEq, Eq)]
+pub enum StatsFormat {
+    /// Human-readable animated dashboard (default).
+    #[default]
+    Text,
+    /// Machine-readable JSON (summary + per-day history).
+    Json,
+    /// Comma-separated values: date, completed_pomodoros, focus_minutes.
+    Csv,
+}
+
 #[derive(Subcommand, Debug)]
 pub enum Command {
     /// Show focus statistics (today, all-time, streak, best day).
-    Stats,
+    Stats {
+        /// Output format: text (dashboard), json, or csv.
+        #[arg(long, value_enum, default_value_t = StatsFormat::Text)]
+        format: StatsFormat,
+    },
 
     /// Inspect or create the configuration file.
     Config {
@@ -304,7 +320,6 @@ fn localized_command(i18n: &I18n) -> clap::Command {
 
     // Subcommand descriptions (and their own arguments/subcommands).
     let subs: &[(&str, Msg)] = &[
-        ("stats", Msg::HelpStats),
         ("themes", Msg::HelpThemes),
         ("presets", Msg::HelpPresets),
         ("languages", Msg::HelpLanguages),
@@ -314,6 +329,10 @@ fn localized_command(i18n: &I18n) -> clap::Command {
     for (name, msg) in subs {
         cmd = cmd.mut_subcommand(*name, |c| c.about(t(*msg)));
     }
+    cmd = cmd.mut_subcommand("stats", |c| {
+        c.about(t(Msg::HelpStats))
+            .mut_arg("format", |a| a.help(t(Msg::HelpFormat)))
+    });
     cmd = cmd.mut_subcommand("completions", |c| {
         c.about(t(Msg::HelpCompletions))
             .mut_arg("shell", |a| a.help(t(Msg::HelpCompletionsShell)))

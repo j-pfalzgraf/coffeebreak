@@ -7,7 +7,7 @@ use std::io::IsTerminal;
 
 use anyhow::{Context, Result};
 
-use crate::cli::ConfigAction;
+use crate::cli::{ConfigAction, StatsFormat};
 use crate::config::Config;
 use crate::i18n::{I18n, LANGUAGES, Msg, Noun};
 use crate::session::{self, PRESET_NAMES};
@@ -15,8 +15,16 @@ use crate::stats::Stats;
 use crate::theme::{THEME_NAMES, Theme};
 
 /// `coffeebreak stats` / `coffeebreak --stats`.
-pub fn stats(theme: &Theme, i18n: &I18n, goal: u64) {
-    Stats::load_or_default(i18n).print_summary(theme, i18n, goal);
+///
+/// `text` renders the animated dashboard; `json`/`csv` print machine-readable
+/// output (no colour, no animation) suitable for piping.
+pub fn stats(theme: &Theme, i18n: &I18n, goal: u64, format: StatsFormat) {
+    let stats = Stats::load_or_default(i18n);
+    match format {
+        StatsFormat::Text => stats.print_summary(theme, i18n, goal),
+        StatsFormat::Json => println!("{}", stats.to_json()),
+        StatsFormat::Csv => print!("{}", stats.to_csv()),
+    }
 }
 
 /// `coffeebreak doctor` — print localised environment diagnostics.

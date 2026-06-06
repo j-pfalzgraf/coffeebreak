@@ -567,3 +567,104 @@ fn wait_mode_with_non_tty_stdin_auto_advances_and_does_not_hang() {
         "expected stats written"
     );
 }
+
+// --- Stats export formats ---------------------------------------------------
+
+#[test]
+fn stats_json_export_is_structured() {
+    let home = TempHome::new("statsjson");
+    // Produce one completed focus block, then export JSON.
+    let run_args = [
+        "--plain",
+        "--seconds",
+        "-w",
+        "1",
+        "--cycles",
+        "1",
+        "--no-sound",
+        "--no-notify",
+    ];
+    assert!(run(&home, &run_args).status.success());
+
+    let args = ["stats", "--format", "json"];
+    let out = run(&home, &args);
+    assert!(out.status.success(), "{}", describe(&args, &out));
+    let s = stdout(&out);
+    let s = s.trim();
+    assert!(
+        s.starts_with('{') && s.ends_with('}'),
+        "expected a JSON object\n{}",
+        describe(&args, &out)
+    );
+    for key in [
+        "\"summary\"",
+        "\"total_pomodoros\"",
+        "\"days\"",
+        "\"current_streak\"",
+    ] {
+        assert!(
+            s.contains(key),
+            "json missing {key}\n{}",
+            describe(&args, &out)
+        );
+    }
+}
+
+#[test]
+fn stats_csv_export_has_header_and_rows() {
+    let home = TempHome::new("statscsv");
+    let run_args = [
+        "--plain",
+        "--seconds",
+        "-w",
+        "1",
+        "--cycles",
+        "1",
+        "--no-sound",
+        "--no-notify",
+    ];
+    assert!(run(&home, &run_args).status.success());
+
+    let args = ["stats", "--format", "csv"];
+    let out = run(&home, &args);
+    assert!(out.status.success(), "{}", describe(&args, &out));
+    let s = stdout(&out);
+    let mut lines = s.lines();
+    assert_eq!(
+        lines.next(),
+        Some("date,completed_pomodoros,focus_minutes"),
+        "{}",
+        describe(&args, &out)
+    );
+    // At least one data row, shaped date,int,int.
+    let row = lines.next().unwrap_or("");
+    let cols: Vec<&str> = row.split(',').collect();
+    assert_eq!(
+        cols.len(),
+        3,
+        "expected 3 CSV columns, got {row:?}\n{}",
+        describe(&args, &out)
+    );
+    assert!(
+        cols[1].parse::<u64>().is_ok(),
+        "completed_pomodoros not an int: {row:?}"
+    );
+}
+
+#[test]
+fn stats_invalid_format_is_rejected() {
+    let home = TempHome::new("statsfmt");
+    let args = ["stats", "--format", "xml"];
+    let out = run(&home, &args);
+    assert!(
+        !out.status.success(),
+        "invalid --format should fail\n{}",
+        describe(&args, &out)
+    );
+    let combined = format!("{}{}", stdout(&out), text(&out.stderr));
+    assert!(
+        combined.contains("invalid value"),
+        "{}",
+        describe(&args, &out)
+    );
+}

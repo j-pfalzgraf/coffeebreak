@@ -12,7 +12,7 @@ use std::sync::atomic::{AtomicBool, Ordering};
 use anyhow::Result;
 
 use coffeebreak::app::{App, Outcome};
-use coffeebreak::cli::{Cli, Command, SelfAction};
+use coffeebreak::cli::{Cli, Command, SelfAction, StatsFormat};
 use coffeebreak::config::Config;
 use coffeebreak::i18n::{I18n, Msg, Noun};
 use coffeebreak::session::Session;
@@ -71,8 +71,8 @@ fn run() -> Result<()> {
     // Subcommands (none of these run the timer).
     if let Some(cmd) = &cli.command {
         return match cmd {
-            Command::Stats => {
-                commands::stats(&meta_theme, &i18n, goal);
+            Command::Stats { format } => {
+                commands::stats(&meta_theme, &i18n, goal, *format);
                 Ok(())
             }
             Command::Doctor => {
@@ -106,7 +106,7 @@ fn run() -> Result<()> {
 
     // `--stats` shortcut works even with a malformed config file.
     if cli.stats {
-        commands::stats(&meta_theme, &i18n, goal);
+        commands::stats(&meta_theme, &i18n, goal, StatsFormat::Text);
         return Ok(());
     }
 

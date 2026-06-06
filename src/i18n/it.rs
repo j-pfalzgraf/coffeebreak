@@ -339,4 +339,8 @@ pub static ENTRIES: super::Table = &[
         super::Msg::HelpWait,
         "Attendere un tasto tra le fasi invece di avanzare automaticamente",
     ),
+    (
+        super::Msg::HelpFormat,
+        "Formato di output: text (dashboard), json o csv",
+    ),
 ];
