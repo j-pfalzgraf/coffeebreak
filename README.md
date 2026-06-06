@@ -1,5 +1,9 @@
 # coffeebreak ☕
 
+[![CI](https://github.com/j-pfalzgraf/coffeebreak/actions/workflows/ci.yml/badge.svg)](https://github.com/j-pfalzgraf/coffeebreak/actions/workflows/ci.yml)
+[![Security audit](https://github.com/j-pfalzgraf/coffeebreak/actions/workflows/audit.yml/badge.svg)](https://github.com/j-pfalzgraf/coffeebreak/actions/workflows/audit.yml)
+[![License: MIT OR Apache-2.0](https://img.shields.io/badge/license-MIT%20OR%20Apache--2.0-blue.svg)](#license)
+
 **A Pomodoro focus timer for your terminal — with a live, animated coffee cup that *drains* while you focus and *refills* on your break, behind big block-digit countdowns.**
 
 Start a focus block and watch the cup empty cup by cup, steam curling off the surface, the liquid shimmering, a gradient progress bar filling at the bottom — all in a full-screen terminal UI. When the break comes, the cup pours back full. No window, no browser, no distraction. Just you, the terminal, and the next cup.
@@ -405,6 +409,25 @@ cargo build --release             # binary at target/release/coffeebreak
 cargo test                        # run the test suite
 cargo build --release --features sound   # enable the rodio chime
 ```
+
+---
+
+## Development & CI
+
+Continuous integration runs on every push and pull request
+([`ci.yml`](.github/workflows/ci.yml)):
+
+- **rustfmt** — `cargo fmt --all --check` (formatting is enforced)
+- **clippy** — `-D warnings`, with and without the `sound` feature
+- **tests** — on Linux, macOS, and Windows
+- **MSRV** — `cargo check` on Rust 1.85
+- **docs** — `cargo doc` with `-D warnings` (catches broken doc links)
+
+A weekly [security audit](.github/workflows/audit.yml) scans dependencies for
+RustSec advisories, and [Dependabot](.github/dependabot.yml) keeps crates and
+Actions up to date. Pushing a `v*` tag runs the
+[release pipeline](.github/workflows/release.yml) (cross-builds, checksums,
+GitHub Release). See [CONTRIBUTING.md](CONTRIBUTING.md) for the full workflow.
 
 ---
 

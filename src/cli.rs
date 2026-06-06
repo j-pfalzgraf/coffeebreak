@@ -52,11 +52,21 @@ const AFTER_HELP: &str = "\x1b[1;33mExamples:\x1b[0m\n  \
 pub struct Cli {
     // --- Timer options ------------------------------------------------------
     /// Focus block length in minutes (default 25).
-    #[arg(short = 'w', long = "work", value_name = "MIN", help_heading = "Timer options")]
+    #[arg(
+        short = 'w',
+        long = "work",
+        value_name = "MIN",
+        help_heading = "Timer options"
+    )]
     pub work: Option<u64>,
 
     /// Break length in minutes (default 5).
-    #[arg(short = 'b', long = "break", value_name = "MIN", help_heading = "Timer options")]
+    #[arg(
+        short = 'b',
+        long = "break",
+        value_name = "MIN",
+        help_heading = "Timer options"
+    )]
     pub brk: Option<u64>,
 
     /// Number of focus→break cycles to run (default 1).
@@ -86,7 +96,11 @@ pub struct Cli {
     pub long: bool,
 
     /// Long break length in minutes (implies --long; default 15).
-    #[arg(long = "long-break", value_name = "MIN", help_heading = "Timer options")]
+    #[arg(
+        long = "long-break",
+        value_name = "MIN",
+        help_heading = "Timer options"
+    )]
     pub long_break: Option<u64>,
 
     /// How many focus blocks before a long break (default 4).

@@ -115,7 +115,11 @@ fn version_prints_name_and_number() {
     let args = ["--version"];
     let out = run(&home, &args);
 
-    assert!(out.status.success(), "--version should exit 0\n{}", describe(&args, &out));
+    assert!(
+        out.status.success(),
+        "--version should exit 0\n{}",
+        describe(&args, &out)
+    );
     let s = stdout(&out);
     let s = s.trim();
     assert!(
@@ -138,7 +142,11 @@ fn help_mentions_pomodoro() {
     let args = ["--help"];
     let out = run(&home, &args);
 
-    assert!(out.status.success(), "--help should exit 0\n{}", describe(&args, &out));
+    assert!(
+        out.status.success(),
+        "--help should exit 0\n{}",
+        describe(&args, &out)
+    );
     let s = stdout(&out);
     assert!(
         s.contains("Pomodoro"),
@@ -153,7 +161,11 @@ fn presets_lists_all_presets() {
     let args = ["presets"];
     let out = run(&home, &args);
 
-    assert!(out.status.success(), "`presets` should exit 0\n{}", describe(&args, &out));
+    assert!(
+        out.status.success(),
+        "`presets` should exit 0\n{}",
+        describe(&args, &out)
+    );
     let s = stdout(&out);
     for name in ["classic", "deep", "short", "sprint"] {
         assert!(
@@ -171,7 +183,11 @@ fn themes_lists_all_themes() {
     let args = ["themes", "--no-color"];
     let out = run(&home, &args);
 
-    assert!(out.status.success(), "`themes` should exit 0\n{}", describe(&args, &out));
+    assert!(
+        out.status.success(),
+        "`themes` should exit 0\n{}",
+        describe(&args, &out)
+    );
     let s = stdout(&out);
     for name in ["coffee", "ocean", "forest", "grape", "mono"] {
         assert!(
@@ -188,7 +204,11 @@ fn completions_bash_outputs_a_script() {
     let args = ["completions", "bash"];
     let out = run(&home, &args);
 
-    assert!(out.status.success(), "`completions bash` should exit 0\n{}", describe(&args, &out));
+    assert!(
+        out.status.success(),
+        "`completions bash` should exit 0\n{}",
+        describe(&args, &out)
+    );
     let s = stdout(&out);
     assert!(
         s.contains("coffeebreak"),
@@ -203,7 +223,11 @@ fn man_outputs_roff() {
     let args = ["man"];
     let out = run(&home, &args);
 
-    assert!(out.status.success(), "`man` should exit 0\n{}", describe(&args, &out));
+    assert!(
+        out.status.success(),
+        "`man` should exit 0\n{}",
+        describe(&args, &out)
+    );
     let s = stdout(&out);
     assert!(
         s.contains(".TH"),
@@ -218,7 +242,11 @@ fn config_path_points_at_config_toml() {
     let args = ["config", "path"];
     let out = run(&home, &args);
 
-    assert!(out.status.success(), "`config path` should exit 0\n{}", describe(&args, &out));
+    assert!(
+        out.status.success(),
+        "`config path` should exit 0\n{}",
+        describe(&args, &out)
+    );
     let s = stdout(&out);
     let s = s.trim();
     assert!(
@@ -292,7 +320,11 @@ fn stats_with_empty_home_reports_nothing_yet() {
     let args = ["--stats"];
     let out = run(&home, &args);
 
-    assert!(out.status.success(), "`--stats` should exit 0\n{}", describe(&args, &out));
+    assert!(
+        out.status.success(),
+        "`--stats` should exit 0\n{}",
+        describe(&args, &out)
+    );
     let s = stdout(&out);
     assert!(
         s.contains("No pomodoros") || s.to_lowercase().contains("statistics"),
@@ -382,9 +414,17 @@ fn languages_lists_all_locales() {
     assert!(out.status.success(), "{}", describe(&args, &out));
     let s = stdout(&out);
     for code in ["en", "de", "es", "fr", "it", "pt"] {
-        assert!(s.contains(code), "languages output missing `{code}`\n{}", describe(&args, &out));
+        assert!(
+            s.contains(code),
+            "languages output missing `{code}`\n{}",
+            describe(&args, &out)
+        );
     }
-    assert!(s.contains("Deutsch") && s.contains("Português"), "{}", describe(&args, &out));
+    assert!(
+        s.contains("Deutsch") && s.contains("Português"),
+        "{}",
+        describe(&args, &out)
+    );
 }
 
 #[test]
@@ -394,7 +434,11 @@ fn lang_flag_localizes_help() {
     let de = run(&home, &["--lang", "de", "--help"]);
     assert!(en.status.success() && de.status.success());
     // German help must differ from English (localisation actually applied).
-    assert_ne!(stdout(&en), stdout(&de), "German --help should differ from English");
+    assert_ne!(
+        stdout(&en),
+        stdout(&de),
+        "German --help should differ from English"
+    );
 }
 
 #[test]
@@ -402,15 +446,34 @@ fn invalid_language_is_rejected() {
     let home = TempHome::new("badlang");
     let args = ["--lang", "xx", "--help"];
     let out = run(&home, &args);
-    assert!(!out.status.success(), "invalid --lang should fail\n{}", describe(&args, &out));
+    assert!(
+        !out.status.success(),
+        "invalid --lang should fail\n{}",
+        describe(&args, &out)
+    );
     let combined = format!("{}{}", stdout(&out), text(&out.stderr));
-    assert!(combined.contains("invalid value"), "{}", describe(&args, &out));
+    assert!(
+        combined.contains("invalid value"),
+        "{}",
+        describe(&args, &out)
+    );
 }
 
 #[test]
 fn german_run_writes_stats_and_localizes_footer() {
     let home = TempHome::new("derun");
-    let args = ["--lang", "de", "--plain", "--seconds", "-w", "1", "--cycles", "1", "--no-sound", "--no-notify"];
+    let args = [
+        "--lang",
+        "de",
+        "--plain",
+        "--seconds",
+        "-w",
+        "1",
+        "--cycles",
+        "1",
+        "--no-sound",
+        "--no-notify",
+    ];
     let out = run(&home, &args);
     assert!(out.status.success(), "{}", describe(&args, &out));
     let stats = home.path().join(".coffeebreak").join("stats.json");
@@ -432,7 +495,11 @@ fn doctor_reports_environment() {
     assert!(out.status.success(), "{}", describe(&args, &out));
     let s = stdout(&out);
     for needle in ["Language", "Config file", "Data directory", "Sound"] {
-        assert!(s.contains(needle), "doctor output missing `{needle}`\n{}", describe(&args, &out));
+        assert!(
+            s.contains(needle),
+            "doctor output missing `{needle}`\n{}",
+            describe(&args, &out)
+        );
     }
 }
 
@@ -440,7 +507,16 @@ fn doctor_reports_environment() {
 fn stats_dashboard_renders_charts_after_a_run() {
     let home = TempHome::new("dash");
     // Complete one focus block so there is data, then view the dashboard.
-    let run_args = ["--plain", "--seconds", "-w", "1", "--cycles", "1", "--no-sound", "--no-notify"];
+    let run_args = [
+        "--plain",
+        "--seconds",
+        "-w",
+        "1",
+        "--cycles",
+        "1",
+        "--no-sound",
+        "--no-notify",
+    ];
     assert!(run(&home, &run_args).status.success());
 
     let args = ["--goal", "4", "stats", "--no-color"];
@@ -448,7 +524,11 @@ fn stats_dashboard_renders_charts_after_a_run() {
     assert!(out.status.success(), "{}", describe(&args, &out));
     let s = stdout(&out);
     for needle in ["Daily goal:", "Last 14 days", "Last 12 weeks"] {
-        assert!(s.contains(needle), "dashboard missing `{needle}`\n{}", describe(&args, &out));
+        assert!(
+            s.contains(needle),
+            "dashboard missing `{needle}`\n{}",
+            describe(&args, &out)
+        );
     }
 }
 
@@ -459,11 +539,31 @@ fn wait_mode_with_non_tty_stdin_auto_advances_and_does_not_hang() {
     let home = TempHome::new("wait");
     let mut c = cmd(
         &home,
-        &["--wait", "--plain", "--seconds", "-w", "1", "-b", "1", "--cycles", "2", "--no-sound", "--no-notify"],
+        &[
+            "--wait",
+            "--plain",
+            "--seconds",
+            "-w",
+            "1",
+            "-b",
+            "1",
+            "--cycles",
+            "2",
+            "--no-sound",
+            "--no-notify",
+        ],
     );
     c.stdin(Stdio::null());
     let out = c.output().unwrap_or_else(|e| panic!("failed to run: {e}"));
-    assert!(out.status.success(), "wait+piped should complete, not hang\n{}", text(&out.stderr));
-    let contents = std::fs::read_to_string(home.path().join(".coffeebreak").join("stats.json")).unwrap_or_default();
-    assert!(contents.contains("completed_pomodoros"), "expected stats written");
+    assert!(
+        out.status.success(),
+        "wait+piped should complete, not hang\n{}",
+        text(&out.stderr)
+    );
+    let contents = std::fs::read_to_string(home.path().join(".coffeebreak").join("stats.json"))
+        .unwrap_or_default();
+    assert!(
+        contents.contains("completed_pomodoros"),
+        "expected stats written"
+    );
 }

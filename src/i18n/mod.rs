@@ -381,7 +381,9 @@ impl I18n {
     /// Construct for a locale code, normalising and falling back to English for
     /// anything unsupported (e.g. `"de_DE.UTF-8"` → `"de"`, `"xx"` → `"en"`).
     pub fn new(code: &str) -> I18n {
-        I18n { lang: normalize(code) }
+        I18n {
+            lang: normalize(code),
+        }
     }
 
     /// Resolve the locale from (in precedence order) the CLI flag, the config
@@ -508,7 +510,11 @@ fn is_supported(code: &str) -> bool {
 /// Normalise an arbitrary locale string to a supported code, or English.
 fn normalize(code: &str) -> &'static str {
     let base = base_code(code);
-    LANG_CODES.iter().copied().find(|c| *c == base).unwrap_or(DEFAULT_LANG)
+    LANG_CODES
+        .iter()
+        .copied()
+        .find(|c| *c == base)
+        .unwrap_or(DEFAULT_LANG)
 }
 
 /// Extract the base language from a locale string: `"de_DE.UTF-8"` → `"de"`.
@@ -540,7 +546,10 @@ mod tests {
     #[test]
     fn interpolation_replaces_named_args() {
         let i = I18n::new("en");
-        assert_eq!(i.tf(Msg::CycleOf, &[("n", "2"), ("total", "4")]), "cycle 2 of 4");
+        assert_eq!(
+            i.tf(Msg::CycleOf, &[("n", "2"), ("total", "4")]),
+            "cycle 2 of 4"
+        );
     }
 
     #[test]
@@ -583,8 +592,14 @@ mod tests {
         for (code, table) in tables {
             let mut seen = std::collections::HashSet::new();
             for (key, value) in *table {
-                assert!(!value.trim().is_empty(), "{code}: empty translation for {key:?}");
-                assert!(seen.insert(format!("{key:?}")), "{code}: duplicate key {key:?}");
+                assert!(
+                    !value.trim().is_empty(),
+                    "{code}: empty translation for {key:?}"
+                );
+                assert!(
+                    seen.insert(format!("{key:?}")),
+                    "{code}: duplicate key {key:?}"
+                );
             }
         }
     }
@@ -595,7 +610,10 @@ mod tests {
         for (code, _) in LANGUAGES {
             let i = I18n::new(code);
             let out = i.tf(Msg::DoneFooter, &[("count", "3 x")]);
-            assert!(out.contains("3 x"), "{code}: DoneFooter dropped its placeholder");
+            assert!(
+                out.contains("3 x"),
+                "{code}: DoneFooter dropped its placeholder"
+            );
         }
     }
 }

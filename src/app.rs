@@ -49,7 +49,12 @@ impl App {
         let feedback = Feedback::new(session.notifications, session.sound, i18n);
         let fps = session.fps.clamp(2, 60);
         let frame_dt = Duration::from_secs_f64(1.0 / f64::from(fps));
-        App { theme, feedback, i18n, frame_dt }
+        App {
+            theme,
+            feedback,
+            i18n,
+            frame_dt,
+        }
     }
 
     /// Run the whole session. `shutdown` is the Ctrl+C flag used by the plain
@@ -122,7 +127,17 @@ impl App {
                 let (w, h) = TerminalSession::size();
                 let (width, height) = (w as usize, h as usize);
                 let lines = self
-                    .compose(phase, &timer, now, quote, idx + 1, session, frame, width, height)
+                    .compose(
+                        phase,
+                        &timer,
+                        now,
+                        quote,
+                        idx + 1,
+                        session,
+                        frame,
+                        width,
+                        height,
+                    )
                     .position(width, height);
                 renderer.present(&lines)?;
                 frame = frame.wrapping_add(1);
@@ -158,7 +173,10 @@ impl App {
             self.celebrate(&mut renderer, completed_focus)?;
         }
 
-        Ok(Outcome { completed_focus, interrupted: quit })
+        Ok(Outcome {
+            completed_focus,
+            interrupted: quit,
+        })
     }
 
     /// The animated "press any key to continue" screen shown between phases in
@@ -180,14 +198,21 @@ impl App {
 
             let mut fr = Frame::new();
             let mut head = LineBuf::new();
-            head.bold(theme, &format!("▌ {} ▐", self.i18n.phase_label(next)), accent);
+            head.bold(
+                theme,
+                &format!("▌ {} ▐", self.i18n.phase_label(next)),
+                accent,
+            );
             head.dim(
                 theme,
                 format!(
                     "  {}",
                     self.i18n.tf(
                         Msg::CycleOf,
-                        &[("n", &cycle.to_string()), ("total", &session.cycles.to_string())],
+                        &[
+                            ("n", &cycle.to_string()),
+                            ("total", &session.cycles.to_string())
+                        ],
                     )
                 ),
             );
@@ -259,14 +284,21 @@ impl App {
 
         // Header chip: phase + cycle counter.
         let mut head = LineBuf::new();
-        head.bold(theme, &format!("▌ {} ▐", self.i18n.phase_label(phase)), accent);
+        head.bold(
+            theme,
+            &format!("▌ {} ▐", self.i18n.phase_label(phase)),
+            accent,
+        );
         head.dim(
             theme,
             format!(
                 "  {}",
                 self.i18n.tf(
                     Msg::CycleOf,
-                    &[("n", &cycle.to_string()), ("total", &session.cycles.to_string())],
+                    &[
+                        ("n", &cycle.to_string()),
+                        ("total", &session.cycles.to_string())
+                    ],
                 )
             ),
         );
@@ -281,7 +313,11 @@ impl App {
         let remaining = ceil_secs(timer.remaining(now));
         let time_str = fmt_mmss(remaining);
         if show_big {
-            let color = if paused && (frame / 8) % 2 == 0 { p.muted } else { accent };
+            let color = if paused && (frame / 8) % 2 == 0 {
+                p.muted
+            } else {
+                accent
+            };
             f.extend(widgets::big_time(theme, &time_str, color));
         } else {
             let mut t = LineBuf::new();
@@ -291,7 +327,13 @@ impl App {
         f.push_blank();
 
         // Progress bar + meta line.
-        f.push(widgets::progress_bar(theme, elapsed_frac, bar_w, accent, p.accent));
+        f.push(widgets::progress_bar(
+            theme,
+            elapsed_frac,
+            bar_w,
+            accent,
+            p.accent,
+        ));
         let mut meta = LineBuf::new();
         meta.dim(theme, format!("{} {}", time_str, self.i18n.t(Msg::Left)));
         meta.dim(theme, "  ·  ");
@@ -356,7 +398,11 @@ impl App {
             f.push_blank();
             let mut msg = LineBuf::new();
             let count = self.i18n.count(pomodoros, Noun::Pomodoro);
-            msg.bold(theme, &self.i18n.tf(Msg::CelebrateMsg, &[("count", &count)]), p.success);
+            msg.bold(
+                theme,
+                &self.i18n.tf(Msg::CelebrateMsg, &[("count", &count)]),
+                p.success,
+            );
             f.push(msg.into_line());
             f.push_blank();
             f.push(widgets::confetti(theme, cw, frame + 4));
@@ -451,7 +497,10 @@ impl App {
             }
         }
 
-        Ok(Outcome { completed_focus, interrupted })
+        Ok(Outcome {
+            completed_focus,
+            interrupted,
+        })
     }
 }
 
@@ -463,7 +512,10 @@ struct LineBuf {
 
 impl LineBuf {
     fn new() -> LineBuf {
-        LineBuf { s: String::new(), w: 0 }
+        LineBuf {
+            s: String::new(),
+            w: 0,
+        }
     }
     fn plain(&mut self, _theme: &Theme, text: &str) {
         self.s.push_str(text);
@@ -486,7 +538,6 @@ impl LineBuf {
         Line::styled(self.s, self.w)
     }
 }
-
 
 /// Round a duration up to whole seconds (so a countdown shows 00:01 before 00:00).
 fn ceil_secs(d: Duration) -> Duration {

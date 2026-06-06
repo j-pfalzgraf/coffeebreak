@@ -29,7 +29,16 @@ pub fn doctor(theme: &Theme, i18n: &I18n) {
     let mut rows: Vec<(Msg, bool, String)> = Vec::new();
 
     let tty = std::io::stdout().is_terminal() && std::io::stdin().is_terminal();
-    rows.push((Msg::DoctorTerminal, tty, i18n.t(if tty { Msg::DoctorTtyYes } else { Msg::DoctorTtyNo }).to_string()));
+    rows.push((
+        Msg::DoctorTerminal,
+        tty,
+        i18n.t(if tty {
+            Msg::DoctorTtyYes
+        } else {
+            Msg::DoctorTtyNo
+        })
+        .to_string(),
+    ));
 
     let truecolor = std::env::var("COLORTERM")
         .map(|v| v.contains("truecolor") || v.contains("24bit"))
@@ -37,10 +46,19 @@ pub fn doctor(theme: &Theme, i18n: &I18n) {
     rows.push((
         Msg::DoctorColor,
         truecolor,
-        i18n.t(if truecolor { Msg::DoctorColorYes } else { Msg::DoctorColorNo }).to_string(),
+        i18n.t(if truecolor {
+            Msg::DoctorColorYes
+        } else {
+            Msg::DoctorColorNo
+        })
+        .to_string(),
     ));
 
-    rows.push((Msg::DoctorLang, true, format!("{} ({})", i18n.code(), i18n.name())));
+    rows.push((
+        Msg::DoctorLang,
+        true,
+        format!("{} ({})", i18n.code(), i18n.name()),
+    ));
 
     let cfg_path = Config::path().ok();
     let cfg_exists = cfg_path.as_ref().map(|p| p.exists()).unwrap_or(false);
@@ -49,20 +67,35 @@ pub fn doctor(theme: &Theme, i18n: &I18n) {
         cfg_exists,
         format!(
             "{} {}",
-            i18n.t(if cfg_exists { Msg::DoctorConfigExists } else { Msg::DoctorConfigMissing }),
-            cfg_path.map(|p| theme.dim(p.display().to_string())).unwrap_or_default(),
+            i18n.t(if cfg_exists {
+                Msg::DoctorConfigExists
+            } else {
+                Msg::DoctorConfigMissing
+            }),
+            cfg_path
+                .map(|p| theme.dim(p.display().to_string()))
+                .unwrap_or_default(),
         ),
     ));
 
     let data_dir = crate::paths::data_dir().ok();
-    let writable = data_dir.as_ref().map(|d| dir_is_writable(d)).unwrap_or(false);
+    let writable = data_dir
+        .as_ref()
+        .map(|d| dir_is_writable(d))
+        .unwrap_or(false);
     rows.push((
         Msg::DoctorData,
         writable,
         format!(
             "{} {}",
-            i18n.t(if writable { Msg::DoctorDataOk } else { Msg::DoctorDataNo }),
-            data_dir.map(|d| theme.dim(d.display().to_string())).unwrap_or_default(),
+            i18n.t(if writable {
+                Msg::DoctorDataOk
+            } else {
+                Msg::DoctorDataNo
+            }),
+            data_dir
+                .map(|d| theme.dim(d.display().to_string()))
+                .unwrap_or_default(),
         ),
     ));
 
@@ -70,21 +103,44 @@ pub fn doctor(theme: &Theme, i18n: &I18n) {
     rows.push((
         Msg::DoctorNotify,
         notify_ok,
-        i18n.t(if notify_ok { Msg::DoctorNotifyYes } else { Msg::DoctorNotifyNo }).to_string(),
+        i18n.t(if notify_ok {
+            Msg::DoctorNotifyYes
+        } else {
+            Msg::DoctorNotifyNo
+        })
+        .to_string(),
     ));
 
     let chime = cfg!(feature = "sound");
     rows.push((
         Msg::DoctorSound,
         true,
-        i18n.t(if chime { Msg::DoctorSoundChime } else { Msg::DoctorSoundBell }).to_string(),
+        i18n.t(if chime {
+            Msg::DoctorSoundChime
+        } else {
+            Msg::DoctorSoundBell
+        })
+        .to_string(),
     ));
 
-    let label_w = rows.iter().map(|(m, _, _)| i18n.t(*m).chars().count()).max().unwrap_or(16);
+    let label_w = rows
+        .iter()
+        .map(|(m, _, _)| i18n.t(*m).chars().count())
+        .max()
+        .unwrap_or(16);
     for (label, ok, detail) in rows {
-        let (glyph, color) = if ok { ("✓", p.success) } else { ("!", p.warn) };
+        let (glyph, color) = if ok {
+            ("✓", p.success)
+        } else {
+            ("!", p.warn)
+        };
         let padded = format!("{:<label_w$}", i18n.t(label));
-        println!("  {} {} {}", theme.bold(padded, p.accent), theme.paint(glyph, color), detail);
+        println!(
+            "  {} {} {}",
+            theme.bold(padded, p.accent),
+            theme.paint(glyph, color),
+            detail
+        );
     }
     println!();
 }
@@ -171,10 +227,17 @@ pub fn presets(theme: &Theme, i18n: &I18n) {
             if p.long_enabled {
                 cadence.push_str(&i18n.tf(
                     Msg::PresetLong,
-                    &[("long", &p.long.to_string()), ("every", &p.long_every.to_string())],
+                    &[
+                        ("long", &p.long.to_string()),
+                        ("every", &p.long_every.to_string()),
+                    ],
                 ));
             }
-            println!("  {} {}", theme.bold(name, theme.palette.accent), theme.dim(cadence));
+            println!(
+                "  {} {}",
+                theme.bold(name, theme.palette.accent),
+                theme.dim(cadence)
+            );
         }
     }
     println!("\n{}\n", i18n.t(Msg::PresetsHint));

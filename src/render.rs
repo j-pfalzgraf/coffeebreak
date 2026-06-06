@@ -25,7 +25,10 @@ pub struct Line {
 impl Line {
     /// A line whose styled `text` renders `width` visible columns.
     pub fn styled(text: impl Into<String>, width: usize) -> Line {
-        Line { text: text.into(), width }
+        Line {
+            text: text.into(),
+            width,
+        }
     }
 
     /// A plain (unstyled) line; width is measured from the text.
@@ -37,7 +40,10 @@ impl Line {
 
     /// An empty spacer line.
     pub fn blank() -> Line {
-        Line { text: String::new(), width: 0 }
+        Line {
+            text: String::new(),
+            width: 0,
+        }
     }
 
     pub fn width(&self) -> usize {
@@ -153,7 +159,10 @@ pub struct Renderer<W: Write> {
 
 impl<W: Write> Renderer<W> {
     pub fn new(out: W) -> Renderer<W> {
-        Renderer { out, prev: Vec::new() }
+        Renderer {
+            out,
+            prev: Vec::new(),
+        }
     }
 
     /// Forget the cached frame so the next `present` repaints everything
@@ -229,7 +238,9 @@ mod tests {
     #[test]
     fn position_never_exceeds_width() {
         let mut f = Frame::new();
-        f.push(Line::plain("this line is definitely too long for the width"));
+        f.push(Line::plain(
+            "this line is definitely too long for the width",
+        ));
         let out = f.position(10, 3);
         for line in &out {
             // visible width (no ANSI here) must be <= 10

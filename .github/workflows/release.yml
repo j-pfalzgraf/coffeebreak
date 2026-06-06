@@ -27,10 +27,39 @@ permissions:
 
 jobs:
   # ---------------------------------------------------------------------------
+  # Gate the release: the tag must match Cargo.toml, and fmt/lint/tests pass.
+  # (CI runs on branches/PRs, not on tags, so we re-check here.)
+  # ---------------------------------------------------------------------------
+  check:
+    name: pre-release checks
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          components: rustfmt, clippy
+      - uses: Swatinem/rust-cache@v2
+      - name: Verify tag matches Cargo.toml version
+        if: github.ref_type == 'tag'
+        shell: bash
+        run: |
+          tag="${GITHUB_REF_NAME#v}"
+          crate="$(grep -m1 '^version *=' Cargo.toml | sed -E 's/.*"([^"]+)".*/\1/')"
+          echo "tag=$tag  cargo=$crate"
+          if [ "$tag" != "$crate" ]; then
+            echo "::error::Tag v$tag does not match Cargo.toml version $crate" >&2
+            exit 1
+          fi
+      - run: cargo fmt --all --check
+      - run: cargo clippy --all-targets --locked -- -D warnings
+      - run: cargo test --locked
+
+  # ---------------------------------------------------------------------------
   # Build + package one archive per target triple.
   # ---------------------------------------------------------------------------
   build:
     name: build ${{ matrix.target }}
+    needs: check
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false # one target failing should not cancel the others
@@ -142,6 +171,10 @@ jobs:
     needs: build
     runs-on: ubuntu-latest
     steps:
+      # Checkout so we can read CHANGELOG.md for the release notes.
+      - name: Checkout
+        uses: actions/checkout@v4
+
       # Download every build job's artifact into ./dist, flattening the
       # per-artifact subdirectories so all archives sit side by side.
       - name: Download all artifacts
@@ -149,6 +182,24 @@ jobs:
         with:
           path: dist
           merge-multiple: true
+
+      # Pull this version's section out of CHANGELOG.md for the release body.
+      # Falls back to a generic line; auto-generated notes are appended below.
+      - name: Extract release notes
+        id: notes
+        shell: bash
+        run: |
+          version="${GITHUB_REF_NAME#v}"
+          out="$RUNNER_TEMP/notes.md"
+          awk -v ver="$version" '
+            $0 ~ ("^## \\[" ver "\\]") { grab = 1; next }
+            grab && /^## \[/ { exit }
+            grab { print }
+          ' CHANGELOG.md > "$out" || true
+          if [ ! -s "$out" ]; then
+            printf "Release %s.\n" "$GITHUB_REF_NAME" > "$out"
+          fi
+          echo "path=$out" >> "$GITHUB_OUTPUT"
 
       # Generate a single SHA256SUMS file in `sha256sum` format. We cd into the
       # dist dir so the filenames recorded are bare (no `dist/` prefix), which
@@ -178,6 +229,8 @@ jobs:
           draft: false
           prerelease: false
           fail_on_unmatched_files: true
+          body_path: ${{ steps.notes.outputs.path }}
+          generate_release_notes: true
           files: |
             dist/coffeebreak-*.tar.gz
             dist/coffeebreak-*.zip

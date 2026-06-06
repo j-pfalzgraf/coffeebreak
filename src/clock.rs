@@ -42,7 +42,11 @@ pub struct PhaseTimer {
 impl PhaseTimer {
     /// Start a timer of length `total`, running, as of `now`.
     pub fn start(total: Duration, now: Instant) -> PhaseTimer {
-        PhaseTimer { total, accumulated: Duration::ZERO, running_since: Some(now) }
+        PhaseTimer {
+            total,
+            accumulated: Duration::ZERO,
+            running_since: Some(now),
+        }
     }
 
     /// Whether the timer is currently paused.

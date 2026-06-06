@@ -6,28 +6,45 @@ pub static ENTRIES: super::Table = &[
     (super::Msg::PhaseShortBreak, "PAUSE"),
     (super::Msg::PhaseLongBreak, "GRANDE PAUSE"),
     (super::Msg::AnnounceFocus, "C'est l'heure de se concentrer."),
-    (super::Msg::AnnounceShortBreak, "Petite pause — éloignez-vous du clavier."),
-    (super::Msg::AnnounceLongBreak, "Grande pause — vous l'avez méritée."),
-
+    (
+        super::Msg::AnnounceShortBreak,
+        "Petite pause — éloignez-vous du clavier.",
+    ),
+    (
+        super::Msg::AnnounceLongBreak,
+        "Grande pause — vous l'avez méritée.",
+    ),
     (super::Msg::PomodoroOne, "pomodoro"),
     (super::Msg::PomodoroOther, "pomodoros"),
     (super::Msg::CycleOne, "cycle"),
     (super::Msg::CycleOther, "cycles"),
     (super::Msg::DayOne, "jour"),
     (super::Msg::DayOther, "jours"),
-
-    (super::Msg::ControlsHint, "space pause · s passer · +/- ajuster · q quitter"),
+    (
+        super::Msg::ControlsHint,
+        "space pause · s passer · +/- ajuster · q quitter",
+    ),
     (super::Msg::Paused, "EN PAUSE"),
     (super::Msg::Left, "restant"),
     (super::Msg::CycleOf, "cycle {n} sur {total}"),
-
     (super::Msg::DoneFooter, "Terminé ! {count} accomplis. ☕"),
-    (super::Msg::StoppedFooter, "Arrêté — {count} accomplis durant cette session."),
-    (super::Msg::CelebrateMsg, "Session terminée — {count} accomplis !"),
-    (super::Msg::PlanSummary, "{count} · concentration {work} / pause {brk}"),
-
+    (
+        super::Msg::StoppedFooter,
+        "Arrêté — {count} accomplis durant cette session.",
+    ),
+    (
+        super::Msg::CelebrateMsg,
+        "Session terminée — {count} accomplis !",
+    ),
+    (
+        super::Msg::PlanSummary,
+        "{count} · concentration {work} / pause {brk}",
+    ),
     (super::Msg::StatsTitle, "☕ coffeebreak — statistiques"),
-    (super::Msg::StatsEmpty, "Aucun pomodoro terminé pour l'instant — lancez `coffeebreak` pour commencer ! ☕"),
+    (
+        super::Msg::StatsEmpty,
+        "Aucun pomodoro terminé pour l'instant — lancez `coffeebreak` pour commencer ! ☕",
+    ),
     (super::Msg::StatsToday, "Aujourd'hui :"),
     (super::Msg::StatsAllTime, "Total :"),
     (super::Msg::StatsStreak, "Série en cours :"),
@@ -42,68 +59,130 @@ pub static ENTRIES: super::Table = &[
     (super::Msg::GoalReached, "objectif atteint !"),
     (super::Msg::MinFocus, "min de concentration"),
     (super::Msg::Over, "sur"),
-
     (super::Msg::DoctorTitle, "☕ coffeebreak — diagnostic"),
     (super::Msg::DoctorTerminal, "Terminal"),
     (super::Msg::DoctorTtyYes, "interactif (UI animée)"),
     (super::Msg::DoctorTtyNo, "pas un TTY (sortie simple)"),
     (super::Msg::DoctorColor, "Truecolor"),
     (super::Msg::DoctorColorYes, "pris en charge"),
-    (super::Msg::DoctorColorNo, "non détecté (définir COLORTERM=truecolor)"),
+    (
+        super::Msg::DoctorColorNo,
+        "non détecté (définir COLORTERM=truecolor)",
+    ),
     (super::Msg::DoctorLang, "Langue"),
     (super::Msg::DoctorConfig, "Fichier de config"),
     (super::Msg::DoctorConfigExists, "présent"),
-    (super::Msg::DoctorConfigMissing, "non créé (lancer : coffeebreak config init)"),
+    (
+        super::Msg::DoctorConfigMissing,
+        "non créé (lancer : coffeebreak config init)",
+    ),
     (super::Msg::DoctorData, "Dossier de données"),
     (super::Msg::DoctorDataOk, "accessible en écriture"),
     (super::Msg::DoctorDataNo, "non accessible en écriture"),
     (super::Msg::DoctorNotify, "Notifications"),
     (super::Msg::DoctorNotifyYes, "disponibles"),
-    (super::Msg::DoctorNotifyNo, "aucun service de notification détecté"),
+    (
+        super::Msg::DoctorNotifyNo,
+        "aucun service de notification détecté",
+    ),
     (super::Msg::DoctorSound, "Son"),
-    (super::Msg::DoctorSoundChime, "carillon rodio (sound feature)"),
+    (
+        super::Msg::DoctorSoundChime,
+        "carillon rodio (sound feature)",
+    ),
     (super::Msg::DoctorSoundBell, "cloche du terminal"),
-
     (super::Msg::ThemesTitle, "Thèmes disponibles :"),
-    (super::Msg::ThemesHint, "Utilisez-en un avec : coffeebreak --theme <nom>"),
+    (
+        super::Msg::ThemesHint,
+        "Utilisez-en un avec : coffeebreak --theme <nom>",
+    ),
     (super::Msg::PresetsTitle, "Préréglages disponibles :"),
-    (super::Msg::PresetsHint, "Utilisez-en un avec : coffeebreak --preset <nom>"),
-    (super::Msg::PresetCadence, "{work} min de concentration / {brk} min de pause · {count}"),
-    (super::Msg::PresetLong, ", grande pause {long} min toutes les {every}"),
+    (
+        super::Msg::PresetsHint,
+        "Utilisez-en un avec : coffeebreak --preset <nom>",
+    ),
+    (
+        super::Msg::PresetCadence,
+        "{work} min de concentration / {brk} min de pause · {count}",
+    ),
+    (
+        super::Msg::PresetLong,
+        ", grande pause {long} min toutes les {every}",
+    ),
     (super::Msg::LanguagesTitle, "Langues disponibles :"),
-    (super::Msg::LanguagesHint, "Utilisez-en une avec : coffeebreak --lang <code>"),
-
+    (
+        super::Msg::LanguagesHint,
+        "Utilisez-en une avec : coffeebreak --lang <code>",
+    ),
     (super::Msg::ConfigCreated, "Configuration créée :"),
     (super::Msg::ConfigExists, "La configuration existe déjà à"),
-
     (super::Msg::UpdateCurrent, "Version actuelle : {version}"),
     (super::Msg::UpdateSource, "Source : {url}"),
-    (super::Msg::UpdateUpToDate, "coffeebreak {version} est à jour."),
-    (super::Msg::UpdateNewer, "Une version plus récente est disponible : {current} -> {latest}"),
-    (super::Msg::UpdateRunHint, "Lancez `coffeebreak self update` pour mettre à jour."),
+    (
+        super::Msg::UpdateUpToDate,
+        "coffeebreak {version} est à jour.",
+    ),
+    (
+        super::Msg::UpdateNewer,
+        "Une version plus récente est disponible : {current} -> {latest}",
+    ),
+    (
+        super::Msg::UpdateRunHint,
+        "Lancez `coffeebreak self update` pour mettre à jour.",
+    ),
     (super::Msg::UpdateDone, "✓ Mis à jour vers {version}."),
     (super::Msg::UpdateAlready, "Déjà à jour ({version})."),
-    (super::Msg::UninstallIntro, "Ceci supprimera coffeebreak et ses données :"),
+    (
+        super::Msg::UninstallIntro,
+        "Ceci supprimera coffeebreak et ses données :",
+    ),
     (super::Msg::UninstallItemBinary, "binaire"),
     (super::Msg::UninstallItemConfig, "configuration"),
     (super::Msg::UninstallItemData, "données"),
     (super::Msg::UninstallConfirm, "Tout supprimer ?"),
-    (super::Msg::UninstallAborted, "Annulé. Rien n'a été supprimé."),
+    (
+        super::Msg::UninstallAborted,
+        "Annulé. Rien n'a été supprimé.",
+    ),
     (super::Msg::UninstallRemoved, "✓ {path} supprimé"),
-    (super::Msg::UninstallBinFail, "Impossible de supprimer le binaire automatiquement ({error})."),
-    (super::Msg::UninstallDone, "coffeebreak désinstallé. ☕ Merci pour les sessions de concentration !"),
+    (
+        super::Msg::UninstallBinFail,
+        "Impossible de supprimer le binaire automatiquement ({error}).",
+    ),
+    (
+        super::Msg::UninstallDone,
+        "coffeebreak désinstallé. ☕ Merci pour les sessions de concentration !",
+    ),
     (super::Msg::ConfirmYesNo, "[o/N]"),
     (super::Msg::ConfirmAffirmative, "o"),
-    (super::Msg::NotATerminal, "pas un terminal ; relancez avec --yes pour confirmer de façon non interactive"),
-
+    (
+        super::Msg::NotATerminal,
+        "pas un terminal ; relancez avec --yes pour confirmer de façon non interactive",
+    ),
     (super::Msg::WordError, "erreur"),
-    (super::Msg::WarnStatsSave, "impossible d'enregistrer les statistiques ({error})"),
-    (super::Msg::WarnStatsRead, "statistiques illisibles ignorées ({error})"),
-    (super::Msg::WarnCtrlc, "impossible d'installer le gestionnaire Ctrl+C ({error}) ; les statistiques peuvent ne pas être enregistrées si vous interrompez la session"),
-
-    (super::Msg::HelpAbout, "Un minuteur Pomodoro pour votre terminal ☕"),
-    (super::Msg::HelpLongAbout, "coffeebreak enchaîne des cycles de concentration et de pause Pomodoro avec une tasse de café animée en direct dont la vapeur et le remplissage suivent le temps, de grands chiffres de compte à rebours, une barre de progression en dégradé, des notifications de bureau et une citation de développeur à chaque pause."),
-    (super::Msg::HelpAfter, "Exemples :\n  \
+    (
+        super::Msg::WarnStatsSave,
+        "impossible d'enregistrer les statistiques ({error})",
+    ),
+    (
+        super::Msg::WarnStatsRead,
+        "statistiques illisibles ignorées ({error})",
+    ),
+    (
+        super::Msg::WarnCtrlc,
+        "impossible d'installer le gestionnaire Ctrl+C ({error}) ; les statistiques peuvent ne pas être enregistrées si vous interrompez la session",
+    ),
+    (
+        super::Msg::HelpAbout,
+        "Un minuteur Pomodoro pour votre terminal ☕",
+    ),
+    (
+        super::Msg::HelpLongAbout,
+        "coffeebreak enchaîne des cycles de concentration et de pause Pomodoro avec une tasse de café animée en direct dont la vapeur et le remplissage suivent le temps, de grands chiffres de compte à rebours, une barre de progression en dégradé, des notifications de bureau et une citation de développeur à chaque pause.",
+    ),
+    (
+        super::Msg::HelpAfter,
+        "Exemples :\n  \
                  coffeebreak                         25/5 classique, un cycle\n  \
                  coffeebreak --preset classic        Quatre rounds 25/5, finissant par une grande pause\n  \
                  coffeebreak -w 50 -b 10 --cycles 3  Travail intense : trois rounds 50/10\n  \
@@ -113,43 +192,155 @@ pub static ENTRIES: super::Table = &[
                  Pendant une session :\n  \
                  space / p   mettre en pause ou reprendre  s / n   passer la phase en cours\n  \
                  + / =       ajouter une minute            - / _   retirer une minute\n  \
-                 q / Esc     quitter (les statistiques sont enregistrées)"),
-    (super::Msg::HelpStats, "Afficher les statistiques de concentration (aujourd'hui, total, série, meilleur jour)"),
-    (super::Msg::HelpConfig, "Inspecter ou créer le fichier de configuration"),
-    (super::Msg::HelpThemes, "Lister les thèmes de couleurs disponibles avec un aperçu"),
-    (super::Msg::HelpPresets, "Lister les préréglages de minuteur disponibles"),
-    (super::Msg::HelpLanguages, "Lister les langues d'interface disponibles"),
-    (super::Msg::HelpDoctor, "Lancer des diagnostics d'environnement (terminal, langue, config, …)"),
-    (super::Msg::HelpCompletions, "Générer un script de complétion shell (bash, zsh, fish, …)"),
-    (super::Msg::HelpMan, "Afficher une page de manuel roff sur la sortie standard"),
-    (super::Msg::HelpSelf, "Gérer le binaire coffeebreak installé (mettre à jour / désinstaller)"),
-    (super::Msg::HelpSelfUpdate, "Mettre à jour coffeebreak vers la dernière version GitHub"),
-    (super::Msg::HelpSelfUninstall, "Supprimer le binaire coffeebreak et ses dossiers de configuration/données"),
-    (super::Msg::HelpConfigInit, "Écrire un fichier de configuration par défaut (sans effet s'il en existe déjà un)"),
-    (super::Msg::HelpConfigPath, "Afficher le chemin du fichier de configuration"),
-    (super::Msg::HelpConfigShow, "Afficher la configuration effective"),
-    (super::Msg::HelpUpdateCheck, "Vérifier seulement si une version plus récente existe ; ne pas installer"),
-    (super::Msg::HelpUninstallYes, "Ignorer la demande de confirmation"),
-    (super::Msg::HelpCompletionsShell, "Le shell pour lequel générer les complétions"),
-    (super::Msg::HelpWork, "Durée du bloc de concentration en minutes (par défaut 25)"),
-    (super::Msg::HelpBreak, "Durée de la pause en minutes (par défaut 5)"),
-    (super::Msg::HelpCycles, "Nombre de cycles concentration→pause à exécuter (par défaut 1)"),
-    (super::Msg::HelpGoal, "Objectif quotidien de pomodoros affiché dans les stats (0 = désactivé)"),
-    (super::Msg::HelpPreset, "Démarrer à partir d'un préréglage nommé : classic, deep, short, sprint"),
-    (super::Msg::HelpLong, "Activer une grande pause après chaque N blocs de concentration"),
-    (super::Msg::HelpLongBreak, "Durée de la grande pause en minutes (implique --long ; par défaut 15)"),
-    (super::Msg::HelpLongEvery, "Combien de blocs de concentration avant une grande pause (par défaut 4)"),
-    (super::Msg::HelpLabel, "Étiquette facultative pour cette session (affichée dans la ligne d'état)"),
-    (super::Msg::HelpGitLabel, "Utiliser la branche git actuelle comme étiquette de session"),
-    (super::Msg::HelpTheme, "Thème de couleurs : coffee, ocean, forest, grape, mono"),
-    (super::Msg::HelpFps, "Images d'animation par seconde (2–60 ; par défaut 15)"),
-    (super::Msg::HelpPlain, "Sortie en ligne simple, sans animation (utilisée aussi automatiquement en pipe)"),
+                 q / Esc     quitter (les statistiques sont enregistrées)",
+    ),
+    (
+        super::Msg::HelpStats,
+        "Afficher les statistiques de concentration (aujourd'hui, total, série, meilleur jour)",
+    ),
+    (
+        super::Msg::HelpConfig,
+        "Inspecter ou créer le fichier de configuration",
+    ),
+    (
+        super::Msg::HelpThemes,
+        "Lister les thèmes de couleurs disponibles avec un aperçu",
+    ),
+    (
+        super::Msg::HelpPresets,
+        "Lister les préréglages de minuteur disponibles",
+    ),
+    (
+        super::Msg::HelpLanguages,
+        "Lister les langues d'interface disponibles",
+    ),
+    (
+        super::Msg::HelpDoctor,
+        "Lancer des diagnostics d'environnement (terminal, langue, config, …)",
+    ),
+    (
+        super::Msg::HelpCompletions,
+        "Générer un script de complétion shell (bash, zsh, fish, …)",
+    ),
+    (
+        super::Msg::HelpMan,
+        "Afficher une page de manuel roff sur la sortie standard",
+    ),
+    (
+        super::Msg::HelpSelf,
+        "Gérer le binaire coffeebreak installé (mettre à jour / désinstaller)",
+    ),
+    (
+        super::Msg::HelpSelfUpdate,
+        "Mettre à jour coffeebreak vers la dernière version GitHub",
+    ),
+    (
+        super::Msg::HelpSelfUninstall,
+        "Supprimer le binaire coffeebreak et ses dossiers de configuration/données",
+    ),
+    (
+        super::Msg::HelpConfigInit,
+        "Écrire un fichier de configuration par défaut (sans effet s'il en existe déjà un)",
+    ),
+    (
+        super::Msg::HelpConfigPath,
+        "Afficher le chemin du fichier de configuration",
+    ),
+    (
+        super::Msg::HelpConfigShow,
+        "Afficher la configuration effective",
+    ),
+    (
+        super::Msg::HelpUpdateCheck,
+        "Vérifier seulement si une version plus récente existe ; ne pas installer",
+    ),
+    (
+        super::Msg::HelpUninstallYes,
+        "Ignorer la demande de confirmation",
+    ),
+    (
+        super::Msg::HelpCompletionsShell,
+        "Le shell pour lequel générer les complétions",
+    ),
+    (
+        super::Msg::HelpWork,
+        "Durée du bloc de concentration en minutes (par défaut 25)",
+    ),
+    (
+        super::Msg::HelpBreak,
+        "Durée de la pause en minutes (par défaut 5)",
+    ),
+    (
+        super::Msg::HelpCycles,
+        "Nombre de cycles concentration→pause à exécuter (par défaut 1)",
+    ),
+    (
+        super::Msg::HelpGoal,
+        "Objectif quotidien de pomodoros affiché dans les stats (0 = désactivé)",
+    ),
+    (
+        super::Msg::HelpPreset,
+        "Démarrer à partir d'un préréglage nommé : classic, deep, short, sprint",
+    ),
+    (
+        super::Msg::HelpLong,
+        "Activer une grande pause après chaque N blocs de concentration",
+    ),
+    (
+        super::Msg::HelpLongBreak,
+        "Durée de la grande pause en minutes (implique --long ; par défaut 15)",
+    ),
+    (
+        super::Msg::HelpLongEvery,
+        "Combien de blocs de concentration avant une grande pause (par défaut 4)",
+    ),
+    (
+        super::Msg::HelpLabel,
+        "Étiquette facultative pour cette session (affichée dans la ligne d'état)",
+    ),
+    (
+        super::Msg::HelpGitLabel,
+        "Utiliser la branche git actuelle comme étiquette de session",
+    ),
+    (
+        super::Msg::HelpTheme,
+        "Thème de couleurs : coffee, ocean, forest, grape, mono",
+    ),
+    (
+        super::Msg::HelpFps,
+        "Images d'animation par seconde (2–60 ; par défaut 15)",
+    ),
+    (
+        super::Msg::HelpPlain,
+        "Sortie en ligne simple, sans animation (utilisée aussi automatiquement en pipe)",
+    ),
     (super::Msg::HelpNoColor, "Désactiver la sortie en couleurs"),
-    (super::Msg::HelpNoSound, "Couper le signal sonore au changement de phase"),
-    (super::Msg::HelpNoNotify, "Ne pas envoyer de notifications de bureau"),
-    (super::Msg::HelpStatsFlag, "Afficher les statistiques du jour et globales, puis quitter"),
-    (super::Msg::HelpLang, "Langue d'interface : en, de, es, fr, it, pt"),
-    (super::Msg::WaitContinue, "Appuie sur une touche pour continuer · q pour quitter"),
-    (super::Msg::WaitContinuePlain, "Appuie sur Entrée pour continuer…"),
-    (super::Msg::HelpWait, "Attendre une touche entre les phases au lieu d'enchaîner automatiquement"),
+    (
+        super::Msg::HelpNoSound,
+        "Couper le signal sonore au changement de phase",
+    ),
+    (
+        super::Msg::HelpNoNotify,
+        "Ne pas envoyer de notifications de bureau",
+    ),
+    (
+        super::Msg::HelpStatsFlag,
+        "Afficher les statistiques du jour et globales, puis quitter",
+    ),
+    (
+        super::Msg::HelpLang,
+        "Langue d'interface : en, de, es, fr, it, pt",
+    ),
+    (
+        super::Msg::WaitContinue,
+        "Appuie sur une touche pour continuer · q pour quitter",
+    ),
+    (
+        super::Msg::WaitContinuePlain,
+        "Appuie sur Entrée pour continuer…",
+    ),
+    (
+        super::Msg::HelpWait,
+        "Attendre une touche entre les phases au lieu d'enchaîner automatiquement",
+    ),
 ];

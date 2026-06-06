@@ -42,7 +42,10 @@ fn run() -> Result<()> {
     // Load config leniently for pre-parse locale/theme/goal (a bad config must
     // not block --help or meta commands; the timer path re-loads it strictly).
     let cfg = Config::load().ok();
-    let cfg_lang = cfg.as_ref().map(|c| c.language.clone()).filter(|s| !s.is_empty());
+    let cfg_lang = cfg
+        .as_ref()
+        .map(|c| c.language.clone())
+        .filter(|s| !s.is_empty());
     let help_i18n = I18n::detect(scan_lang_arg().as_deref(), cfg_lang.as_deref());
 
     let cli = Cli::parse_localized(&help_i18n);
@@ -51,9 +54,8 @@ fn run() -> Result<()> {
     let i18n = I18n::detect(cli.lang.as_deref(), cfg_lang.as_deref());
 
     // Colour for non-timer output: honour --no-color, NO_COLOR, and tty-ness.
-    let color = !cli.no_color
-        && std::env::var_os("NO_COLOR").is_none()
-        && std::io::stdout().is_terminal();
+    let color =
+        !cli.no_color && std::env::var_os("NO_COLOR").is_none() && std::io::stdout().is_terminal();
     let theme_name = cli
         .theme
         .clone()
@@ -61,7 +63,10 @@ fn run() -> Result<()> {
         .filter(|t| !t.is_empty())
         .unwrap_or_else(|| DEFAULT_THEME.to_string());
     let meta_theme = Theme::resolve(&theme_name, color);
-    let goal = cli.goal.or_else(|| cfg.as_ref().map(|c| c.daily_goal)).unwrap_or(0);
+    let goal = cli
+        .goal
+        .or_else(|| cfg.as_ref().map(|c| c.daily_goal))
+        .unwrap_or(0);
 
     // Subcommands (none of these run the timer).
     if let Some(cmd) = &cli.command {
@@ -116,7 +121,10 @@ fn run() -> Result<()> {
     {
         let flag = shutdown.clone();
         if let Err(e) = ctrlc::set_handler(move || flag.store(true, Ordering::SeqCst)) {
-            eprintln!("coffeebreak: {}", i18n.tf(Msg::WarnCtrlc, &[("error", &e.to_string())]));
+            eprintln!(
+                "coffeebreak: {}",
+                i18n.tf(Msg::WarnCtrlc, &[("error", &e.to_string())])
+            );
         }
     }
 
@@ -124,7 +132,10 @@ fn run() -> Result<()> {
     let outcome = app.run(&session, &mut stats, shutdown);
 
     if let Err(e) = stats.save() {
-        eprintln!("coffeebreak: {}", i18n.tf(Msg::WarnStatsSave, &[("error", &format!("{e:#}"))]));
+        eprintln!(
+            "coffeebreak: {}",
+            i18n.tf(Msg::WarnStatsSave, &[("error", &format!("{e:#}"))])
+        );
     }
 
     let outcome = outcome?;

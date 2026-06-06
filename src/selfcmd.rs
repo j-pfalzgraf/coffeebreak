@@ -40,21 +40,33 @@ pub fn update(check_only: bool, i18n: &I18n) -> Result<()> {
             );
             println!("{}", i18n.t(Msg::UpdateRunHint));
         } else {
-            println!("{}", i18n.tf(Msg::UpdateUpToDate, &[("version", CURRENT_VERSION)]));
+            println!(
+                "{}",
+                i18n.tf(Msg::UpdateUpToDate, &[("version", CURRENT_VERSION)])
+            );
         }
         return Ok(());
     }
 
     // Be transparent about what is about to happen (security stance).
-    println!("{}", i18n.tf(Msg::UpdateCurrent, &[("version", CURRENT_VERSION)]));
+    println!(
+        "{}",
+        i18n.tf(Msg::UpdateCurrent, &[("version", CURRENT_VERSION)])
+    );
     let url = format!("https://github.com/{REPO_OWNER}/{REPO_NAME}/releases");
     println!("{}", i18n.tf(Msg::UpdateSource, &[("url", &url)]));
 
     let status = updater.update().context("update failed")?;
     if status.updated() {
-        println!("{}", i18n.tf(Msg::UpdateDone, &[("version", status.version())]));
+        println!(
+            "{}",
+            i18n.tf(Msg::UpdateDone, &[("version", status.version())])
+        );
     } else {
-        println!("{}", i18n.tf(Msg::UpdateAlready, &[("version", status.version())]));
+        println!(
+            "{}",
+            i18n.tf(Msg::UpdateAlready, &[("version", status.version())])
+        );
     }
     Ok(())
 }
@@ -71,9 +83,21 @@ pub fn uninstall(assume_yes: bool, i18n: &I18n) -> Result<()> {
     let data_dir = paths::data_dir()?;
 
     println!("{}", i18n.t(Msg::UninstallIntro));
-    println!("  • {:<7} {}", i18n.t(Msg::UninstallItemBinary), binary.display());
-    println!("  • {:<7} {}", i18n.t(Msg::UninstallItemConfig), config_dir.display());
-    println!("  • {:<7} {}", i18n.t(Msg::UninstallItemData), data_dir.display());
+    println!(
+        "  • {:<7} {}",
+        i18n.t(Msg::UninstallItemBinary),
+        binary.display()
+    );
+    println!(
+        "  • {:<7} {}",
+        i18n.t(Msg::UninstallItemConfig),
+        config_dir.display()
+    );
+    println!(
+        "  • {:<7} {}",
+        i18n.t(Msg::UninstallItemData),
+        data_dir.display()
+    );
     println!();
 
     if !assume_yes && !confirm(i18n.t(Msg::UninstallConfirm), i18n)? {
@@ -86,7 +110,13 @@ pub fn uninstall(assume_yes: bool, i18n: &I18n) -> Result<()> {
 
     match fs::remove_file(&binary) {
         Ok(()) => {
-            println!("{}", i18n.tf(Msg::UninstallRemoved, &[("path", &binary.display().to_string())]))
+            println!(
+                "{}",
+                i18n.tf(
+                    Msg::UninstallRemoved,
+                    &[("path", &binary.display().to_string())]
+                )
+            )
         }
         Err(e) => {
             // On Windows a running executable can't delete itself.
@@ -106,7 +136,13 @@ pub fn uninstall(assume_yes: bool, i18n: &I18n) -> Result<()> {
 fn remove_dir_if_present(dir: &std::path::Path, i18n: &I18n) -> Result<()> {
     match fs::remove_dir_all(dir) {
         Ok(()) => {
-            println!("{}", i18n.tf(Msg::UninstallRemoved, &[("path", &dir.display().to_string())]));
+            println!(
+                "{}",
+                i18n.tf(
+                    Msg::UninstallRemoved,
+                    &[("path", &dir.display().to_string())]
+                )
+            );
             Ok(())
         }
         Err(e) if e.kind() == io::ErrorKind::NotFound => Ok(()),

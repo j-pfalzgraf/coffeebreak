@@ -60,7 +60,11 @@ pub fn poll_wait(timeout: Duration) -> Result<WaitEvent> {
         return Ok(WaitEvent::Timeout);
     }
     match event::read()? {
-        Event::Key(key) => Ok(if is_quit(key) { WaitEvent::Quit } else { WaitEvent::Continue }),
+        Event::Key(key) => Ok(if is_quit(key) {
+            WaitEvent::Quit
+        } else {
+            WaitEvent::Continue
+        }),
         Event::Resize(_, _) => Ok(WaitEvent::Resize),
         _ => Ok(WaitEvent::Timeout),
     }
@@ -73,7 +77,10 @@ fn is_quit(key: KeyEvent) -> bool {
     {
         return true;
     }
-    matches!(key.code, KeyCode::Char('q') | KeyCode::Char('Q') | KeyCode::Esc)
+    matches!(
+        key.code,
+        KeyCode::Char('q') | KeyCode::Char('Q') | KeyCode::Esc
+    )
 }
 
 fn map_key(key: KeyEvent) -> Option<Control> {

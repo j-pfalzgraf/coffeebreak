@@ -66,9 +66,7 @@ impl Stats {
             Ok(text) => serde_json::from_str(&text)
                 .with_context(|| format!("failed to parse stats at {}", path.display())),
             Err(e) if e.kind() == std::io::ErrorKind::NotFound => Ok(Stats::default()),
-            Err(e) => {
-                Err(e).with_context(|| format!("failed to read stats at {}", path.display()))
-            }
+            Err(e) => Err(e).with_context(|| format!("failed to read stats at {}", path.display())),
         }
     }
 
@@ -78,7 +76,10 @@ impl Stats {
         match Stats::load() {
             Ok(s) => s,
             Err(e) => {
-                eprintln!("coffeebreak: {}", i18n.tf(Msg::WarnStatsRead, &[("error", &format!("{e:#}"))]));
+                eprintln!(
+                    "coffeebreak: {}",
+                    i18n.tf(Msg::WarnStatsRead, &[("error", &format!("{e:#}"))])
+                );
                 Stats::default()
             }
         }
@@ -138,7 +139,10 @@ impl Stats {
 
     /// The stats for a specific date (zeroed if absent).
     pub fn day(&self, date: NaiveDate) -> DayStat {
-        self.days.get(&date.format("%Y-%m-%d").to_string()).copied().unwrap_or_default()
+        self.days
+            .get(&date.format("%Y-%m-%d").to_string())
+            .copied()
+            .unwrap_or_default()
     }
 
     /// The last `n` days up to and including `today`, oldest first, with absent
@@ -250,7 +254,11 @@ impl Stats {
             format!("  {} {}", theme.bold(format!("{label:<16}"), accent), value)
         };
 
-        let mut lines = vec![String::new(), theme.bold(i18n.t(Msg::StatsTitle), accent), String::new()];
+        let mut lines = vec![
+            String::new(),
+            theme.bold(i18n.t(Msg::StatsTitle), accent),
+            String::new(),
+        ];
 
         // --- textual summary (shown in full from the first frame) ---
         let (pomos, minutes, days) = self.totals();
@@ -274,12 +282,21 @@ impl Stats {
                 i18n.count(days as u64, Noun::Day),
             ),
         ));
-        lines.push(field(i18n.t(Msg::StatsStreak), i18n.count(self.streak(today_date), Noun::Day)));
-        lines.push(field(i18n.t(Msg::StatsLongestStreak), i18n.count(self.longest_streak(), Noun::Day)));
+        lines.push(field(
+            i18n.t(Msg::StatsStreak),
+            i18n.count(self.streak(today_date), Noun::Day),
+        ));
+        lines.push(field(
+            i18n.t(Msg::StatsLongestStreak),
+            i18n.count(self.longest_streak(), Noun::Day),
+        ));
         if let Some((date, stat)) = self.best_day() {
             lines.push(field(
                 i18n.t(Msg::StatsBestDay),
-                format!("{date} ({})", i18n.count(stat.completed_pomodoros, Noun::Pomodoro)),
+                format!(
+                    "{date} ({})",
+                    i18n.count(stat.completed_pomodoros, Noun::Pomodoro)
+                ),
             ));
         }
 
@@ -289,15 +306,21 @@ impl Stats {
             let bar = charts::goal_bar(theme, done, goal, 20, accent);
             let mut value = format!("{} {}/{}", bar.as_str(), done, goal);
             if reveal >= 1.0 && today_stat.completed_pomodoros >= goal {
-                value.push_str(&format!("  {}", theme.bold(i18n.t(Msg::GoalReached), p.success)));
+                value.push_str(&format!(
+                    "  {}",
+                    theme.bold(i18n.t(Msg::GoalReached), p.success)
+                ));
             }
             lines.push(String::new());
             lines.push(field(i18n.t(Msg::StatsGoal), value));
         }
 
         // --- last 14 days bar chart ---
-        let last14: Vec<u64> =
-            self.last_n_days(14, today_date).iter().map(|(_, d)| scale(d.completed_pomodoros)).collect();
+        let last14: Vec<u64> = self
+            .last_n_days(14, today_date)
+            .iter()
+            .map(|(_, d)| scale(d.completed_pomodoros))
+            .collect();
         lines.push(String::new());
         lines.push(format!("  {}", theme.dim(i18n.t(Msg::StatsLast14))));
         for bar in charts::bar_chart(theme, &last14, 5, p.focus, accent) {
@@ -306,8 +329,14 @@ impl Stats {
 
         // --- last 12 weeks contribution heatmap ---
         let series = self.last_n_days(84, today_date);
-        let counts: Vec<u64> = series.iter().map(|(_, d)| scale(d.completed_pomodoros)).collect();
-        let first_wd = series.first().map(|(d, _)| d.weekday().num_days_from_monday() as usize).unwrap_or(0);
+        let counts: Vec<u64> = series
+            .iter()
+            .map(|(_, d)| scale(d.completed_pomodoros))
+            .collect();
+        let first_wd = series
+            .first()
+            .map(|(d, _)| d.weekday().num_days_from_monday() as usize)
+            .unwrap_or(0);
         let empty_cell = p.muted.shade(0.3);
         lines.push(String::new());
         lines.push(format!("  {}", theme.dim(i18n.t(Msg::StatsHeatmap))));
@@ -368,7 +397,10 @@ mod tests {
         let counts: Vec<u64> = series.iter().map(|(_, d)| d.completed_pomodoros).collect();
         // oldest first: 06-03=1, 06-04=0 (gap filled), 06-05=1
         assert_eq!(counts, vec![1, 0, 1]);
-        assert_eq!(series.first().unwrap().0, NaiveDate::from_ymd_opt(2026, 6, 3).unwrap());
+        assert_eq!(
+            series.first().unwrap().0,
+            NaiveDate::from_ymd_opt(2026, 6, 3).unwrap()
+        );
         assert_eq!(series.last().unwrap().0, today);
     }
 
@@ -376,7 +408,13 @@ mod tests {
     fn longest_streak_finds_the_longest_run() {
         let mut s = Stats::default();
         // A run of 3, a gap, then a run of 2.
-        for d in ["2026-05-01", "2026-05-02", "2026-05-03", "2026-05-10", "2026-05-11"] {
+        for d in [
+            "2026-05-01",
+            "2026-05-02",
+            "2026-05-03",
+            "2026-05-10",
+            "2026-05-11",
+        ] {
             s.record_pomodoro(25, d);
         }
         assert_eq!(s.longest_streak(), 3);

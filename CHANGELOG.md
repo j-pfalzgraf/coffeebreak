@@ -68,6 +68,21 @@ themes and presets — all on top of a refactored, modular codebase.
   `theme`, `render`, `widgets`, `app`, `feedback`, and `clock`.
 - Plain line output is now selected **automatically** when stdout/stdin are not
   TTYs (pipes, CI), and can be forced with `--plain`.
+- The codebase is now **rustfmt-clean** (formatting is enforced by CI).
+
+### CI / Infrastructure
+
+- **Continuous integration** ([`ci.yml`](.github/workflows/ci.yml)): rustfmt,
+  clippy (`-D warnings`, with and without the `sound` feature), tests on
+  Linux/macOS/Windows, an MSRV (1.85) check, and a docs build that denies broken
+  links. Cargo caching throughout.
+- **Security audit** ([`audit.yml`](.github/workflows/audit.yml)) scanning for
+  RustSec advisories on every dependency change and weekly.
+- **Dependabot** ([`dependabot.yml`](.github/dependabot.yml)) for Cargo and
+  GitHub Actions updates.
+- **Hardened release pipeline**: a pre-release gate (tag↔`Cargo.toml` version
+  match plus fmt/clippy/tests) and release notes drawn from `CHANGELOG.md`.
+- Added issue forms, a pull-request template, and `CONTRIBUTING.md`.
 
 ## [0.1.0] - TBD
 

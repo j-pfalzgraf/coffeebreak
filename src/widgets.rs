@@ -178,7 +178,9 @@ pub fn big_time(theme: &Theme, text: &str, color: Rgb) -> Vec<Line> {
             }
         }
     }
-    rows.iter().map(|cells| row_from_cells(theme, cells)).collect()
+    rows.iter()
+        .map(|cells| row_from_cells(theme, cells))
+        .collect()
 }
 
 // ---------------------------------------------------------------------------
@@ -192,7 +194,11 @@ pub fn progress_bar(theme: &Theme, elapsed: f64, width: usize, from: Rgb, to: Rg
     let mut cells = Vec::with_capacity(width);
     for i in 0..width {
         if i < filled {
-            let t = if width > 1 { i as f64 / (width - 1) as f64 } else { 0.0 };
+            let t = if width > 1 {
+                i as f64 / (width - 1) as f64
+            } else {
+                0.0
+            };
             cells.push(('█', Some(from.lerp(to, t))));
         } else {
             cells.push(('░', Some(theme.palette.muted.shade(0.6))));
@@ -237,7 +243,10 @@ mod tests {
         let lines = coffee_cup(&theme, 0.5, 0.8, 0);
         let w = lines[0].width();
         assert_eq!(w, CUP_W);
-        assert!(lines.iter().all(|l| l.width() == w), "all cup lines same width");
+        assert!(
+            lines.iter().all(|l| l.width() == w),
+            "all cup lines same width"
+        );
     }
 
     #[test]

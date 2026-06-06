@@ -40,13 +40,18 @@ impl Feedback {
         } else {
             Box::new(SilentPlayer)
         };
-        Feedback { notifier, sound, i18n }
+        Feedback {
+            notifier,
+            sound,
+            i18n,
+        }
     }
 
     /// Announce entry into `phase` on every enabled channel.
     pub fn announce(&self, phase: Phase) {
         let summary = format!("coffeebreak — {}", self.i18n.phase_label(phase));
-        self.notifier.notify(&summary, self.i18n.phase_announce(phase));
+        self.notifier
+            .notify(&summary, self.i18n.phase_announce(phase));
         self.sound.play();
     }
 }

@@ -112,7 +112,11 @@ pub fn heatmap(
                 cells.push((' ', None)); // padding outside the data range
             } else {
                 let v = counts[slot - first_weekday];
-                let c = if v == 0 { empty } else { heat(empty, color, v, max) };
+                let c = if v == 0 {
+                    empty
+                } else {
+                    heat(empty, color, v, max)
+                };
                 cells.push(('■', Some(c)));
             }
         }
@@ -124,10 +128,18 @@ pub fn heatmap(
 /// A labelled progress bar toward a daily goal: `done`/`goal`.
 pub fn goal_bar(theme: &Theme, done: u64, goal: u64, width: usize, color: Rgb) -> Line {
     let width = width.max(1);
-    let frac = if goal == 0 { 0.0 } else { (done as f64 / goal as f64).clamp(0.0, 1.0) };
+    let frac = if goal == 0 {
+        0.0
+    } else {
+        (done as f64 / goal as f64).clamp(0.0, 1.0)
+    };
     let filled = (frac * width as f64).round() as usize;
     let reached = goal > 0 && done >= goal;
-    let bar_color = if reached { theme.palette.success } else { color };
+    let bar_color = if reached {
+        theme.palette.success
+    } else {
+        color
+    };
 
     let mut cells = Vec::with_capacity(width);
     for i in 0..width {

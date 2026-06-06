@@ -18,7 +18,11 @@ impl Rgb {
     pub fn lerp(self, other: Rgb, t: f64) -> Rgb {
         let t = t.clamp(0.0, 1.0);
         let mix = |a: u8, b: u8| (f64::from(a) + (f64::from(b) - f64::from(a)) * t).round() as u8;
-        Rgb(mix(self.0, other.0), mix(self.1, other.1), mix(self.2, other.2))
+        Rgb(
+            mix(self.0, other.0),
+            mix(self.1, other.1),
+            mix(self.2, other.2),
+        )
     }
 
     /// Scale brightness by `factor` (e.g. `0.6` to dim), clamped per channel.
@@ -29,7 +33,11 @@ impl Rgb {
 
     /// Convert to a crossterm colour.
     pub fn into_color(self) -> Color {
-        Color::Rgb { r: self.0, g: self.1, b: self.2 }
+        Color::Rgb {
+            r: self.0,
+            g: self.1,
+            b: self.2,
+        }
     }
 }
 
@@ -77,7 +85,11 @@ impl Theme {
             "mono" => ("mono", MONO),
             _ => ("coffee", COFFEE),
         };
-        Theme { name, palette, enabled }
+        Theme {
+            name,
+            palette,
+            enabled,
+        }
     }
 
     /// Whether colour output is on.
@@ -123,7 +135,10 @@ impl Theme {
     /// Dim/muted `text`.
     pub fn dim(&self, text: impl fmt::Display) -> String {
         if self.enabled {
-            format!("{}", format!("{text}").with(self.palette.muted.into_color()))
+            format!(
+                "{}",
+                format!("{text}").with(self.palette.muted.into_color())
+            )
         } else {
             format!("{text}")
         }
@@ -135,14 +150,14 @@ impl Theme {
 // ---------------------------------------------------------------------------
 
 const COFFEE: Palette = Palette {
-    focus: Rgb(0xE6, 0x7E, 0x22),       // warm amber
-    short_break: Rgb(0x3F, 0xB9, 0x50), // green
-    long_break: Rgb(0x9B, 0x59, 0xB6),  // purple
-    accent: Rgb(0xF1, 0xC4, 0x0F),      // gold
-    text: Rgb(0xEC, 0xE3, 0xD4),        // cream
-    muted: Rgb(0x8A, 0x7E, 0x6E),       // taupe
-    cup: Rgb(0xD8, 0xCB, 0xB8),         // porcelain
-    coffee_top: Rgb(0x8B, 0x5A, 0x2B),  // crema
+    focus: Rgb(0xE6, 0x7E, 0x22),         // warm amber
+    short_break: Rgb(0x3F, 0xB9, 0x50),   // green
+    long_break: Rgb(0x9B, 0x59, 0xB6),    // purple
+    accent: Rgb(0xF1, 0xC4, 0x0F),        // gold
+    text: Rgb(0xEC, 0xE3, 0xD4),          // cream
+    muted: Rgb(0x8A, 0x7E, 0x6E),         // taupe
+    cup: Rgb(0xD8, 0xCB, 0xB8),           // porcelain
+    coffee_top: Rgb(0x8B, 0x5A, 0x2B),    // crema
     coffee_bottom: Rgb(0x3E, 0x26, 0x12), // espresso
     steam: Rgb(0xCF, 0xCF, 0xCF),
     bar_start: Rgb(0xE6, 0x7E, 0x22),

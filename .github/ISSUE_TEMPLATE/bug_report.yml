@@ -1,0 +1,53 @@
+name: Bug report
+description: Something in coffeebreak isn't working as expected.
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: Thanks for taking the time to report a bug! Please fill in the details below.
+  - type: input
+    id: version
+    attributes:
+      label: coffeebreak version
+      description: Output of `coffeebreak --version`.
+      placeholder: coffeebreak 0.1.0
+    validations:
+      required: true
+  - type: dropdown
+    id: os
+    attributes:
+      label: Operating system
+      options:
+        - Linux
+        - macOS
+        - Windows
+        - Other (mention below)
+    validations:
+      required: true
+  - type: input
+    id: terminal
+    attributes:
+      label: Terminal / shell
+      description: e.g. Alacritty + zsh, Windows Terminal + PowerShell, tmux, …
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      description: The exact command(s) you ran and what happened.
+      placeholder: |
+        1. Run `coffeebreak --preset classic`
+        2. …
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected vs. actual behaviour
+    validations:
+      required: true
+  - type: textarea
+    id: doctor
+    attributes:
+      label: Diagnostics (optional)
+      description: Output of `coffeebreak doctor` often helps.
+      render: text

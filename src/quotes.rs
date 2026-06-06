@@ -69,7 +69,11 @@ mod tests {
 
     #[test]
     fn has_a_healthy_collection() {
-        assert!(QUOTES.len() >= 30, "expected at least 30 quotes, got {}", QUOTES.len());
+        assert!(
+            QUOTES.len() >= 30,
+            "expected at least 30 quotes, got {}",
+            QUOTES.len()
+        );
     }
 
     #[test]
@@ -84,7 +88,10 @@ mod tests {
     fn quotes_are_attributed_and_single_line() {
         for quote in QUOTES {
             assert!(!quote.contains('\n'), "quote spans multiple lines: {quote}");
-            assert!(quote.contains(" — "), "quote is missing an attribution: {quote}");
+            assert!(
+                quote.contains(" — "),
+                "quote is missing an attribution: {quote}"
+            );
         }
     }
 

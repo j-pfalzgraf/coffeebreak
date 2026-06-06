@@ -55,13 +55,41 @@ pub const PRESET_NAMES: &[&str] = &["classic", "deep", "short", "sprint"];
 pub fn preset(name: &str) -> Option<Preset> {
     match name.to_ascii_lowercase().as_str() {
         // The textbook Pomodoro: four 25/5 rounds with a long break at the end.
-        "classic" => Some(Preset { work: 25, brk: 5, long: 15, long_every: 4, cycles: 4, long_enabled: true }),
+        "classic" => Some(Preset {
+            work: 25,
+            brk: 5,
+            long: 15,
+            long_every: 4,
+            cycles: 4,
+            long_enabled: true,
+        }),
         // Long, deliberate focus blocks.
-        "deep" => Some(Preset { work: 50, brk: 10, long: 20, long_every: 3, cycles: 3, long_enabled: true }),
+        "deep" => Some(Preset {
+            work: 50,
+            brk: 10,
+            long: 20,
+            long_every: 3,
+            cycles: 3,
+            long_enabled: true,
+        }),
         // Short, snappy rounds.
-        "short" => Some(Preset { work: 15, brk: 3, long: 10, long_every: 4, cycles: 6, long_enabled: true }),
+        "short" => Some(Preset {
+            work: 15,
+            brk: 3,
+            long: 10,
+            long_every: 4,
+            cycles: 6,
+            long_enabled: true,
+        }),
         // A single quick sprint.
-        "sprint" => Some(Preset { work: 20, brk: 5, long: 15, long_every: 4, cycles: 1, long_enabled: false }),
+        "sprint" => Some(Preset {
+            work: 20,
+            brk: 5,
+            long: 15,
+            long_every: 4,
+            cycles: 1,
+            long_enabled: false,
+        }),
         _ => None,
     }
 }
@@ -99,8 +127,9 @@ impl Session {
             }
         });
 
-        let color =
-            !cli.no_color && std::env::var_os("NO_COLOR").is_none() && std::io::IsTerminal::is_terminal(&std::io::stdout());
+        let color = !cli.no_color
+            && std::env::var_os("NO_COLOR").is_none()
+            && std::io::IsTerminal::is_terminal(&std::io::stdout());
 
         Session {
             work: dur(work),
@@ -117,7 +146,11 @@ impl Session {
             // --wait forces manual advance; otherwise honour the config.
             auto_advance: !cli.wait && config.auto_advance,
             theme: cli.theme.clone().unwrap_or_else(|| {
-                if config.theme.is_empty() { DEFAULT_THEME.to_string() } else { config.theme.clone() }
+                if config.theme.is_empty() {
+                    DEFAULT_THEME.to_string()
+                } else {
+                    config.theme.clone()
+                }
             }),
             fps: cli.fps.unwrap_or(config.fps),
             lang: crate::i18n::I18n::detect(cli.lang.as_deref(), Some(&config.language))
