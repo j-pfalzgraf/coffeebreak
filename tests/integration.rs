@@ -364,3 +364,53 @@ fn parse_first_completed_pomodoros(json: &str) -> Option<u64> {
         .collect();
     digits.parse().ok()
 }
+
+// --- Internationalisation ---------------------------------------------------
+
+#[test]
+fn languages_lists_all_locales() {
+    let home = TempHome::new("langs");
+    let args = ["languages", "--no-color"];
+    let out = run(&home, &args);
+    assert!(out.status.success(), "{}", describe(&args, &out));
+    let s = stdout(&out);
+    for code in ["en", "de", "es", "fr", "it", "pt"] {
+        assert!(s.contains(code), "languages output missing `{code}`\n{}", describe(&args, &out));
+    }
+    assert!(s.contains("Deutsch") && s.contains("Português"), "{}", describe(&args, &out));
+}
+
+#[test]
+fn lang_flag_localizes_help() {
+    let home = TempHome::new("helplang");
+    let en = run(&home, &["--lang", "en", "--help"]);
+    let de = run(&home, &["--lang", "de", "--help"]);
+    assert!(en.status.success() && de.status.success());
+    // German help must differ from English (localisation actually applied).
+    assert_ne!(stdout(&en), stdout(&de), "German --help should differ from English");
+}
+
+#[test]
+fn invalid_language_is_rejected() {
+    let home = TempHome::new("badlang");
+    let args = ["--lang", "xx", "--help"];
+    let out = run(&home, &args);
+    assert!(!out.status.success(), "invalid --lang should fail\n{}", describe(&args, &out));
+    let combined = format!("{}{}", stdout(&out), text(&out.stderr));
+    assert!(combined.contains("invalid value"), "{}", describe(&args, &out));
+}
+
+#[test]
+fn german_run_writes_stats_and_localizes_footer() {
+    let home = TempHome::new("derun");
+    let args = ["--lang", "de", "--plain", "--seconds", "-w", "1", "--cycles", "1", "--no-sound", "--no-notify"];
+    let out = run(&home, &args);
+    assert!(out.status.success(), "{}", describe(&args, &out));
+    let stats = home.path().join(".coffeebreak").join("stats.json");
+    let contents = std::fs::read_to_string(&stats).unwrap_or_default();
+    assert!(
+        contents.contains("completed_pomodoros"),
+        "expected stats written\n{}",
+        describe(&args, &out)
+    );
+}

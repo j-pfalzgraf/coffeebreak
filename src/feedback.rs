@@ -7,10 +7,11 @@
 //! notification daemon or audio device must never crash the timer.
 
 use crate::Phase;
+use crate::i18n::I18n;
 
-/// Sends desktop notifications on phase change.
+/// Sends a desktop notification with already-localised text.
 pub trait Notifier: Send {
-    fn notify(&self, phase: Phase);
+    fn notify(&self, summary: &str, body: &str);
 }
 
 /// Plays an audible cue on phase change.
@@ -18,15 +19,17 @@ pub trait SoundPlayer: Send {
     fn play(&self);
 }
 
-/// Bundles the two channels and fans a phase change out to both.
+/// Bundles the two channels and fans a phase change out to both, localising the
+/// notification text via the active [`I18n`].
 pub struct Feedback {
     notifier: Box<dyn Notifier>,
     sound: Box<dyn SoundPlayer>,
+    i18n: I18n,
 }
 
 impl Feedback {
     /// Build feedback honoring the session's `notifications`/`sound` switches.
-    pub fn new(notifications: bool, sound: bool) -> Feedback {
+    pub fn new(notifications: bool, sound: bool, i18n: I18n) -> Feedback {
         let notifier: Box<dyn Notifier> = if notifications {
             Box::new(DesktopNotifier)
         } else {
@@ -37,12 +40,13 @@ impl Feedback {
         } else {
             Box::new(SilentPlayer)
         };
-        Feedback { notifier, sound }
+        Feedback { notifier, sound, i18n }
     }
 
     /// Announce entry into `phase` on every enabled channel.
     pub fn announce(&self, phase: Phase) {
-        self.notifier.notify(phase);
+        let summary = format!("coffeebreak — {}", self.i18n.phase_label(phase));
+        self.notifier.notify(&summary, self.i18n.phase_announce(phase));
         self.sound.play();
     }
 }
@@ -53,12 +57,12 @@ impl Feedback {
 pub struct DesktopNotifier;
 
 impl Notifier for DesktopNotifier {
-    fn notify(&self, phase: Phase) {
+    fn notify(&self, summary: &str, body: &str) {
         use notify_rust::{Notification, Timeout};
         let _ = Notification::new()
             .appname("coffeebreak")
-            .summary(&format!("coffeebreak — {}", phase.label()))
-            .body(phase.announce())
+            .summary(summary)
+            .body(body)
             .timeout(Timeout::Milliseconds(6000))
             .show();
     }
@@ -68,7 +72,7 @@ impl Notifier for DesktopNotifier {
 pub struct NullNotifier;
 
 impl Notifier for NullNotifier {
-    fn notify(&self, _phase: Phase) {}
+    fn notify(&self, _summary: &str, _body: &str) {}
 }
 
 // --- SoundPlayer implementations -------------------------------------------

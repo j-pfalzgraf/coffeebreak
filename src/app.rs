@@ -16,6 +16,7 @@ use unicode_width::UnicodeWidthStr;
 
 use crate::clock::PhaseTimer;
 use crate::feedback::Feedback;
+use crate::i18n::{I18n, Msg, Noun};
 use crate::input::{self, Control};
 use crate::render::{Frame, Line, Renderer};
 use crate::session::Session;
@@ -36,6 +37,7 @@ pub struct Outcome {
 pub struct App {
     theme: Theme,
     feedback: Feedback,
+    i18n: I18n,
     frame_dt: Duration,
 }
 
@@ -43,10 +45,11 @@ impl App {
     /// Build the app from resolved session preferences.
     pub fn new(session: &Session) -> App {
         let theme = Theme::resolve(&session.theme, session.color);
-        let feedback = Feedback::new(session.notifications, session.sound);
+        let i18n = I18n::new(&session.lang);
+        let feedback = Feedback::new(session.notifications, session.sound, i18n);
         let fps = session.fps.clamp(2, 60);
         let frame_dt = Duration::from_secs_f64(1.0 / f64::from(fps));
-        App { theme, feedback, frame_dt }
+        App { theme, feedback, i18n, frame_dt }
     }
 
     /// Run the whole session. `shutdown` is the Ctrl+C flag used by the plain
@@ -188,8 +191,17 @@ impl App {
 
         // Header chip: phase + cycle counter.
         let mut head = LineBuf::new();
-        head.bold(theme, &format!("▌ {} ▐", phase.label()), accent);
-        head.dim(theme, format!("  cycle {} of {}", cycle, session.cycles));
+        head.bold(theme, &format!("▌ {} ▐", self.i18n.phase_label(phase)), accent);
+        head.dim(
+            theme,
+            format!(
+                "  {}",
+                self.i18n.tf(
+                    Msg::CycleOf,
+                    &[("n", &cycle.to_string()), ("total", &session.cycles.to_string())],
+                )
+            ),
+        );
         f.push(head.into_line());
         f.push_blank();
 
@@ -213,7 +225,7 @@ impl App {
         // Progress bar + meta line.
         f.push(widgets::progress_bar(theme, elapsed_frac, bar_w, accent, p.accent));
         let mut meta = LineBuf::new();
-        meta.dim(theme, format!("{} left", time_str));
+        meta.dim(theme, format!("{} {}", time_str, self.i18n.t(Msg::Left)));
         meta.dim(theme, "  ·  ");
         meta.dim(theme, format!("{}%", (elapsed_frac * 100.0).round() as u64));
         if let Some(label) = &session.label {
@@ -221,12 +233,15 @@ impl App {
             meta.color(theme, label, p.muted);
         }
         if paused {
+            // Blink the PAUSED marker; the off-frame is the same width of blanks
+            // so the line doesn't jitter (the localised word can differ in width).
+            let marker = format!("⏸ {}", self.i18n.t(Msg::Paused));
+            let marker_w = marker.width();
             meta.plain(theme, "  ");
-            // Blink the PAUSED marker.
             if (frame / 8) % 2 == 0 {
-                meta.bold(theme, "⏸ PAUSED", p.warn);
+                meta.bold(theme, &marker, p.warn);
             } else {
-                meta.plain(theme, "        ");
+                meta.plain(theme, &" ".repeat(marker_w));
             }
         }
         f.push(meta.into_line());
@@ -244,7 +259,7 @@ impl App {
 
         f.push_blank();
         let mut hint = LineBuf::new();
-        hint.dim(theme, "space pause · s skip · +/- adjust · q quit");
+        hint.dim(theme, self.i18n.t(Msg::ControlsHint));
         f.push(hint.into_line());
 
         f
@@ -272,11 +287,8 @@ impl App {
             f.extend(widgets::big_time(theme, &pomodoros.to_string(), p.success));
             f.push_blank();
             let mut msg = LineBuf::new();
-            msg.bold(
-                theme,
-                &format!("Session complete — {} pomodoro{} done!", pomodoros, plural(pomodoros)),
-                p.success,
-            );
+            let count = self.i18n.count(pomodoros, Noun::Pomodoro);
+            msg.bold(theme, &self.i18n.tf(Msg::CelebrateMsg, &[("count", &count)]), p.success);
             f.push(msg.into_line());
             f.push_blank();
             f.push(widgets::confetti(theme, cw, frame + 4));
@@ -306,16 +318,18 @@ impl App {
         let mut last_quote: Option<&str> = None;
         let mut interrupted = false;
 
+        let plan_summary = self.i18n.tf(
+            Msg::PlanSummary,
+            &[
+                ("count", &self.i18n.count(session.cycles, Noun::Cycle)),
+                ("work", &fmt_mmss(session.work)),
+                ("brk", &fmt_mmss(session.short_break)),
+            ],
+        );
         println!(
             "{}  {}",
             theme.bold("coffeebreak", theme.palette.accent),
-            theme.dim(format!(
-                "{} cycle{} · focus {} / break {}",
-                session.cycles,
-                plural(session.cycles),
-                fmt_mmss(session.work),
-                fmt_mmss(session.short_break)
-            ))
+            theme.dim(plan_summary)
         );
 
         'outer: for (idx, &(phase, duration)) in plan.iter().enumerate() {
@@ -323,7 +337,11 @@ impl App {
                 self.feedback.announce(phase);
             }
             let accent = theme.phase_color(phase);
-            print!("{}  {}", theme.bold(format!("▶ {}", phase.label()), accent), fmt_mmss(duration));
+            print!(
+                "{}  {}",
+                theme.bold(format!("▶ {}", self.i18n.phase_label(phase)), accent),
+                fmt_mmss(duration)
+            );
             if !phase.is_focus() {
                 let q = quotes::random_quote(last_quote);
                 last_quote = Some(q);
@@ -389,9 +407,6 @@ impl LineBuf {
     }
 }
 
-fn plural(n: u64) -> &'static str {
-    if n == 1 { "" } else { "s" }
-}
 
 /// Round a duration up to whole seconds (so a countdown shows 00:01 before 00:00).
 fn ceil_secs(d: Duration) -> Duration {

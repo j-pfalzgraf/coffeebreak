@@ -11,6 +11,7 @@ use anyhow::{Context, Result};
 use chrono::{Local, NaiveDate};
 use serde::{Deserialize, Serialize};
 
+use crate::i18n::{I18n, Msg, Noun};
 use crate::paths;
 
 /// One day's tally.
@@ -49,12 +50,12 @@ impl Stats {
     }
 
     /// Like [`Stats::load`] but never fails: a corrupt or unreadable file is
-    /// reported to stderr and treated as empty.
-    pub fn load_or_default() -> Stats {
+    /// reported to stderr (localised) and treated as empty.
+    pub fn load_or_default(i18n: &I18n) -> Stats {
         match Stats::load() {
             Ok(s) => s,
             Err(e) => {
-                eprintln!("coffeebreak: ignoring unreadable stats ({e:#})");
+                eprintln!("coffeebreak: {}", i18n.tf(Msg::WarnStatsRead, &[("error", &format!("{e:#}"))]));
                 Stats::default()
             }
         }
@@ -112,38 +113,54 @@ impl Stats {
             .max_by_key(|(_, d)| d.completed_pomodoros)
     }
 
-    /// Render the human-facing report to stdout, styled via `theme`.
-    pub fn print_summary(&self, theme: &crate::theme::Theme) {
+    /// Render the human-facing report to stdout, styled via `theme` and
+    /// localised via `i18n`.
+    pub fn print_summary(&self, theme: &crate::theme::Theme, i18n: &I18n) {
         let p = &theme.palette;
 
         let field = |label: &str, value: String| {
-            println!("  {:<16} {}", theme.bold(label, p.accent), value);
+            println!("  {} {}", theme.bold(format!("{label:<16}"), p.accent), value);
         };
 
-        println!("\n{}\n", theme.bold("☕ coffeebreak — statistics", p.accent));
+        println!("\n{}\n", theme.bold(i18n.t(Msg::StatsTitle), p.accent));
 
         let (pomos, minutes, days) = self.totals();
         if pomos == 0 {
-            println!("  {}\n", theme.dim("No pomodoros completed yet — run `coffeebreak` to start! ☕"));
+            println!("  {}\n", theme.dim(i18n.t(Msg::StatsEmpty)));
             return;
         }
 
+        let min_focus = i18n.t(Msg::MinFocus);
         let today_key = today();
         let today_stat = self.days.get(&today_key).copied().unwrap_or_default();
+
         field(
-            "Today:",
+            i18n.t(Msg::StatsToday),
             format!(
-                "{} pomodoros · {} min focus",
-                today_stat.completed_pomodoros, today_stat.focus_minutes
+                "{} · {} {min_focus}",
+                i18n.count(today_stat.completed_pomodoros, Noun::Pomodoro),
+                today_stat.focus_minutes
             ),
         );
-        field("All time:", format!("{pomos} pomodoros · {minutes} min focus over {days} days"));
+        field(
+            i18n.t(Msg::StatsAllTime),
+            format!(
+                "{} · {} {min_focus} {} {}",
+                i18n.count(pomos, Noun::Pomodoro),
+                minutes,
+                i18n.t(Msg::Over),
+                i18n.count(days as u64, Noun::Day),
+            ),
+        );
 
         if let Ok(today_date) = NaiveDate::parse_from_str(&today_key, "%Y-%m-%d") {
-            field("Current streak:", format!("{} days", self.streak(today_date)));
+            field(i18n.t(Msg::StatsStreak), i18n.count(self.streak(today_date), Noun::Day));
         }
         if let Some((date, stat)) = self.best_day() {
-            field("Best day:", format!("{date} ({} pomodoros)", stat.completed_pomodoros));
+            field(
+                i18n.t(Msg::StatsBestDay),
+                format!("{date} ({})", i18n.count(stat.completed_pomodoros, Noun::Pomodoro)),
+            );
         }
         println!();
     }

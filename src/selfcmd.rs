@@ -9,12 +9,13 @@ use std::io::{self, Write};
 
 use anyhow::{Context, Result, bail};
 
+use crate::i18n::{I18n, Msg};
 use crate::{BIN_NAME, REPO_NAME, REPO_OWNER, paths};
 
 const CURRENT_VERSION: &str = env!("CARGO_PKG_VERSION");
 
 /// `coffeebreak self update [--check]`.
-pub fn update(check_only: bool) -> Result<()> {
+pub fn update(check_only: bool, i18n: &I18n) -> Result<()> {
     let updater = self_update::backends::github::Update::configure()
         .repo_owner(REPO_OWNER)
         .repo_name(REPO_NAME)
@@ -28,29 +29,32 @@ pub fn update(check_only: bool) -> Result<()> {
         let latest = updater
             .get_latest_release()
             .context("failed to query the latest release")?;
-        if self_update::version::bump_is_greater(CURRENT_VERSION, &latest.version)
-            .unwrap_or(false)
+        if self_update::version::bump_is_greater(CURRENT_VERSION, &latest.version).unwrap_or(false)
         {
             println!(
-                "A newer version is available: {CURRENT_VERSION} -> {}",
-                latest.version
+                "{}",
+                i18n.tf(
+                    Msg::UpdateNewer,
+                    &[("current", CURRENT_VERSION), ("latest", &latest.version)],
+                )
             );
-            println!("Run `coffeebreak self update` to upgrade.");
+            println!("{}", i18n.t(Msg::UpdateRunHint));
         } else {
-            println!("coffeebreak {CURRENT_VERSION} is up to date.");
+            println!("{}", i18n.tf(Msg::UpdateUpToDate, &[("version", CURRENT_VERSION)]));
         }
         return Ok(());
     }
 
     // Be transparent about what is about to happen (security stance).
-    println!("Current version: {CURRENT_VERSION}");
-    println!("Source: https://github.com/{REPO_OWNER}/{REPO_NAME}/releases");
+    println!("{}", i18n.tf(Msg::UpdateCurrent, &[("version", CURRENT_VERSION)]));
+    let url = format!("https://github.com/{REPO_OWNER}/{REPO_NAME}/releases");
+    println!("{}", i18n.tf(Msg::UpdateSource, &[("url", &url)]));
 
     let status = updater.update().context("update failed")?;
     if status.updated() {
-        println!("✓ Updated to {}.", status.version());
+        println!("{}", i18n.tf(Msg::UpdateDone, &[("version", status.version())]));
     } else {
-        println!("Already up to date ({}).", status.version());
+        println!("{}", i18n.tf(Msg::UpdateAlready, &[("version", status.version())]));
     }
     Ok(())
 }
@@ -61,46 +65,48 @@ pub fn update(check_only: bool) -> Result<()> {
 /// itself. Each removal is reported; a failure to remove the running binary
 /// (common on Windows) is surfaced with manual instructions rather than
 /// aborting.
-pub fn uninstall(assume_yes: bool) -> Result<()> {
+pub fn uninstall(assume_yes: bool, i18n: &I18n) -> Result<()> {
     let binary = std::env::current_exe().context("could not locate the running binary")?;
     let config_dir = paths::config_dir()?;
     let data_dir = paths::data_dir()?;
 
-    println!("This will remove coffeebreak and its data:");
-    println!("  • binary:  {}", binary.display());
-    println!("  • config:  {}", config_dir.display());
-    println!("  • data:    {}", data_dir.display());
+    println!("{}", i18n.t(Msg::UninstallIntro));
+    println!("  • {:<7} {}", i18n.t(Msg::UninstallItemBinary), binary.display());
+    println!("  • {:<7} {}", i18n.t(Msg::UninstallItemConfig), config_dir.display());
+    println!("  • {:<7} {}", i18n.t(Msg::UninstallItemData), data_dir.display());
     println!();
 
-    if !assume_yes && !confirm("Remove all of the above?")? {
-        println!("Aborted. Nothing was removed.");
+    if !assume_yes && !confirm(i18n.t(Msg::UninstallConfirm), i18n)? {
+        println!("{}", i18n.t(Msg::UninstallAborted));
         return Ok(());
     }
 
-    remove_dir_if_present(&config_dir)?;
-    remove_dir_if_present(&data_dir)?;
+    remove_dir_if_present(&config_dir, i18n)?;
+    remove_dir_if_present(&data_dir, i18n)?;
 
     match fs::remove_file(&binary) {
-        Ok(()) => println!("✓ Removed binary {}", binary.display()),
+        Ok(()) => {
+            println!("{}", i18n.tf(Msg::UninstallRemoved, &[("path", &binary.display().to_string())]))
+        }
         Err(e) => {
             // On Windows a running executable can't delete itself.
             eprintln!(
-                "Could not remove the binary automatically ({e}).\n\
-                 Please delete it manually:\n  {}",
+                "{}\n  {}",
+                i18n.tf(Msg::UninstallBinFail, &[("error", &e.to_string())]),
                 binary.display()
             );
         }
     }
 
-    println!("coffeebreak uninstalled. ☕ Thanks for the focus sessions!");
+    println!("{}", i18n.t(Msg::UninstallDone));
     Ok(())
 }
 
 /// Remove a directory tree if it exists, treating "not found" as success.
-fn remove_dir_if_present(dir: &std::path::Path) -> Result<()> {
+fn remove_dir_if_present(dir: &std::path::Path, i18n: &I18n) -> Result<()> {
     match fs::remove_dir_all(dir) {
         Ok(()) => {
-            println!("✓ Removed {}", dir.display());
+            println!("{}", i18n.tf(Msg::UninstallRemoved, &[("path", &dir.display().to_string())]));
             Ok(())
         }
         Err(e) if e.kind() == io::ErrorKind::NotFound => Ok(()),
@@ -110,15 +116,18 @@ fn remove_dir_if_present(dir: &std::path::Path) -> Result<()> {
 
 /// Yes/no prompt on the controlling terminal. Refuses to assume "yes" when
 /// stdin isn't a TTY (e.g. piped) — the caller must pass `--yes` for that.
-fn confirm(prompt: &str) -> Result<bool> {
+fn confirm(prompt: &str, i18n: &I18n) -> Result<bool> {
     use std::io::IsTerminal;
     if !io::stdin().is_terminal() {
-        bail!("not a terminal; re-run with --yes to confirm non-interactively");
+        bail!("{}", i18n.t(Msg::NotATerminal));
     }
-    print!("{prompt} [y/N] ");
+    print!("{prompt} {} ", i18n.t(Msg::ConfirmYesNo));
     io::stdout().flush()?;
     let mut input = String::new();
     io::stdin().read_line(&mut input)?;
     let answer = input.trim().to_ascii_lowercase();
-    Ok(answer == "y" || answer == "yes")
+    // Accept the locale's affirmative key (matching the displayed prompt) plus a
+    // universal English "y"/"yes" for muscle memory.
+    let affirmative = i18n.t(Msg::ConfirmAffirmative);
+    Ok(answer == affirmative || answer == "y" || answer == "yes")
 }

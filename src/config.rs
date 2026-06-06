@@ -38,6 +38,8 @@ pub struct Config {
     pub theme: String,
     /// Animation frames per second for the live UI (2..=60).
     pub fps: u32,
+    /// Interface language code (see `coffeebreak languages`); empty = auto-detect.
+    pub language: String,
 }
 
 impl Default for Config {
@@ -54,6 +56,8 @@ impl Default for Config {
             git_label: false,
             theme: crate::theme::DEFAULT_THEME.to_string(),
             fps: 15,
+            // Empty means "auto-detect from the environment, default English".
+            language: String::new(),
         }
     }
 }

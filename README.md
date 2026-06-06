@@ -157,6 +157,7 @@ over the config file.
 | `--git-label`           | Use the current git branch as the label                 |
 | `--plain`               | Force plain line output (no animated UI)                |
 | `--fps N`               | Animation frame rate, 2–60 (default 15)                 |
+| `--lang CODE`           | Interface language: `en`, `de`, `es`, `fr`, `it`, `pt`  |
 | `--stats`               | Show today / all-time / current streak / best day       |
 | `--no-sound`            | Mute the audible cue                                     |
 | `--no-notify`           | Disable desktop notifications                           |
@@ -173,6 +174,7 @@ over the config file.
 | `coffeebreak config show`              | Print the effective configuration                                |
 | `coffeebreak themes`                    | Preview the five colour themes                                   |
 | `coffeebreak presets`                   | List the built-in presets and their timings                     |
+| `coffeebreak languages`                 | List the interface languages (marks the active one)             |
 | `coffeebreak completions <shell>`       | Emit completions for `bash`, `zsh`, `fish`, `powershell`, `elvish` |
 | `coffeebreak man`                       | Emit the man page                                               |
 | `coffeebreak self update [--check]`     | Update to the latest release (`--check` only checks)            |
@@ -237,7 +239,33 @@ Four cadences are built in. Use them with `--preset NAME`, or list them with
 | `classic` | 4 × 25/5, finishing with a 15 min long break      |
 | `deep`    | 3 × 50/10, finishing with a 20 min long break     |
 | `short`   | 6 × 15/3, with a 10 min long break every 4 blocks |
-| `sprint`  | 1 × 20/5 (no long break)                          | 1 × 20 min focus / 5 min break (no long break)                    |
+| `sprint`  | 1 × 20/5 (no long break)                          |
+
+---
+
+## Languages
+
+coffeebreak is fully localised and **defaults to English**. It ships interface
+translations for English, German, Spanish, French, Italian, and Portuguese.
+
+The language is chosen in this order: the `--lang` flag → the `language` config
+key → your `LC_ALL` / `LC_MESSAGES` / `LANG` / `LANGUAGE` environment → English.
+Anything not yet translated falls back to English.
+
+```sh
+coffeebreak --lang de            # run in German
+coffeebreak languages            # list available languages (marks the active one)
+LANG=es_ES.UTF-8 coffeebreak     # auto-detected from the environment
+```
+
+| Code | Language   |
+| ---- | ---------- |
+| `en` | English    |
+| `de` | Deutsch    |
+| `es` | Español    |
+| `fr` | Français   |
+| `it` | Italiano   |
+| `pt` | Português  |
 
 ---
 
@@ -269,6 +297,7 @@ notifications      = true      # send a desktop notification at phase changes
 git_label          = false    # label the session with the current git branch
 theme              = "coffee" # colour theme: coffee, ocean, forest, grape, mono
 fps                = 15        # animation frame rate, 2-60
+language           = ""       # interface language: en, de, es, fr, it, pt ("" = auto-detect)
 ```
 
 Use `coffeebreak config path` to see where the file is resolved, and

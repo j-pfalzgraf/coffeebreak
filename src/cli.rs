@@ -7,9 +7,10 @@
 
 use clap::builder::PossibleValuesParser;
 use clap::builder::styling::{AnsiColor, Effects, Styles};
-use clap::{Parser, Subcommand};
+use clap::{CommandFactory, FromArgMatches, Parser, Subcommand};
 use clap_complete::Shell;
 
+use crate::i18n::{I18n, LANG_CODES, Msg};
 use crate::session::PRESET_NAMES;
 use crate::theme::THEME_NAMES;
 
@@ -109,6 +110,17 @@ pub struct Cli {
     #[arg(long, value_name = "FPS", help_heading = "Display")]
     pub fps: Option<u32>,
 
+    /// Interface language: en, de, es, fr, it, pt.
+    #[arg(
+        long,
+        global = true,
+        value_name = "CODE",
+        ignore_case = true,
+        value_parser = PossibleValuesParser::new(LANG_CODES),
+        help_heading = "Display"
+    )]
+    pub lang: Option<String>,
+
     /// Plain, non-animated line output (also used automatically when piped).
     #[arg(long, help_heading = "Display")]
     pub plain: bool,
@@ -156,6 +168,9 @@ pub enum Command {
     /// List the available timer presets.
     Presets,
 
+    /// List the available interface languages.
+    Languages,
+
     /// Generate a shell completion script (bash, zsh, fish, …).
     Completions {
         /// The shell to generate completions for.
@@ -200,13 +215,98 @@ pub enum SelfAction {
 }
 
 impl Cli {
-    /// Parse from the process arguments.
+    /// Parse from the process arguments (English help).
     pub fn parse_args() -> Cli {
         Cli::parse()
     }
 
+    /// Parse from the process arguments with help/usage text localised via `i18n`.
+    ///
+    /// `--help`/`--version`/parse errors are handled by clap (it prints and
+    /// exits); on success the parsed [`Cli`] is returned.
+    pub fn parse_localized(i18n: &I18n) -> Cli {
+        let matches = localized_command(i18n).get_matches();
+        match Cli::from_arg_matches(&matches) {
+            Ok(cli) => cli,
+            Err(e) => e.exit(),
+        }
+    }
+
     /// Build the clap `Command` (used for completions and the man page).
     pub fn command() -> clap::Command {
-        <Cli as clap::CommandFactory>::command()
+        <Cli as CommandFactory>::command()
     }
+}
+
+/// Apply localised help text to the derived clap command.
+///
+/// English remains the canonical text baked in by the derive; this overrides the
+/// user-visible strings for the active locale (a no-op effect for English).
+fn localized_command(i18n: &I18n) -> clap::Command {
+    let t = |m: Msg| i18n.t(m).to_string();
+
+    let mut cmd = Cli::command()
+        .about(t(Msg::HelpAbout))
+        .long_about(t(Msg::HelpLongAbout))
+        .after_help(t(Msg::HelpAfter))
+        .after_long_help(t(Msg::HelpAfter));
+
+    // Top-level argument help.
+    let args: &[(&str, Msg)] = &[
+        ("work", Msg::HelpWork),
+        ("brk", Msg::HelpBreak),
+        ("cycles", Msg::HelpCycles),
+        ("preset", Msg::HelpPreset),
+        ("long", Msg::HelpLong),
+        ("long_break", Msg::HelpLongBreak),
+        ("long_every", Msg::HelpLongEvery),
+        ("label", Msg::HelpLabel),
+        ("git_label", Msg::HelpGitLabel),
+        ("theme", Msg::HelpTheme),
+        ("fps", Msg::HelpFps),
+        ("lang", Msg::HelpLang),
+        ("plain", Msg::HelpPlain),
+        ("no_color", Msg::HelpNoColor),
+        ("no_sound", Msg::HelpNoSound),
+        ("no_notify", Msg::HelpNoNotify),
+        ("stats", Msg::HelpStatsFlag),
+    ];
+    for (id, msg) in args {
+        cmd = cmd.mut_arg(*id, |a| a.help(t(*msg)));
+    }
+
+    // Subcommand descriptions (and their own arguments/subcommands).
+    let subs: &[(&str, Msg)] = &[
+        ("stats", Msg::HelpStats),
+        ("themes", Msg::HelpThemes),
+        ("presets", Msg::HelpPresets),
+        ("languages", Msg::HelpLanguages),
+        ("man", Msg::HelpMan),
+    ];
+    for (name, msg) in subs {
+        cmd = cmd.mut_subcommand(*name, |c| c.about(t(*msg)));
+    }
+    cmd = cmd.mut_subcommand("completions", |c| {
+        c.about(t(Msg::HelpCompletions))
+            .mut_arg("shell", |a| a.help(t(Msg::HelpCompletionsShell)))
+    });
+    cmd = cmd.mut_subcommand("config", |c| {
+        c.about(t(Msg::HelpConfig))
+            .mut_subcommand("init", |s| s.about(t(Msg::HelpConfigInit)))
+            .mut_subcommand("path", |s| s.about(t(Msg::HelpConfigPath)))
+            .mut_subcommand("show", |s| s.about(t(Msg::HelpConfigShow)))
+    });
+    cmd = cmd.mut_subcommand("self", |c| {
+        c.about(t(Msg::HelpSelf))
+            .mut_subcommand("update", |s| {
+                s.about(t(Msg::HelpSelfUpdate))
+                    .mut_arg("check", |a| a.help(t(Msg::HelpUpdateCheck)))
+            })
+            .mut_subcommand("uninstall", |s| {
+                s.about(t(Msg::HelpSelfUninstall))
+                    .mut_arg("yes", |a| a.help(t(Msg::HelpUninstallYes)))
+            })
+    });
+
+    cmd
 }

@@ -32,3 +32,4 @@ notifications = true        # show a desktop notification on phase change
 git_label = false           # use the current git branch name as the session label
 theme = "coffee"            # one of: coffee, ocean, forest, grape, mono
 fps = 15                    # animation frames per second, 2..=60
+language = ""               # interface language: en, de, es, fr, it, pt ("" = auto-detect from $LANG)

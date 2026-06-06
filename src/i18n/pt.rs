@@ -1,0 +1,121 @@
+//! Portuguese (pt) locale table.
+
+/// Translations for this locale. Any omitted message falls back to English.
+pub static ENTRIES: super::Table = &[
+    (super::Msg::PhaseFocus, "FOCO"),
+    (super::Msg::PhaseShortBreak, "PAUSA"),
+    (super::Msg::PhaseLongBreak, "PAUSA LONGA"),
+    (super::Msg::AnnounceFocus, "Hora de focar."),
+    (super::Msg::AnnounceShortBreak, "Pausa curta — afaste-se do teclado."),
+    (super::Msg::AnnounceLongBreak, "Pausa longa — bem merecida."),
+
+    (super::Msg::PomodoroOne, "pomodoro"),
+    (super::Msg::PomodoroOther, "pomodoros"),
+    (super::Msg::CycleOne, "ciclo"),
+    (super::Msg::CycleOther, "ciclos"),
+    (super::Msg::DayOne, "dia"),
+    (super::Msg::DayOther, "dias"),
+
+    (super::Msg::ControlsHint, "space pausar · s saltar · +/- ajustar · q sair"),
+    (super::Msg::Paused, "EM PAUSA"),
+    (super::Msg::Left, "restante"),
+    (super::Msg::CycleOf, "ciclo {n} de {total}"),
+
+    (super::Msg::DoneFooter, "Concluído! {count} concluídos. ☕"),
+    (super::Msg::StoppedFooter, "Parado — {count} concluídos nesta sessão."),
+    (super::Msg::CelebrateMsg, "Sessão concluída — {count} feitos!"),
+    (super::Msg::PlanSummary, "{count} · foco {work} / pausa {brk}"),
+
+    (super::Msg::StatsTitle, "☕ coffeebreak — estatísticas"),
+    (super::Msg::StatsEmpty, "Ainda não concluiu pomodoros — execute `coffeebreak` para começar! ☕"),
+    (super::Msg::StatsToday, "Hoje:"),
+    (super::Msg::StatsAllTime, "Total:"),
+    (super::Msg::StatsStreak, "Sequência atual:"),
+    (super::Msg::StatsBestDay, "Melhor dia:"),
+    (super::Msg::MinFocus, "min de foco"),
+    (super::Msg::Over, "ao longo de"),
+
+    (super::Msg::ThemesTitle, "Temas disponíveis:"),
+    (super::Msg::ThemesHint, "Use um com: coffeebreak --theme <nome>"),
+    (super::Msg::PresetsTitle, "Predefinições disponíveis:"),
+    (super::Msg::PresetsHint, "Use uma com: coffeebreak --preset <nome>"),
+    (super::Msg::PresetCadence, "{work} min de foco / {brk} min de pausa · {count}"),
+    (super::Msg::PresetLong, ", pausa longa {long} min a cada {every}"),
+    (super::Msg::LanguagesTitle, "Idiomas disponíveis:"),
+    (super::Msg::LanguagesHint, "Use um com: coffeebreak --lang <código>"),
+
+    (super::Msg::ConfigCreated, "Configuração criada:"),
+    (super::Msg::ConfigExists, "A configuração já existe em"),
+
+    (super::Msg::UpdateCurrent, "Versão atual: {version}"),
+    (super::Msg::UpdateSource, "Origem: {url}"),
+    (super::Msg::UpdateUpToDate, "O coffeebreak {version} está atualizado."),
+    (super::Msg::UpdateNewer, "Está disponível uma versão mais recente: {current} -> {latest}"),
+    (super::Msg::UpdateRunHint, "Execute `coffeebreak self update` para atualizar."),
+    (super::Msg::UpdateDone, "✓ Atualizado para {version}."),
+    (super::Msg::UpdateAlready, "Já está atualizado ({version})."),
+    (super::Msg::UninstallIntro, "Isto irá remover o coffeebreak e os seus dados:"),
+    (super::Msg::UninstallItemBinary, "binário"),
+    (super::Msg::UninstallItemConfig, "configuração"),
+    (super::Msg::UninstallItemData, "dados"),
+    (super::Msg::UninstallConfirm, "Remover tudo o que está acima?"),
+    (super::Msg::UninstallAborted, "Cancelado. Nada foi removido."),
+    (super::Msg::UninstallRemoved, "✓ Removido {path}"),
+    (super::Msg::UninstallBinFail, "Não foi possível remover o binário automaticamente ({error})."),
+    (super::Msg::UninstallDone, "coffeebreak desinstalado. ☕ Obrigado pelas sessões de foco!"),
+    (super::Msg::ConfirmYesNo, "[s/N]"),
+    (super::Msg::ConfirmAffirmative, "s"),
+    (super::Msg::NotATerminal, "não é um terminal; execute novamente com --yes para confirmar de forma não interativa"),
+
+    (super::Msg::WordError, "erro"),
+    (super::Msg::WarnStatsSave, "não foi possível guardar as estatísticas ({error})"),
+    (super::Msg::WarnStatsRead, "a ignorar estatísticas ilegíveis ({error})"),
+    (super::Msg::WarnCtrlc, "não foi possível instalar o handler de Ctrl+C ({error}); as estatísticas podem não ser guardadas se interromper a sessão"),
+
+    (super::Msg::HelpAbout, "Um temporizador Pomodoro de foco para o seu terminal ☕"),
+    (super::Msg::HelpLongAbout, "O coffeebreak executa ciclos Pomodoro de foco/pausa com uma chávena de café animada ao vivo, cujo vapor e enchimento acompanham o tempo, dígitos grandes de contagem decrescente, uma barra de progresso em gradiente, notificações no ambiente de trabalho e uma citação para programadores em cada pausa."),
+    (super::Msg::HelpAfter, "Exemplos:\n  \
+         coffeebreak                         Clássico 25/5, um ciclo\n  \
+         coffeebreak --preset classic        Quatro rondas 25/5, terminando numa pausa longa\n  \
+         coffeebreak -w 50 -b 10 --cycles 3  Trabalho profundo: três rondas 50/10\n  \
+         coffeebreak --theme ocean           Usa o tema de cor ocean\n  \
+         coffeebreak --lang de               Executa em alemão\n  \
+         coffeebreak --stats                 Mostra as suas estatísticas de foco\n\n\
+         Durante uma sessão:\n  \
+         space / p   pausar ou retomar       s / n   saltar a fase atual\n  \
+         + / =       adicionar um minuto     - / _   remover um minuto\n  \
+         q / Esc     sair (estatísticas guardadas)"),
+    (super::Msg::HelpStats, "Mostra estatísticas de foco (hoje, total, sequência, melhor dia)"),
+    (super::Msg::HelpConfig, "Inspeciona ou cria o ficheiro de configuração"),
+    (super::Msg::HelpThemes, "Lista os temas de cor disponíveis com uma pré-visualização"),
+    (super::Msg::HelpPresets, "Lista as predefinições de temporizador disponíveis"),
+    (super::Msg::HelpLanguages, "Lista os idiomas de interface disponíveis"),
+    (super::Msg::HelpCompletions, "Gera um script de conclusão da shell (bash, zsh, fish, …)"),
+    (super::Msg::HelpMan, "Imprime uma página man roff para stdout"),
+    (super::Msg::HelpSelf, "Gere o binário coffeebreak instalado (update / uninstall)"),
+    (super::Msg::HelpSelfUpdate, "Atualiza o coffeebreak para a versão mais recente do GitHub"),
+    (super::Msg::HelpSelfUninstall, "Remove o binário coffeebreak e os seus diretórios de configuração/dados"),
+    (super::Msg::HelpConfigInit, "Escreve um ficheiro de configuração predefinido (não faz nada se já existir um)"),
+    (super::Msg::HelpConfigPath, "Imprime o caminho para o ficheiro de configuração"),
+    (super::Msg::HelpConfigShow, "Imprime a configuração efetiva"),
+    (super::Msg::HelpUpdateCheck, "Apenas verifica se existe uma versão mais recente; não instala"),
+    (super::Msg::HelpUninstallYes, "Ignora a confirmação"),
+    (super::Msg::HelpCompletionsShell, "A shell para a qual gerar as conclusões"),
+    (super::Msg::HelpWork, "Duração do bloco de foco em minutos (predefinição 25)"),
+    (super::Msg::HelpBreak, "Duração da pausa em minutos (predefinição 5)"),
+    (super::Msg::HelpCycles, "Número de ciclos foco→pausa a executar (predefinição 1)"),
+    (super::Msg::HelpPreset, "Começa a partir de uma predefinição: classic, deep, short, sprint"),
+    (super::Msg::HelpLong, "Ativa uma pausa longa a cada N blocos de foco"),
+    (super::Msg::HelpLongBreak, "Duração da pausa longa em minutos (implica --long; predefinição 15)"),
+    (super::Msg::HelpLongEvery, "Quantos blocos de foco antes de uma pausa longa (predefinição 4)"),
+    (super::Msg::HelpLabel, "Rótulo opcional para esta sessão (mostrado na linha de estado)"),
+    (super::Msg::HelpGitLabel, "Usa o ramo git atual como rótulo da sessão"),
+    (super::Msg::HelpTheme, "Tema de cor: coffee, ocean, forest, grape, mono"),
+    (super::Msg::HelpFps, "Frames de animação por segundo (2–60; predefinição 15)"),
+    (super::Msg::HelpPlain, "Saída simples em linha, sem animação (usada automaticamente em pipe)"),
+    (super::Msg::HelpNoColor, "Desativa a saída colorida"),
+    (super::Msg::HelpNoSound, "Silencia o aviso sonoro na mudança de fase"),
+    (super::Msg::HelpNoNotify, "Não envia notificações no ambiente de trabalho"),
+    (super::Msg::HelpStatsFlag, "Mostra as estatísticas de hoje e totais, depois sai"),
+    (super::Msg::HelpLang, "Idioma da interface: en, de, es, fr, it, pt"),
+];

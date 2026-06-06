@@ -13,6 +13,13 @@ themes and presets — all on top of a refactored, modular codebase.
 
 ### Added
 
+- **Full internationalisation**, defaulting to English. Every user-facing
+  string — the live UI, status line, statistics, command output, notifications,
+  footers, and even the `--help`/man text — is localised. Ships English,
+  German, Spanish, French, Italian, and Portuguese. The language is resolved from
+  `--lang CODE`, the `language` config key, or the `LC_ALL`/`LC_MESSAGES`/`LANG`/
+  `LANGUAGE` environment, with English fallback for anything untranslated. Added
+  a `coffeebreak languages` subcommand.
 - **Animated full-screen TUI.** On a TTY, sessions now run in the alternate
   screen with an ASCII coffee cup that **drains** as you focus and **refills**
   during a break, animated rising steam, a shimmering liquid surface, a large

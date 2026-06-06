@@ -37,6 +37,7 @@ pub mod feedback;
 pub mod git;
 pub mod input;
 pub mod paths;
+pub mod i18n;
 pub mod quotes;
 pub mod render;
 pub mod selfcmd;
@@ -72,22 +73,7 @@ impl Phase {
     pub fn is_focus(self) -> bool {
         matches!(self, Phase::Focus)
     }
-
-    /// Short uppercase label for the status line, e.g. `FOCUS`.
-    pub fn label(self) -> &'static str {
-        match self {
-            Phase::Focus => "FOCUS",
-            Phase::ShortBreak => "BREAK",
-            Phase::LongBreak => "LONG BREAK",
-        }
-    }
-
-    /// Human sentence used in desktop notifications.
-    pub fn announce(self) -> &'static str {
-        match self {
-            Phase::Focus => "Time to focus. ☕",
-            Phase::ShortBreak => "Short break — step away from the keyboard.",
-            Phase::LongBreak => "Long break — you earned it. 🎉",
-        }
-    }
 }
+
+// User-facing phase text lives in [`i18n`] (localised): see
+// `I18n::phase_label` and `I18n::phase_announce`.

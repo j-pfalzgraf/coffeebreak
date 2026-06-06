@@ -30,6 +30,8 @@ pub struct Session {
     pub plain: bool,
     pub theme: String,
     pub fps: u32,
+    /// Resolved interface language code (e.g. `"en"`, `"de"`).
+    pub lang: String,
     pub label: Option<String>,
 }
 
@@ -114,6 +116,9 @@ impl Session {
                 if config.theme.is_empty() { DEFAULT_THEME.to_string() } else { config.theme.clone() }
             }),
             fps: cli.fps.unwrap_or(config.fps),
+            lang: crate::i18n::I18n::detect(cli.lang.as_deref(), Some(&config.language))
+                .code()
+                .to_string(),
             label,
         }
     }
@@ -170,6 +175,7 @@ mod tests {
             plain: false,
             theme: "coffee".into(),
             fps: 15,
+            lang: "en".into(),
             label: None,
         }
     }
