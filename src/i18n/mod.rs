@@ -69,6 +69,8 @@ pub enum Msg {
     Paused,
     Left,
     CycleOf,
+    WaitContinue,
+    WaitContinuePlain,
 
     // Footers / run summaries.
     DoneFooter,
@@ -184,6 +186,7 @@ pub enum Msg {
     HelpBreak,
     HelpCycles,
     HelpGoal,
+    HelpWait,
     HelpPreset,
     HelpLong,
     HelpLongBreak,
@@ -223,6 +226,8 @@ impl Msg {
             Paused => "PAUSED",
             Left => "left",
             CycleOf => "cycle {n} of {total}",
+            WaitContinue => "Press any key to continue · q to quit",
+            WaitContinuePlain => "Press Enter to continue…",
 
             DoneFooter => "Done! {count} completed. ☕",
             StoppedFooter => "Stopped — {count} completed this session.",
@@ -347,6 +352,7 @@ impl Msg {
             HelpBreak => "Break length in minutes (default 5)",
             HelpCycles => "Number of focus→break cycles to run (default 1)",
             HelpGoal => "Daily pomodoro goal shown in stats (0 = off)",
+            HelpWait => "Wait for a keypress between phases instead of auto-advancing",
             HelpPreset => "Start from a named preset: classic, deep, short, sprint",
             HelpLong => "Enable a long break after every N focus blocks",
             HelpLongBreak => "Long break length in minutes (implies --long; default 15)",

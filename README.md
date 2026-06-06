@@ -149,6 +149,7 @@ over the config file.
 | `-b, --break MIN`       | Short break length, in minutes                          |
 | `--cycles N`            | Number of focus→break rounds                            |
 | `--goal N`              | Daily pomodoro goal shown in the stats dashboard        |
+| `--wait`                | Wait for a keypress between phases instead of auto-advancing |
 | `--long`                | Enable a long break after every N focus blocks          |
 | `--long-break MIN`      | Long-break length, in minutes (implies `--long`)        |
 | `--long-every N`        | Focus blocks before a long break (default 4)            |
@@ -193,6 +194,11 @@ During a session in the animated UI:
 | `+` / `=` / `Up`        | Add a minute to the current phase     |
 | `-` / `_` / `Down`      | Remove a minute from the current phase|
 | `q` / `Esc` / `Ctrl+C`  | Quit (stats are saved)                |
+
+With `--wait` (or `auto_advance = false` in the config), the timer pauses on an
+animated "press any key to continue" screen between phases instead of starting
+the next one automatically — handy if you don't want breaks to begin the moment
+you step away. Piped/non-interactive runs always auto-advance.
 
 ### Examples
 

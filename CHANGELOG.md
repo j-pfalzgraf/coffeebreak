@@ -13,6 +13,10 @@ themes and presets — all on top of a refactored, modular codebase.
 
 ### Added
 
+- **Manual phase advancement.** `--wait` (or `auto_advance = false` in the
+  config) pauses between phases on an animated "press any key to continue"
+  screen instead of auto-starting the next phase. Piped/non-interactive runs
+  still auto-advance so scripts never block.
 - **Animated statistics dashboard.** `coffeebreak stats` now renders a daily-goal
   progress bar, a 14-day vertical bar chart, and a GitHub-style 12-week
   contribution heatmap (plus current/longest streak), with a short grow-in reveal

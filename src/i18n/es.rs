@@ -151,4 +151,7 @@ pub static ENTRIES: super::Table = &[
     (super::Msg::HelpNoNotify, "No envía notificaciones de escritorio"),
     (super::Msg::HelpStatsFlag, "Muestra las estadísticas de hoy y el histórico, y luego sale"),
     (super::Msg::HelpLang, "Idioma de la interfaz: en, de, es, fr, it, pt"),
+    (super::Msg::WaitContinue, "Pulsa cualquier tecla para continuar · q para salir"),
+    (super::Msg::WaitContinuePlain, "Pulsa Intro para continuar…"),
+    (super::Msg::HelpWait, "Esperar una tecla entre fases en lugar de avanzar automáticamente"),
 ];

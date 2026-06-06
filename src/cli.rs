@@ -67,6 +67,10 @@ pub struct Cli {
     #[arg(long, value_name = "N", help_heading = "Timer options")]
     pub goal: Option<u64>,
 
+    /// Wait for a keypress between phases instead of auto-advancing.
+    #[arg(long, help_heading = "Timer options")]
+    pub wait: bool,
+
     /// Start from a named preset: classic, deep, short, sprint.
     #[arg(
         long,
@@ -264,6 +268,7 @@ fn localized_command(i18n: &I18n) -> clap::Command {
         ("brk", Msg::HelpBreak),
         ("cycles", Msg::HelpCycles),
         ("goal", Msg::HelpGoal),
+        ("wait", Msg::HelpWait),
         ("preset", Msg::HelpPreset),
         ("long", Msg::HelpLong),
         ("long_break", Msg::HelpLongBreak),

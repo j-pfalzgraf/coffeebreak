@@ -149,4 +149,7 @@ pub static ENTRIES: super::Table = &[
     (super::Msg::HelpNoNotify, "Ne pas envoyer de notifications de bureau"),
     (super::Msg::HelpStatsFlag, "Afficher les statistiques du jour et globales, puis quitter"),
     (super::Msg::HelpLang, "Langue d'interface : en, de, es, fr, it, pt"),
+    (super::Msg::WaitContinue, "Appuie sur une touche pour continuer · q pour quitter"),
+    (super::Msg::WaitContinuePlain, "Appuie sur Entrée pour continuer…"),
+    (super::Msg::HelpWait, "Attendre une touche entre les phases au lieu d'enchaîner automatiquement"),
 ];

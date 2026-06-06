@@ -6,7 +6,7 @@
 //! [`Frame`], diff-renders it via [`Renderer`], and reads keyboard [`Control`]s
 //! each frame. All countdown arithmetic lives in [`PhaseTimer`].
 
-use std::io::{self, Write};
+use std::io::{self, IsTerminal, Write};
 use std::sync::Arc;
 use std::sync::atomic::{AtomicBool, Ordering};
 use std::time::{Duration, Instant};
@@ -17,7 +17,7 @@ use unicode_width::UnicodeWidthStr;
 use crate::clock::PhaseTimer;
 use crate::feedback::Feedback;
 use crate::i18n::{I18n, Msg, Noun};
-use crate::input::{self, Control};
+use crate::input::{self, Control, WaitEvent};
 use crate::render::{Frame, Line, Renderer};
 use crate::session::Session;
 use crate::stats::{self, Stats};
@@ -88,6 +88,14 @@ impl App {
         'outer: for (idx, &(phase, duration)) in plan.iter().enumerate() {
             if idx != 0 {
                 self.feedback.announce(phase);
+                // Manual advance: alert (above), then wait for the user.
+                if !session.auto_advance {
+                    frame = frame.wrapping_add(1);
+                    if !self.wait_screen(&mut renderer, phase, idx + 1, session, &mut frame)? {
+                        quit = true;
+                        break;
+                    }
+                }
             }
             let quote = if phase.is_focus() {
                 None
@@ -151,6 +159,66 @@ impl App {
         }
 
         Ok(Outcome { completed_focus, interrupted: quit })
+    }
+
+    /// The animated "press any key to continue" screen shown between phases in
+    /// manual-advance mode. Returns `true` to continue, `false` to quit.
+    fn wait_screen<W: Write>(
+        &self,
+        renderer: &mut Renderer<W>,
+        next: Phase,
+        cycle: usize,
+        session: &Session,
+        frame: &mut usize,
+    ) -> Result<bool> {
+        let theme = &self.theme;
+        let accent = theme.phase_color(next);
+        loop {
+            let (w, h) = TerminalSession::size();
+            let (width, height) = (w as usize, h as usize);
+            let f = *frame;
+
+            let mut fr = Frame::new();
+            let mut head = LineBuf::new();
+            head.bold(theme, &format!("▌ {} ▐", self.i18n.phase_label(next)), accent);
+            head.dim(
+                theme,
+                format!(
+                    "  {}",
+                    self.i18n.tf(
+                        Msg::CycleOf,
+                        &[("n", &cycle.to_string()), ("total", &session.cycles.to_string())],
+                    )
+                ),
+            );
+            fr.push(head.into_line());
+            fr.push_blank();
+
+            if height >= 16 && width >= 26 {
+                // A steaming, ready cup awaiting the user.
+                fr.extend(widgets::coffee_cup(theme, 1.0, 1.0, f / 3));
+                fr.push_blank();
+            }
+
+            // Gently pulse the prompt so it reads as "waiting".
+            let mut prompt = LineBuf::new();
+            if (f / 4) % 2 == 0 {
+                prompt.bold(theme, self.i18n.t(Msg::WaitContinue), accent);
+            } else {
+                prompt.dim(theme, self.i18n.t(Msg::WaitContinue));
+            }
+            fr.push(prompt.into_line());
+
+            renderer.present(&fr.position(width, height))?;
+            *frame = frame.wrapping_add(1);
+
+            match input::poll_wait(self.frame_dt)? {
+                WaitEvent::Continue => return Ok(true),
+                WaitEvent::Quit => return Ok(false),
+                WaitEvent::Resize => renderer.clear()?,
+                WaitEvent::Timeout => {}
+            }
+        }
     }
 
     /// Compose one animation frame.
@@ -335,6 +403,18 @@ impl App {
         'outer: for (idx, &(phase, duration)) in plan.iter().enumerate() {
             if idx != 0 {
                 self.feedback.announce(phase);
+                // Manual advance: wait for Enter, but only on an interactive
+                // stdin (piped/CI input auto-advances so nothing blocks).
+                if !session.auto_advance && io::stdin().is_terminal() {
+                    println!("{}", theme.dim(self.i18n.t(Msg::WaitContinuePlain)));
+                    let _ = io::stdout().flush();
+                    let mut buf = String::new();
+                    let eof = io::stdin().read_line(&mut buf).unwrap_or(0) == 0;
+                    if eof || shutdown.load(Ordering::SeqCst) {
+                        interrupted = true;
+                        break 'outer;
+                    }
+                }
             }
             let accent = theme.phase_color(phase);
             print!(

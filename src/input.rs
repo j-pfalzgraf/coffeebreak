@@ -40,11 +40,44 @@ pub fn poll(timeout: Duration) -> Result<Option<Control>> {
     }
 }
 
-fn map_key(key: KeyEvent) -> Option<Control> {
-    // Ctrl+C / Ctrl+D quit.
+/// The outcome of waiting on the "press any key to continue" screen.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum WaitEvent {
+    /// Nothing happened before the timeout elapsed.
+    Timeout,
+    /// A key was pressed to continue.
+    Continue,
+    /// The user asked to quit (`q` / Esc / Ctrl+C).
+    Quit,
+    /// The terminal was resized.
+    Resize,
+}
+
+/// Wait up to `timeout` for the between-phases screen: any key continues, the
+/// usual quit keys quit.
+pub fn poll_wait(timeout: Duration) -> Result<WaitEvent> {
+    if !event::poll(timeout)? {
+        return Ok(WaitEvent::Timeout);
+    }
+    match event::read()? {
+        Event::Key(key) => Ok(if is_quit(key) { WaitEvent::Quit } else { WaitEvent::Continue }),
+        Event::Resize(_, _) => Ok(WaitEvent::Resize),
+        _ => Ok(WaitEvent::Timeout),
+    }
+}
+
+/// Whether a key event means "quit".
+fn is_quit(key: KeyEvent) -> bool {
     if key.modifiers.contains(KeyModifiers::CONTROL)
         && matches!(key.code, KeyCode::Char('c') | KeyCode::Char('d'))
     {
+        return true;
+    }
+    matches!(key.code, KeyCode::Char('q') | KeyCode::Char('Q') | KeyCode::Esc)
+}
+
+fn map_key(key: KeyEvent) -> Option<Control> {
+    if is_quit(key) {
         return Some(Control::Quit);
     }
     match key.code {
@@ -52,7 +85,6 @@ fn map_key(key: KeyEvent) -> Option<Control> {
         KeyCode::Char('s') | KeyCode::Char('S') | KeyCode::Char('n') | KeyCode::Char('N') => {
             Some(Control::Skip)
         }
-        KeyCode::Char('q') | KeyCode::Char('Q') | KeyCode::Esc => Some(Control::Quit),
         KeyCode::Char('+') | KeyCode::Char('=') | KeyCode::Up => Some(Control::Extend),
         KeyCode::Char('-') | KeyCode::Char('_') | KeyCode::Down => Some(Control::Shrink),
         _ => None,

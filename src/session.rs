@@ -28,6 +28,8 @@ pub struct Session {
     pub notifications: bool,
     pub color: bool,
     pub plain: bool,
+    /// Wait for a keypress between phases instead of auto-advancing.
+    pub auto_advance: bool,
     pub theme: String,
     pub fps: u32,
     /// Resolved interface language code (e.g. `"en"`, `"de"`).
@@ -112,6 +114,8 @@ impl Session {
             notifications: !cli.no_notify && config.notifications,
             color,
             plain: cli.plain,
+            // --wait forces manual advance; otherwise honour the config.
+            auto_advance: !cli.wait && config.auto_advance,
             theme: cli.theme.clone().unwrap_or_else(|| {
                 if config.theme.is_empty() { DEFAULT_THEME.to_string() } else { config.theme.clone() }
             }),
@@ -173,6 +177,7 @@ mod tests {
             notifications: false,
             color: false,
             plain: false,
+            auto_advance: true,
             theme: "coffee".into(),
             fps: 15,
             lang: "en".into(),

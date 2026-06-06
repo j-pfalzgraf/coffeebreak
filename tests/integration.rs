@@ -16,7 +16,7 @@
 //! plain, non-animated path and the runs terminate promptly instead of hanging.
 
 use std::path::{Path, PathBuf};
-use std::process::{Command, Output};
+use std::process::{Command, Output, Stdio};
 use std::sync::atomic::{AtomicU64, Ordering};
 use std::time::{SystemTime, UNIX_EPOCH};
 
@@ -450,4 +450,20 @@ fn stats_dashboard_renders_charts_after_a_run() {
     for needle in ["Daily goal:", "Last 14 days", "Last 12 weeks"] {
         assert!(s.contains(needle), "dashboard missing `{needle}`\n{}", describe(&args, &out));
     }
+}
+
+#[test]
+fn wait_mode_with_non_tty_stdin_auto_advances_and_does_not_hang() {
+    // `--wait` waits for a keypress only on an interactive stdin. With piped/null
+    // stdin it must auto-advance so scripts and CI never block.
+    let home = TempHome::new("wait");
+    let mut c = cmd(
+        &home,
+        &["--wait", "--plain", "--seconds", "-w", "1", "-b", "1", "--cycles", "2", "--no-sound", "--no-notify"],
+    );
+    c.stdin(Stdio::null());
+    let out = c.output().unwrap_or_else(|e| panic!("failed to run: {e}"));
+    assert!(out.status.success(), "wait+piped should complete, not hang\n{}", text(&out.stderr));
+    let contents = std::fs::read_to_string(home.path().join(".coffeebreak").join("stats.json")).unwrap_or_default();
+    assert!(contents.contains("completed_pomodoros"), "expected stats written");
 }
