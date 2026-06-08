@@ -5,7 +5,7 @@
 #   curl -fsSL https://raw.githubusercontent.com/j-pfalzgraf/coffeebreak/main/install.sh | sh
 #
 # Environment overrides:
-#   COFFEEBREAK_VERSION       Release tag to install (e.g. v0.1.0). Default: latest.
+#   COFFEEBREAK_VERSION       Release tag to install (e.g. v1.0.0). Default: latest.
 #   COFFEEBREAK_INSTALL_DIR   Directory to install into. Default: $HOME/.local/bin
 #
 # This script:

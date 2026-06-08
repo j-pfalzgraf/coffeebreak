@@ -7,75 +7,106 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-A major UI and architecture upgrade. coffeebreak now renders a full-screen,
-animated terminal interface, reacts to keyboard input mid-session, and ships
-themes and presets — all on top of a refactored, modular codebase.
+## [1.0.0] - 2026-06-08
+
+coffeebreak's first stable release: a full-screen, animated terminal Pomodoro
+timer that reacts to keyboard input mid-session and ships themes, presets, full
+internationalisation, and a statistics dashboard — all on top of a modular,
+well-tested codebase. The original Pomodoro core is included below.
 
 ### Added
 
-- **Manual phase advancement.** `--wait` (or `auto_advance = false` in the
-  config) pauses between phases on an animated "press any key to continue"
-  screen instead of auto-starting the next phase. Piped/non-interactive runs
-  still auto-advance so scripts never block.
-- **Custom colour themes.** Define your own palette under `[custom_theme]` in the
-  config (per-field `#RRGGBB` overrides on top of the `coffee` base) and select it
-  with `--theme custom`.
-- **Machine-readable stats export.** `coffeebreak stats --format json|csv` prints
-  a structured summary + per-day history (JSON) or rows (CSV) — no colour, no
-  animation, pipe-friendly for scripts and dashboards. `text` (the animated
-  dashboard) remains the default.
-- **Animated statistics dashboard.** `coffeebreak stats` now renders a daily-goal
-  progress bar, a 14-day vertical bar chart, and a GitHub-style 12-week
-  contribution heatmap (plus current/longest streak), with a short grow-in reveal
-  animation on a colour terminal. New `charts` module (`sparkline`, `bar_chart`,
-  `heatmap`, `goal_bar`).
-- **Daily goal**: `--goal N` flag and `daily_goal` config key, shown in the
-  dashboard.
-- **`coffeebreak doctor`** — localised environment diagnostics (terminal,
-  truecolour, language, config/data paths, notifications, sound backend).
-- **Full internationalisation**, defaulting to English. Every user-facing
-  string — the live UI, status line, statistics, command output, notifications,
-  footers, and even the `--help`/man text — is localised. Ships English,
-  German, Spanish, French, Italian, and Portuguese. The language is resolved from
-  `--lang CODE`, the `language` config key, or the `LC_ALL`/`LC_MESSAGES`/`LANG`/
-  `LANGUAGE` environment, with English fallback for anything untranslated. Added
-  a `coffeebreak languages` subcommand.
-- **Animated full-screen TUI.** On a TTY, sessions now run in the alternate
-  screen with an ASCII coffee cup that **drains** as you focus and **refills**
-  during a break, animated rising steam, a shimmering liquid surface, a large
-  block-digit countdown, and a gradient progress bar.
+#### Timer & session
+
+- Pomodoro focus cycles with configurable work and break durations
+  (`-w/--work`, `-b/--break`, `--cycles`).
+- Long breaks (`--long`, `--long-break`, `--long-every`).
+- **Animated full-screen TUI.** On a TTY, sessions run in the alternate screen
+  with an ASCII coffee cup that **drains** as you focus and **refills** during a
+  break, animated rising steam, a shimmering liquid surface, a large block-digit
+  countdown, and a gradient progress bar.
 - **Interactive keyboard controls** during a session:
   - `space` / `p` — pause / resume
   - `s` / `n` — skip the current phase
   - `+` / `=` / `Up` — add a minute to the current phase
   - `-` / `_` / `Down` — remove a minute from the current phase
   - `q` / `Esc` / `Ctrl+C` — quit (stats are saved)
-- **Colour themes** (truecolour): `coffee` (default), `ocean`, `forest`,
-  `grape`, and `mono`. Select with `--theme NAME` or via config.
-- **`coffeebreak themes`** subcommand to preview every theme.
+- **Manual phase advancement.** `--wait` (or `auto_advance = false` in the
+  config) pauses between phases on an animated "press any key to continue"
+  screen instead of auto-starting the next phase. Piped/non-interactive runs
+  still auto-advance so scripts never block.
 - **Presets** via `--preset NAME`: `classic` (4×25/5, ending on a long break),
   `deep` (3×50/10, ending on a long break), `short` (6×15/3 with a long break
   every 4 blocks), and `sprint` (1×20/5, no long break).
-- **`coffeebreak presets`** subcommand to list available presets.
-- **`coffeebreak config init|path|show`** subcommands to scaffold, locate, and
-  inspect the config file.
-- **`coffeebreak completions <bash|zsh|fish|powershell|elvish>`** for shell
-  completion scripts.
-- **`coffeebreak man`** to emit a man page.
+- Session labels: `-l/--label TEXT` and `--git-label` (uses the current git
+  branch).
 - New flags: `--fps N` (2–60, default 15) to tune animation smoothness,
   `--plain` to force plain line output, and `--theme NAME` to pick a theme.
-- New config keys: `theme` (string, `"coffee"`) and `fps` (u32, `15`).
-- Expanded collection of developer quotes shown between phases.
 
-### Changed
+#### Appearance & internationalisation
 
-- **Replaced `indicatif`** with a custom, flicker-free renderer that diffs and
-  redraws only what changed, keeping idle CPU near zero.
-- **OOP/DRY refactor** splitting the monolith into focused modules:
-  `theme`, `render`, `widgets`, `app`, `feedback`, and `clock`.
-- Plain line output is now selected **automatically** when stdout/stdin are not
-  TTYs (pipes, CI), and can be forced with `--plain`.
-- The codebase is now **rustfmt-clean** (formatting is enforced by CI).
+- **Colour themes** (truecolour): `coffee` (default), `ocean`, `forest`,
+  `grape`, and `mono`. Select with `--theme NAME` or via config.
+- **Custom colour themes.** Define your own palette under `[custom_theme]` in the
+  config (per-field `#RRGGBB` overrides on top of the `coffee` base) and select it
+  with `--theme custom`.
+- **Full internationalisation**, defaulting to English. Every user-facing
+  string — the live UI, status line, statistics, command output, notifications,
+  footers, and even the `--help`/man text — is localised. Ships English,
+  German, Spanish, French, Italian, and Portuguese. The language is resolved from
+  `--lang CODE`, the `language` config key, or the `LC_ALL`/`LC_MESSAGES`/`LANG`/
+  `LANGUAGE` environment, with English fallback for anything untranslated.
+- Developer quotes shown between phases.
+
+#### Statistics
+
+- Daily stats with streak and best-day tracking in `~/.coffeebreak/stats.json`,
+  viewable via `coffeebreak stats` or `--stats`.
+- **Animated statistics dashboard.** `coffeebreak stats` renders a daily-goal
+  progress bar, a 14-day vertical bar chart, and a GitHub-style 12-week
+  contribution heatmap (plus current/longest streak), with a short grow-in reveal
+  animation on a colour terminal. New `charts` module (`sparkline`, `bar_chart`,
+  `heatmap`, `goal_bar`).
+- **Daily goal**: `--goal N` flag and `daily_goal` config key, shown in the
+  dashboard.
+- **Machine-readable stats export.** `coffeebreak stats --format json|csv` prints
+  a structured summary + per-day history (JSON) or rows (CSV) — no colour, no
+  animation, pipe-friendly for scripts and dashboards. `text` (the animated
+  dashboard) remains the default.
+
+#### Commands, configuration & notifications
+
+- **`coffeebreak config init|path|show`** subcommands to scaffold, locate, and
+  inspect the config file.
+- **`coffeebreak doctor`** — localised environment diagnostics (terminal,
+  truecolour, language, config/data paths, notifications, sound backend).
+- **`coffeebreak themes`**, **`coffeebreak presets`**, and **`coffeebreak
+  languages`** subcommands to preview themes, list presets, and list locales.
+- **`coffeebreak completions <bash|zsh|fish|powershell|elvish>`** for shell
+  completion scripts, and **`coffeebreak man`** to emit a man page.
+- Config keys: `theme` (string, `"coffee"`) and `fps` (u32, `15`), alongside
+  `language`, `daily_goal`, `auto_advance`, and the `[custom_theme]` palette.
+- Desktop notifications on phase changes.
+- Terminal-bell sound by default, with an optional `rodio` chime behind the
+  `sound` build feature; `--no-sound` to mute.
+- `--no-color` / `NO_COLOR` support.
+
+#### Distribution
+
+- Self-update lifecycle: `coffeebreak self update [--check]` and
+  `coffeebreak self uninstall [-y]`.
+- Install/uninstall scripts for Unix (`install.sh`, `uninstall.sh`) and Windows
+  (`install.ps1`), plus `cargo install coffeebreak-cli`.
+
+### Engineering
+
+- A custom, flicker-free renderer that diffs and redraws only what changed,
+  keeping idle CPU near zero (replacing `indicatif`).
+- A modular, OOP/DRY codebase split into focused modules: `theme`, `render`,
+  `widgets`, `charts`, `app`, `feedback`, `clock`, `session`, `config`, `cli`,
+  `stats`, `commands`, `selfcmd`, and `i18n`.
+- Plain line output is selected **automatically** when stdout/stdin are not TTYs
+  (pipes, CI), and can be forced with `--plain`.
 
 ### CI / Infrastructure
 
@@ -101,30 +132,5 @@ themes and presets — all on top of a refactored, modular codebase.
   (gated on a `CARGO_REGISTRY_TOKEN` secret).
 - Added issue forms, a pull-request template, and `CONTRIBUTING.md`.
 
-## [0.1.0] - TBD
-
-Initial release — the original Pomodoro MVP.
-
-### Added
-
-- Pomodoro focus cycles with configurable work and break durations
-  (`-w/--work`, `-b/--break`, `--cycles`).
-- Long breaks (`--long`, `--long-break`, `--long-every`).
-- An ASCII coffee cup and a live countdown progress bar.
-- Desktop notifications on phase changes.
-- Developer quotes shown between phases.
-- Daily stats with streak and best-day tracking in `~/.coffeebreak/stats.json`,
-  viewable via `coffeebreak stats` or `--stats`.
-- Session labels: `-l/--label TEXT` and `--git-label` (uses the current git
-  branch).
-- Terminal-bell sound by default, with an optional `rodio` chime behind the
-  `sound` build feature; `--no-sound` to mute.
-- `--no-color` / `NO_COLOR` support.
-- Self-update lifecycle: `coffeebreak self update [--check]` and
-  `coffeebreak self uninstall [-y]`.
-- Install/uninstall scripts for Unix (`install.sh`, `uninstall.sh`) and Windows
-  (`install.ps1`), plus `cargo install coffeebreak-cli`.
-- Continuous integration.
-
-[Unreleased]: https://github.com/j-pfalzgraf/coffeebreak/compare/v0.1.0...HEAD
-[0.1.0]: https://github.com/j-pfalzgraf/coffeebreak/releases/tag/v0.1.0
+[Unreleased]: https://github.com/j-pfalzgraf/coffeebreak/compare/v1.0.0...HEAD
+[1.0.0]: https://github.com/j-pfalzgraf/coffeebreak/releases/tag/v1.0.0

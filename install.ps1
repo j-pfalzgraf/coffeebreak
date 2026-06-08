@@ -12,7 +12,7 @@
 
 .NOTES
     Environment overrides:
-        $env:COFFEEBREAK_VERSION  - release tag to install (e.g. v0.1.0). Default: latest.
+        $env:COFFEEBREAK_VERSION  - release tag to install (e.g. v1.0.0). Default: latest.
 
     Security:
         - HTTPS only.

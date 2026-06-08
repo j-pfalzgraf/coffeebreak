@@ -53,7 +53,7 @@ unchanged.
 
 ## Releases
 
-Pushing a tag like `v0.1.0` triggers [`release.yml`](.github/workflows/release.yml),
+Pushing a tag like `v1.0.0` triggers [`release.yml`](.github/workflows/release.yml),
 which re-checks fmt/clippy/tests, verifies the tag matches `Cargo.toml`,
 cross-builds binaries for all supported targets, and publishes a GitHub Release
 with a `SHA256SUMS` file. Update `CHANGELOG.md` before tagging.

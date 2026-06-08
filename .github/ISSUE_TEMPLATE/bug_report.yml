@@ -10,7 +10,7 @@ body:
     attributes:
       label: coffeebreak version
       description: Output of `coffeebreak --version`.
-      placeholder: coffeebreak 0.1.0
+      placeholder: coffeebreak 1.0.0
     validations:
       required: true
   - type: dropdown

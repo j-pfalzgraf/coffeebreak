@@ -1,6 +1,6 @@
 # Release workflow for coffeebreak.
 #
-# Triggered when a version tag (e.g. v0.1.0) is pushed. It cross-builds the
+# Triggered when a version tag (e.g. v1.0.0) is pushed. It cross-builds the
 # `coffeebreak` binary for all six supported target triples, packages each one
 # as a release asset whose filename embeds the Rust target triple (so the
 # `self_update` crate can locate the right asset), generates a single
@@ -18,7 +18,7 @@ name: release
 on:
   push:
     tags:
-      - "v*" # any tag starting with v, e.g. v0.1.0
+      - "v*" # any tag starting with v, e.g. v1.0.0
   workflow_dispatch: {} # allow manual runs from the Actions tab
 
 # The final job needs write access to create the Release and upload assets.
@@ -248,7 +248,7 @@ jobs:
             dist/coffeebreak-*.zip
 
       # Create (or update) the GitHub Release for this tag and attach every
-      # archive plus the checksums file. github.ref_name is the tag (e.g. v0.1.0)
+      # archive plus the checksums file. github.ref_name is the tag (e.g. v1.0.0)
       # on tag pushes; on workflow_dispatch it is the branch/tag chosen.
       - name: Publish GitHub Release
         uses: softprops/action-gh-release@v3

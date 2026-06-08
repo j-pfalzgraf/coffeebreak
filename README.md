@@ -120,7 +120,7 @@ This installs to `~/.local/bin/coffeebreak`. Override the location with
 `COFFEEBREAK_INSTALL_DIR`, or pin a version with `COFFEEBREAK_VERSION`:
 
 ```sh
-COFFEEBREAK_INSTALL_DIR="$HOME/bin" COFFEEBREAK_VERSION=v0.1.0 \
+COFFEEBREAK_INSTALL_DIR="$HOME/bin" COFFEEBREAK_VERSION=v1.0.0 \
   curl -fsSL https://raw.githubusercontent.com/j-pfalzgraf/coffeebreak/main/install.sh | sh
 ```
 
