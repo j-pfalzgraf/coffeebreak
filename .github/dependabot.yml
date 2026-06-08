@@ -24,6 +24,11 @@ updates:
       interval: weekly
     commit-message:
       prefix: "ci"
+    ignore:
+      # `dtolnay/rust-toolchain@<x.y>` pins a Rust toolchain version (the MSRV),
+      # not an action release. Dependabot would otherwise "bump" it to a
+      # nonexistent Rust version (e.g. 1.100) and break the msrv job.
+      - dependency-name: "dtolnay/rust-toolchain"
     groups:
       actions:
         patterns:

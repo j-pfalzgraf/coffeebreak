@@ -76,7 +76,10 @@ jobs:
     steps:
       - uses: actions/checkout@v6
       - name: Install Rust 1.85
-        uses: dtolnay/rust-toolchain@1.100
+        # Pinned to the MSRV from Cargo.toml (rust-version = "1.85"). This is a
+        # Rust toolchain version, NOT an action version — do not let Dependabot
+        # bump it (see the ignore rule in .github/dependabot.yml).
+        uses: dtolnay/rust-toolchain@1.85
       - uses: Swatinem/rust-cache@v2
       - name: Check on MSRV
         run: cargo check --locked --all-targets
