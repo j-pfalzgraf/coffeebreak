@@ -48,7 +48,7 @@ jobs:
       # Optional: only runs when a Codecov token is configured.
       - name: Upload to Codecov
         if: ${{ env.CODECOV_TOKEN != '' }}
-        uses: codecov/codecov-action@v6
+        uses: codecov/codecov-action@v7
         with:
           files: lcov.info
           token: ${{ env.CODECOV_TOKEN }}
