@@ -61,7 +61,11 @@ pub fn coffee_cup(theme: &Theme, fill: f64, steam: f64, frame: usize) -> Vec<Lin
             // Higher rows fade out.
             let fade = 0.45 + 0.18 * sr as f64;
             for (i, &col) in wisp_cols.iter().enumerate() {
-                let ch = if (frame + sr + i) % 2 == 0 { '(' } else { ')' };
+                let ch = if (frame + sr + i).is_multiple_of(2) {
+                    '('
+                } else {
+                    ')'
+                };
                 cells[col] = (ch, Some(p.steam.shade(fade)));
             }
         }

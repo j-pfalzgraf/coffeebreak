@@ -227,7 +227,7 @@ impl App {
 
             // Gently pulse the prompt so it reads as "waiting".
             let mut prompt = LineBuf::new();
-            if (f / 4) % 2 == 0 {
+            if (f / 4).is_multiple_of(2) {
                 prompt.bold(theme, self.i18n.t(Msg::WaitContinue), accent);
             } else {
                 prompt.dim(theme, self.i18n.t(Msg::WaitContinue));
@@ -313,7 +313,7 @@ impl App {
         let remaining = ceil_secs(timer.remaining(now));
         let time_str = fmt_mmss(remaining);
         if show_big {
-            let color = if paused && (frame / 8) % 2 == 0 {
+            let color = if paused && (frame / 8).is_multiple_of(2) {
                 p.muted
             } else {
                 accent
@@ -348,7 +348,7 @@ impl App {
             let marker = format!("⏸ {}", self.i18n.t(Msg::Paused));
             let marker_w = marker.width();
             meta.plain(theme, "  ");
-            if (frame / 8) % 2 == 0 {
+            if (frame / 8).is_multiple_of(2) {
                 meta.bold(theme, &marker, p.warn);
             } else {
                 meta.plain(theme, &" ".repeat(marker_w));

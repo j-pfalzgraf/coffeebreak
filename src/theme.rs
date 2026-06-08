@@ -119,14 +119,14 @@ impl Theme {
     /// When `name` is `"custom"` and `custom` is `Some`, that palette is used;
     /// otherwise this behaves like [`Theme::resolve`].
     pub fn build(name: &str, enabled: bool, custom: Option<Palette>) -> Theme {
-        if name.eq_ignore_ascii_case("custom") {
-            if let Some(palette) = custom {
-                return Theme {
-                    name: "custom",
-                    palette,
-                    enabled,
-                };
-            }
+        if name.eq_ignore_ascii_case("custom")
+            && let Some(palette) = custom
+        {
+            return Theme {
+                name: "custom",
+                palette,
+                enabled,
+            };
         }
         Theme::resolve(name, enabled)
     }
