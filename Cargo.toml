@@ -2,7 +2,7 @@
 name = "coffeebreak-cli"
 version = "0.1.0"
 edition = "2024"
-rust-version = "1.85"
+rust-version = "1.88"
 description = "A Pomodoro focus timer for your terminal — ASCII coffee cup, live countdown, and dev quotes."
 authors = ["coffeebreak contributors"]
 license = "MIT OR Apache-2.0"

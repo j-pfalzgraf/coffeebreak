@@ -81,7 +81,7 @@ themes and presets — all on top of a refactored, modular codebase.
 
 - **Continuous integration** ([`ci.yml`](.github/workflows/ci.yml)): rustfmt,
   clippy (`-D warnings`, with and without the `sound` feature), tests on
-  Linux/macOS/Windows, an MSRV (1.85) check, and a docs build that denies broken
+  Linux/macOS/Windows, an MSRV (1.88) check, and a docs build that denies broken
   links. Cargo caching throughout.
 - **Security audit** ([`audit.yml`](.github/workflows/audit.yml)) scanning for
   RustSec advisories on every dependency change and weekly.
@@ -92,7 +92,6 @@ themes and presets — all on top of a refactored, modular codebase.
 - **Spell checking** with `typos` ([`spellcheck.yml`](.github/workflows/spellcheck.yml)).
 - **Install-script linting** ([`scripts.yml`](.github/workflows/scripts.yml)):
   shellcheck for the shell installers and PSScriptAnalyzer for `install.ps1`.
-- **API docs published to GitHub Pages** ([`docs.yml`](.github/workflows/docs.yml)).
 - **Dependabot** ([`dependabot.yml`](.github/dependabot.yml)) for Cargo and
   GitHub Actions updates.
 - **Hardened release pipeline**: a pre-release gate (tag↔`Cargo.toml` version

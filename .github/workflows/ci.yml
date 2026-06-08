@@ -71,15 +71,15 @@ jobs:
 
   # ----------------------------------------------------- minimum supported Rust
   msrv:
-    name: msrv (1.85)
+    name: msrv (1.88)
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6
-      - name: Install Rust 1.85
-        # Pinned to the MSRV from Cargo.toml (rust-version = "1.85"). This is a
+      - name: Install Rust 1.88
+        # Pinned to the MSRV from Cargo.toml (rust-version = "1.88"). This is a
         # Rust toolchain version, NOT an action version — do not let Dependabot
         # bump it (see the ignore rule in .github/dependabot.yml).
-        uses: dtolnay/rust-toolchain@1.85
+        uses: dtolnay/rust-toolchain@1.88
       - uses: Swatinem/rust-cache@v2
       - name: Check on MSRV
         run: cargo check --locked --all-targets

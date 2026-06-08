@@ -461,7 +461,7 @@ Continuous integration runs on every push and pull request
 - **rustfmt** — `cargo fmt --all --check` (formatting is enforced)
 - **clippy** — `-D warnings`, with and without the `sound` feature
 - **tests** — on Linux, macOS, and Windows
-- **MSRV** — `cargo check` on Rust 1.85
+- **MSRV** — `cargo check` on Rust 1.88
 - **docs** — `cargo doc` with `-D warnings` (catches broken doc links)
 - **coverage** — `cargo-llvm-cov` ([`coverage.yml`](.github/workflows/coverage.yml)), lcov uploaded as an artifact
 

@@ -16,7 +16,22 @@ use anyhow::{Context, Result};
 use directories::BaseDirs;
 
 /// The user's home directory.
+///
+/// We honor the conventional per-platform home variable directly — `$HOME` on
+/// Unix, `%USERPROFILE%` on Windows — and only fall back to the OS lookup when
+/// it is unset (or not absolute). This keeps the home-relative config/data
+/// paths predictable and redirectable on **every** platform: the `directories`
+/// crate resolves the Windows home via `SHGetKnownFolderPath(FOLDERID_Profile)`,
+/// which ignores `%USERPROFILE%`, so without this the location could not be
+/// pinned — e.g. for the hermetic integration tests or a relocated profile.
 pub fn home_dir() -> Result<PathBuf> {
+    let var = if cfg!(windows) { "USERPROFILE" } else { "HOME" };
+    if let Some(home) = std::env::var_os(var) {
+        let p = PathBuf::from(&home);
+        if p.is_absolute() {
+            return Ok(p);
+        }
+    }
     let base = BaseDirs::new().context("could not determine the home directory")?;
     Ok(base.home_dir().to_path_buf())
 }

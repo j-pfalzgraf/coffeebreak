@@ -5,7 +5,7 @@ contributions are very welcome.
 
 ## Prerequisites
 
-- A recent Rust toolchain (the project's MSRV is **1.85**, edition 2024).
+- A recent Rust toolchain (the project's MSRV is **1.88**, edition 2024).
 - For the optional `sound` feature on Linux: ALSA dev headers
   (`sudo apt install libasound2-dev`).
 
