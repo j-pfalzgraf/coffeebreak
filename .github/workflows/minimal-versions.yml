@@ -1,0 +1,38 @@
+# Verify the crate still builds against the *minimum* versions of its declared
+# dependencies (the lower bounds in Cargo.toml), not just the latest that happen
+# to be in Cargo.lock. A lower bound that is actually too low is a real bug for
+# downstream `cargo install` users who resolve different versions.
+#
+# Advisory only: it uses the nightly toolchain's unstable resolver and never
+# blocks (so a transitive crate's bad lower bound can't break this repo's CI).
+name: Minimal versions
+
+on:
+  schedule:
+    - cron: "30 6 * * 1" # Mondays 06:30 UTC (staggered between audit and links)
+  workflow_dispatch: {}
+
+permissions:
+  contents: read
+
+concurrency:
+  group: minimal-versions-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  minimal-versions:
+    name: direct-minimal-versions
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    steps:
+      - uses: actions/checkout@v6
+      # @nightly is a channel, not a pinned version — Dependabot leaves it alone.
+      - uses: dtolnay/rust-toolchain@nightly
+      - uses: Swatinem/rust-cache@v2
+      # `--all-features` builds the rodio chime, which needs ALSA on Linux.
+      - name: Install ALSA dev headers
+        run: sudo apt-get update && sudo apt-get install -y libasound2-dev
+      - name: Pin direct dependencies to their minimum versions
+        run: cargo +nightly -Z direct-minimal-versions generate-lockfile
+      - name: Check against minimal versions
+        run: cargo +nightly check --all-features --all-targets

@@ -69,11 +69,34 @@ pub struct Theme {
 }
 
 /// All built-in theme names, in display order.
-pub const THEME_NAMES: &[&str] = &["coffee", "ocean", "forest", "grape", "mono"];
+pub const THEME_NAMES: &[&str] = &[
+    "coffee",
+    "ocean",
+    "forest",
+    "grape",
+    "mono",
+    "dracula",
+    "nord",
+    "gruvbox",
+    "solarized",
+    "rose-pine",
+];
 
 /// Theme names accepted on the CLI — the built-ins plus the config-defined
 /// `custom` palette.
-pub const THEME_CHOICES: &[&str] = &["coffee", "ocean", "forest", "grape", "mono", "custom"];
+pub const THEME_CHOICES: &[&str] = &[
+    "coffee",
+    "ocean",
+    "forest",
+    "grape",
+    "mono",
+    "dracula",
+    "nord",
+    "gruvbox",
+    "solarized",
+    "rose-pine",
+    "custom",
+];
 
 /// The default theme name.
 pub const DEFAULT_THEME: &str = "coffee";
@@ -105,6 +128,11 @@ impl Theme {
             "forest" => ("forest", FOREST),
             "grape" => ("grape", GRAPE),
             "mono" => ("mono", MONO),
+            "dracula" => ("dracula", DRACULA),
+            "nord" => ("nord", NORD),
+            "gruvbox" => ("gruvbox", GRUVBOX),
+            "solarized" => ("solarized", SOLARIZED),
+            "rose-pine" | "rosepine" | "rose_pine" => ("rose-pine", ROSE_PINE),
             _ => ("coffee", COFFEE),
         };
         Theme {
@@ -326,6 +354,96 @@ const MONO: Palette = Palette {
     warn: Rgb(0xBB, 0xBB, 0xBB),
 };
 
+// The popular "Dracula" palette: vivid purples and pinks on a dark backdrop.
+const DRACULA: Palette = Palette {
+    focus: Rgb(0xBD, 0x93, 0xF9),         // purple
+    short_break: Rgb(0x50, 0xFA, 0x7B),   // green
+    long_break: Rgb(0xFF, 0x79, 0xC6),    // pink
+    accent: Rgb(0xF1, 0xFA, 0x8C),        // yellow
+    text: Rgb(0xF8, 0xF8, 0xF2),          // foreground
+    muted: Rgb(0x62, 0x72, 0xA4),         // comment
+    cup: Rgb(0xF8, 0xF8, 0xF2),           // bright porcelain
+    coffee_top: Rgb(0xFF, 0xB8, 0x6C),    // orange crema
+    coffee_bottom: Rgb(0x44, 0x47, 0x5A), // current-line dark
+    steam: Rgb(0xBD, 0xC6, 0xE8),
+    bar_start: Rgb(0xBD, 0x93, 0xF9),
+    bar_end: Rgb(0xFF, 0x79, 0xC6),
+    success: Rgb(0x50, 0xFA, 0x7B),
+    warn: Rgb(0xFF, 0x55, 0x55), // red
+};
+
+// "Nord": a calm, frosty arctic palette.
+const NORD: Palette = Palette {
+    focus: Rgb(0x88, 0xC0, 0xD0),       // frost cyan
+    short_break: Rgb(0xA3, 0xBE, 0x8C), // aurora green
+    long_break: Rgb(0xB4, 0x8E, 0xAD),  // aurora purple
+    accent: Rgb(0xEB, 0xCB, 0x8B),      // aurora yellow
+    text: Rgb(0xEC, 0xEF, 0xF4),        // snow storm
+    muted: Rgb(0x4C, 0x56, 0x6A),       // polar night 3
+    cup: Rgb(0xD8, 0xDE, 0xE9),
+    coffee_top: Rgb(0xD0, 0x87, 0x70),    // aurora orange crema
+    coffee_bottom: Rgb(0x3B, 0x42, 0x52), // polar night 1
+    steam: Rgb(0xE5, 0xE9, 0xF0),
+    bar_start: Rgb(0x5E, 0x81, 0xAC), // frost deep blue
+    bar_end: Rgb(0x88, 0xC0, 0xD0),
+    success: Rgb(0xA3, 0xBE, 0x8C),
+    warn: Rgb(0xBF, 0x61, 0x6A), // aurora red
+};
+
+// "Gruvbox" (dark): warm, retro, high-contrast earth tones.
+const GRUVBOX: Palette = Palette {
+    focus: Rgb(0xFE, 0x80, 0x19),         // bright orange
+    short_break: Rgb(0xB8, 0xBB, 0x26),   // bright green
+    long_break: Rgb(0xD3, 0x86, 0x9B),    // bright purple
+    accent: Rgb(0xFA, 0xBD, 0x2F),        // bright yellow
+    text: Rgb(0xEB, 0xDB, 0xB2),          // fg
+    muted: Rgb(0x92, 0x83, 0x74),         // gray
+    cup: Rgb(0xD5, 0xC4, 0xA1),           // light cream
+    coffee_top: Rgb(0xD6, 0x5D, 0x0E),    // neutral orange crema
+    coffee_bottom: Rgb(0x28, 0x28, 0x28), // bg0
+    steam: Rgb(0xEB, 0xDB, 0xB2),
+    bar_start: Rgb(0xFE, 0x80, 0x19),
+    bar_end: Rgb(0xFA, 0xBD, 0x2F),
+    success: Rgb(0xB8, 0xBB, 0x26),
+    warn: Rgb(0xFB, 0x49, 0x34), // bright red
+};
+
+// "Solarized" (dark): Ethan Schoonover's precision low-eye-strain palette.
+const SOLARIZED: Palette = Palette {
+    focus: Rgb(0x26, 0x8B, 0xD2),         // blue
+    short_break: Rgb(0x85, 0x99, 0x00),   // green
+    long_break: Rgb(0x6C, 0x71, 0xC4),    // violet
+    accent: Rgb(0xB5, 0x89, 0x00),        // yellow
+    text: Rgb(0x93, 0xA1, 0xA1),          // base1
+    muted: Rgb(0x58, 0x6E, 0x75),         // base01
+    cup: Rgb(0xEE, 0xE8, 0xD5),           // base2
+    coffee_top: Rgb(0xCB, 0x4B, 0x16),    // orange crema
+    coffee_bottom: Rgb(0x00, 0x2B, 0x36), // base03
+    steam: Rgb(0x93, 0xA1, 0xA1),
+    bar_start: Rgb(0x2A, 0xA1, 0x98), // cyan
+    bar_end: Rgb(0x26, 0x8B, 0xD2),
+    success: Rgb(0x85, 0x99, 0x00),
+    warn: Rgb(0xDC, 0x32, 0x2F), // red
+};
+
+// "Rosé Pine": a soho-vibes palette of muted roses and irises.
+const ROSE_PINE: Palette = Palette {
+    focus: Rgb(0xC4, 0xA7, 0xE7),       // iris
+    short_break: Rgb(0x9C, 0xCF, 0xD8), // foam
+    long_break: Rgb(0x31, 0x74, 0x8F),  // pine
+    accent: Rgb(0xF6, 0xC1, 0x77),      // gold
+    text: Rgb(0xE0, 0xDE, 0xF4),        // text
+    muted: Rgb(0x6E, 0x6A, 0x86),       // muted
+    cup: Rgb(0xE0, 0xDE, 0xF4),
+    coffee_top: Rgb(0xEB, 0xBC, 0xBA),    // rose crema
+    coffee_bottom: Rgb(0x26, 0x23, 0x3A), // overlay
+    steam: Rgb(0x90, 0x8C, 0xAA),         // subtle
+    bar_start: Rgb(0xC4, 0xA7, 0xE7),
+    bar_end: Rgb(0xEB, 0xBC, 0xBA),
+    success: Rgb(0x9C, 0xCF, 0xD8),
+    warn: Rgb(0xEB, 0x6F, 0x92), // love
+};
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -346,6 +464,28 @@ mod tests {
     fn resolve_is_case_insensitive_with_fallback() {
         assert_eq!(Theme::resolve("OCEAN", true).name, "ocean");
         assert_eq!(Theme::resolve("nope", true).name, "coffee");
+    }
+
+    #[test]
+    fn every_named_theme_resolves_to_itself() {
+        // Guards against a THEME_NAMES entry without a matching `resolve` arm
+        // (which would silently fall back to coffee).
+        for name in THEME_NAMES {
+            assert_eq!(
+                Theme::resolve(name, true).name,
+                *name,
+                "theme `{name}` does not resolve to itself"
+            );
+            // Case-insensitivity holds for every theme.
+            assert_eq!(Theme::resolve(&name.to_uppercase(), true).name, *name);
+        }
+    }
+
+    #[test]
+    fn rose_pine_accepts_spelling_variants() {
+        for spelling in ["rose-pine", "rosepine", "rose_pine", "Rose-Pine"] {
+            assert_eq!(Theme::resolve(spelling, true).name, "rose-pine");
+        }
     }
 
     #[test]

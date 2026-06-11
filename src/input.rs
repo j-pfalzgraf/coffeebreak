@@ -8,7 +8,7 @@
 use std::time::Duration;
 
 use anyhow::Result;
-use crossterm::event::{self, Event, KeyCode, KeyEvent, KeyModifiers};
+use crossterm::event::{self, Event, KeyCode, KeyEvent, KeyEventKind, KeyModifiers};
 
 /// A user control action mapped from a keypress (or a terminal resize).
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -34,7 +34,11 @@ pub fn poll(timeout: Duration) -> Result<Option<Control>> {
         return Ok(None);
     }
     match event::read()? {
-        Event::Key(key) => Ok(map_key(key)),
+        // Only act on key *presses*. On Windows, crossterm also delivers release
+        // (and repeat) events as `Event::Key`; without this guard every keystroke
+        // would fire twice (pause would toggle then untoggle, ±1 would adjust by
+        // two, etc.). On Unix non-press events don't occur unless requested.
+        Event::Key(key) if key.kind == KeyEventKind::Press => Ok(map_key(key)),
         Event::Resize(_, _) => Ok(Some(Control::Resize)),
         _ => Ok(None),
     }
@@ -60,7 +64,9 @@ pub fn poll_wait(timeout: Duration) -> Result<WaitEvent> {
         return Ok(WaitEvent::Timeout);
     }
     match event::read()? {
-        Event::Key(key) => Ok(if is_quit(key) {
+        // Presses only (see `poll`): ignore Windows release/repeat events so a
+        // single keypress doesn't both continue and register as a stray key.
+        Event::Key(key) if key.kind == KeyEventKind::Press => Ok(if is_quit(key) {
             WaitEvent::Quit
         } else {
             WaitEvent::Continue

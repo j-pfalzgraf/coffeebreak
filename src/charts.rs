@@ -12,21 +12,10 @@
 
 use crate::render::Line;
 use crate::theme::{Rgb, Theme};
+use crate::ui::row_from_cells as row;
 
 /// Lower-eighth block glyphs, index `0..=8` (empty → full).
 const EIGHTHS: [char; 9] = [' ', '▁', '▂', '▃', '▄', '▅', '▆', '▇', '█'];
-
-/// Build a styled line from cells, each an (optional-coloured) width-1 char.
-fn row(theme: &Theme, cells: &[(char, Option<Rgb>)]) -> Line {
-    let mut s = String::with_capacity(cells.len() * 4);
-    for (ch, color) in cells {
-        match color {
-            Some(c) => s.push_str(&theme.paint(*ch, *c)),
-            None => s.push(*ch),
-        }
-    }
-    Line::styled(s, cells.len())
-}
 
 /// Map a value to a colour from `low` → `high` by its ratio to `max`.
 fn heat(low: Rgb, high: Rgb, value: u64, max: u64) -> Rgb {

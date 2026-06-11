@@ -413,7 +413,7 @@ fn languages_lists_all_locales() {
     let out = run(&home, &args);
     assert!(out.status.success(), "{}", describe(&args, &out));
     let s = stdout(&out);
-    for code in ["en", "de", "es", "fr", "it", "pt"] {
+    for code in ["en", "de", "es", "fr", "it", "pt", "nl"] {
         assert!(
             s.contains(code),
             "languages output missing `{code}`\n{}",
@@ -421,7 +421,7 @@ fn languages_lists_all_locales() {
         );
     }
     assert!(
-        s.contains("Deutsch") && s.contains("Português"),
+        s.contains("Deutsch") && s.contains("Português") && s.contains("Nederlands"),
         "{}",
         describe(&args, &out)
     );
@@ -659,6 +659,153 @@ fn stats_invalid_format_is_rejected() {
     assert!(
         !out.status.success(),
         "invalid --format should fail\n{}",
+        describe(&args, &out)
+    );
+    let combined = format!("{}{}", stdout(&out), text(&out.stderr));
+    assert!(
+        combined.contains("invalid value"),
+        "{}",
+        describe(&args, &out)
+    );
+}
+
+// --- Achievements, demo, and the new themes/presets/indicator ---------------
+
+#[test]
+fn achievements_board_renders_after_a_run() {
+    let home = TempHome::new("ach");
+    // Earn the first badge, then view the board.
+    let run_args = [
+        "--plain",
+        "--seconds",
+        "-w",
+        "1",
+        "--cycles",
+        "1",
+        "--no-sound",
+        "--no-notify",
+    ];
+    assert!(run(&home, &run_args).status.success());
+
+    let args = ["achievements", "--no-color"];
+    let out = run(&home, &args);
+    assert!(out.status.success(), "{}", describe(&args, &out));
+    let s = stdout(&out);
+    for needle in ["achievements", "Unlocked:", "First Sip", "First steps"] {
+        assert!(
+            s.contains(needle),
+            "achievements board missing `{needle}`\n{}",
+            describe(&args, &out)
+        );
+    }
+}
+
+#[test]
+fn achievements_empty_state_is_friendly() {
+    let home = TempHome::new("ach-empty");
+    let args = ["achievements", "--no-color"];
+    let out = run(&home, &args);
+    assert!(out.status.success(), "{}", describe(&args, &out));
+    let s = stdout(&out);
+    assert!(
+        s.to_lowercase().contains("no badges") || s.contains("achievements"),
+        "expected an empty-state achievements message\n{}",
+        describe(&args, &out)
+    );
+}
+
+#[test]
+fn demo_without_a_tty_prints_a_hint_and_exits() {
+    // With piped stdout (not a TTY), `demo` cannot animate; it must print a hint
+    // and exit cleanly rather than hang or error.
+    let home = TempHome::new("demo");
+    let args = ["demo", "--no-color"];
+    let out = run(&home, &args);
+    assert!(
+        out.status.success(),
+        "`demo` on a non-TTY should exit 0\n{}",
+        describe(&args, &out)
+    );
+    let s = stdout(&out);
+    assert!(
+        s.to_lowercase().contains("terminal"),
+        "expected a non-TTY hint mentioning a terminal\n{}",
+        describe(&args, &out)
+    );
+}
+
+#[test]
+fn presets_list_includes_the_new_cadences() {
+    let home = TempHome::new("newpresets");
+    let args = ["presets", "--no-color"];
+    let out = run(&home, &args);
+    assert!(out.status.success(), "{}", describe(&args, &out));
+    let s = stdout(&out);
+    for name in ["5217", "flow", "animedoro"] {
+        assert!(
+            s.contains(name),
+            "presets missing new preset `{name}`\n{}",
+            describe(&args, &out)
+        );
+    }
+}
+
+#[test]
+fn themes_list_includes_the_new_palettes() {
+    let home = TempHome::new("newthemes");
+    let args = ["themes", "--no-color"];
+    let out = run(&home, &args);
+    assert!(out.status.success(), "{}", describe(&args, &out));
+    let s = stdout(&out);
+    for name in ["dracula", "nord", "gruvbox", "solarized", "rose-pine"] {
+        assert!(
+            s.contains(name),
+            "themes missing new theme `{name}`\n{}",
+            describe(&args, &out)
+        );
+    }
+}
+
+#[test]
+fn ring_indicator_and_new_theme_complete_a_run() {
+    // A new theme + the ring indicator must drive a plain run to completion.
+    let home = TempHome::new("ringrun");
+    let args = [
+        "--plain",
+        "--seconds",
+        "-w",
+        "1",
+        "--cycles",
+        "1",
+        "--no-sound",
+        "--no-notify",
+        "--theme",
+        "nord",
+        "--indicator",
+        "ring",
+    ];
+    let out = run(&home, &args);
+    assert!(
+        out.status.success(),
+        "ring + nord run should exit 0\n{}",
+        describe(&args, &out)
+    );
+    let stats_path = home.path().join(".coffeebreak/stats.json");
+    assert!(
+        stats_path.exists(),
+        "expected stats written\n{}",
+        describe(&args, &out)
+    );
+}
+
+#[test]
+fn invalid_indicator_is_rejected() {
+    let home = TempHome::new("badind");
+    let args = ["--indicator", "spiral", "--help"];
+    let out = run(&home, &args);
+    assert!(
+        !out.status.success(),
+        "invalid --indicator should fail\n{}",
         describe(&args, &out)
     );
     let combined = format!("{}{}", stdout(&out), text(&out.stderr));

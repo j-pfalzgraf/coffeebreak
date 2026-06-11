@@ -21,6 +21,7 @@ mod de;
 mod es;
 mod fr;
 mod it;
+mod nl;
 mod pt;
 
 use crate::Phase;
@@ -36,13 +37,14 @@ pub const LANGUAGES: &[(&str, &str)] = &[
     ("fr", "Français"),
     ("it", "Italiano"),
     ("pt", "Português"),
+    ("nl", "Nederlands"),
 ];
 
 /// The default locale code.
 pub const DEFAULT_LANG: &str = "en";
 
 /// All supported locale codes (for CLI validation).
-pub const LANG_CODES: &[&str] = &["en", "de", "es", "fr", "it", "pt"];
+pub const LANG_CODES: &[&str] = &["en", "de", "es", "fr", "it", "pt", "nl"];
 
 /// Every user-facing message, identified at compile time.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -202,6 +204,74 @@ pub enum Msg {
     HelpStatsFlag,
     HelpLang,
     HelpFormat,
+    HelpAchievements,
+    HelpDemo,
+    HelpIndicator,
+    HelpBrew,
+
+    // Achievements — chrome.
+    AchTitle,
+    AchEmpty,
+    AchUnlocked,
+    AchNext,
+    AchAllUnlocked,
+    // Achievements — tier headings.
+    AchTierFirst,
+    AchTierVolume,
+    AchTierStreak,
+    AchTierSingleDay,
+    AchTierConsistency,
+    // Achievements — badge titles (…T) and descriptions (…D).
+    AchFirstSipT,
+    AchFirstSipD,
+    AchGettingStartedT,
+    AchGettingStartedD,
+    AchHalfCenturyT,
+    AchHalfCenturyD,
+    AchCenturionT,
+    AchCenturionD,
+    AchDeepDiverT,
+    AchDeepDiverD,
+    AchMountaineerT,
+    AchMountaineerD,
+    AchMillenniumT,
+    AchMillenniumD,
+    AchHourMasterT,
+    AchHourMasterD,
+    AchOnARollT,
+    AchOnARollD,
+    AchWeekWarriorT,
+    AchWeekWarriorD,
+    AchFortnightT,
+    AchFortnightD,
+    AchUnbrokenT,
+    AchUnbrokenD,
+    AchProductiveDayT,
+    AchProductiveDayD,
+    AchInTheZoneT,
+    AchInTheZoneD,
+    AchMarathonT,
+    AchMarathonD,
+    AchWeekendFocusT,
+    AchWeekendFocusD,
+    AchRegularT,
+    AchRegularD,
+    AchGoalGetterT,
+    AchGoalGetterD,
+
+    // Animations: brewing intro, demo showcase, spinner.
+    Brewing,
+    BrewSkipHint,
+    Checking,
+    DemoFooter,
+    DemoNotTty,
+    SceneBrewing,
+    SceneCup,
+    SceneClock,
+    SceneRing,
+    SceneSpinner,
+    SceneCharts,
+    SceneFinale,
 }
 
 impl Msg {
@@ -360,15 +430,82 @@ impl Msg {
             HelpLongEvery => "How many focus blocks before a long break (default 4)",
             HelpLabel => "Optional label for this session (shown in the status line)",
             HelpGitLabel => "Use the current git branch as the session label",
-            HelpTheme => "Colour theme: coffee, ocean, forest, grape, mono, custom",
+            HelpTheme => {
+                "Colour theme — see `coffeebreak themes`: coffee, ocean, forest, grape, \
+                 mono, dracula, nord, gruvbox, solarized, rose-pine, custom"
+            }
             HelpFps => "Animation frames per second (2–60; default 15)",
             HelpPlain => "Plain, non-animated line output (also used automatically when piped)",
             HelpNoColor => "Disable coloured output",
             HelpNoSound => "Silence the audible cue on phase change",
             HelpNoNotify => "Do not send desktop notifications",
             HelpStatsFlag => "Show today's and all-time statistics, then exit",
-            HelpLang => "Interface language: en, de, es, fr, it, pt",
+            HelpLang => "Interface language: en, de, es, fr, it, pt, nl",
             HelpFormat => "Output format: text (dashboard), json, or csv",
+            HelpAchievements => "Show your earned badges and progress toward the next",
+            HelpDemo => "Showcase every widget and animation, then exit",
+            HelpIndicator => "Big countdown style: digits (default) or ring",
+            HelpBrew => "Play the brewing intro animation before the first focus block",
+
+            AchTitle => "🏅 coffeebreak — achievements",
+            AchEmpty => "No badges yet — run `coffeebreak` to earn your first! ☕",
+            AchUnlocked => "Unlocked:",
+            AchNext => "Next:",
+            AchAllUnlocked => "All badges unlocked — masterful! ☕",
+            AchTierFirst => "First steps",
+            AchTierVolume => "Volume milestones",
+            AchTierStreak => "Streak milestones",
+            AchTierSingleDay => "Single-day feats",
+            AchTierConsistency => "Consistency",
+            AchFirstSipT => "First Sip",
+            AchFirstSipD => "Complete your very first pomodoro.",
+            AchGettingStartedT => "Getting Started",
+            AchGettingStartedD => "Reach 10 lifetime pomodoros.",
+            AchHalfCenturyT => "Half Century",
+            AchHalfCenturyD => "50 pomodoros completed.",
+            AchCenturionT => "Centurion",
+            AchCenturionD => "100 pomodoros completed.",
+            AchDeepDiverT => "Deep Diver",
+            AchDeepDiverD => "250 pomodoros completed.",
+            AchMountaineerT => "Mountaineer",
+            AchMountaineerD => "500 pomodoros completed.",
+            AchMillenniumT => "Millennium",
+            AchMillenniumD => "1000 pomodoros completed.",
+            AchHourMasterT => "Hour Master",
+            AchHourMasterD => "600 focus minutes in total.",
+            AchOnARollT => "On a Roll",
+            AchOnARollD => "Reach a 3-day streak.",
+            AchWeekWarriorT => "Week Warrior",
+            AchWeekWarriorD => "Reach a 7-day streak.",
+            AchFortnightT => "Fortnight Focus",
+            AchFortnightD => "Reach a 14-day streak.",
+            AchUnbrokenT => "Unbroken",
+            AchUnbrokenD => "Reach a 30-day streak.",
+            AchProductiveDayT => "Productive Day",
+            AchProductiveDayD => "4 pomodoros in a single day.",
+            AchInTheZoneT => "In the Zone",
+            AchInTheZoneD => "8 pomodoros in a single day.",
+            AchMarathonT => "Marathoner",
+            AchMarathonD => "12 pomodoros in a single day.",
+            AchWeekendFocusT => "Weekend Focus",
+            AchWeekendFocusD => "Complete a pomodoro on a Saturday or Sunday.",
+            AchRegularT => "Regular",
+            AchRegularD => "Be active on 5 of the last 7 days.",
+            AchGoalGetterT => "Goal Getter",
+            AchGoalGetterD => "Hit your daily goal today.",
+
+            Brewing => "Brewing…",
+            BrewSkipHint => "press any key to skip",
+            Checking => "checking for updates…",
+            DemoFooter => "any key to exit · the live UI animates every frame",
+            DemoNotTty => "demo needs an interactive terminal (a TTY).",
+            SceneBrewing => "Brewing",
+            SceneCup => "Coffee cup",
+            SceneClock => "Countdown",
+            SceneRing => "Ring gauge",
+            SceneSpinner => "Spinner",
+            SceneCharts => "Charts",
+            SceneFinale => "Celebration",
         }
     }
 }
@@ -499,6 +636,7 @@ fn table(code: &str) -> Table {
         "fr" => fr::ENTRIES,
         "it" => it::ENTRIES,
         "pt" => pt::ENTRIES,
+        "nl" => nl::ENTRIES,
         _ => &[],
     }
 }
@@ -530,6 +668,32 @@ fn base_code(code: &str) -> String {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    /// Every shipped translation table, paired with its code.
+    const ALL_TABLES: &[(&str, Table)] = &[
+        ("de", de::ENTRIES),
+        ("es", es::ENTRIES),
+        ("fr", fr::ENTRIES),
+        ("it", it::ENTRIES),
+        ("pt", pt::ENTRIES),
+        ("nl", nl::ENTRIES),
+    ];
+
+    /// The set of `{name}` placeholder tokens in a string.
+    fn placeholders(s: &str) -> std::collections::BTreeSet<String> {
+        let mut out = std::collections::BTreeSet::new();
+        let mut rest = s;
+        while let Some(open) = rest.find('{') {
+            rest = &rest[open + 1..];
+            let Some(close) = rest.find('}') else { break };
+            let name = &rest[..close];
+            if !name.is_empty() && name.chars().all(|c| c.is_ascii_alphanumeric() || c == '_') {
+                out.insert(name.to_string());
+            }
+            rest = &rest[close + 1..];
+        }
+        out
+    }
 
     #[test]
     fn english_is_the_default_and_always_present() {
@@ -584,14 +748,7 @@ mod tests {
     fn locale_tables_are_clean() {
         // No locale table may contain a duplicate key or an empty translation;
         // either would silently shadow or blank a message.
-        let tables: &[(&str, Table)] = &[
-            ("de", de::ENTRIES),
-            ("es", es::ENTRIES),
-            ("fr", fr::ENTRIES),
-            ("it", it::ENTRIES),
-            ("pt", pt::ENTRIES),
-        ];
-        for (code, table) in tables {
+        for (code, table) in ALL_TABLES {
             let mut seen = std::collections::HashSet::new();
             for (key, value) in *table {
                 assert!(
@@ -616,6 +773,23 @@ mod tests {
                 out.contains("3 x"),
                 "{code}: DoneFooter dropped its placeholder"
             );
+        }
+    }
+
+    #[test]
+    fn every_translation_preserves_its_placeholders() {
+        // For every translated message, the `{name}` tokens must exactly match
+        // the canonical English — a dropped, renamed, or extra placeholder would
+        // silently break interpolation in that locale.
+        for (code, table) in ALL_TABLES {
+            for (msg, translated) in *table {
+                let english = placeholders(msg.en());
+                let local = placeholders(translated);
+                assert_eq!(
+                    english, local,
+                    "{code}: {msg:?} placeholders {local:?} != English {english:?}"
+                );
+            }
         }
     }
 }

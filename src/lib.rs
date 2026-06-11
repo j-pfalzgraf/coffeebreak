@@ -19,14 +19,17 @@
 //! * [`render`]   — a flicker-free, line-diffing frame renderer.
 //! * [`widgets`]  — the coffee cup, big-digit clock, progress bar, confetti.
 //! * [`term`]     — RAII alternate-screen / raw-mode terminal session.
+//! * [`ui`]       — shared line-building primitives (`row_from_cells`, `LineBuf`).
 //! * [`input`]    — keyboard controls (pause / skip / quit / adjust).
 //! * [`feedback`] — [`feedback::Notifier`] / [`feedback::SoundPlayer`] backends.
 //!
 //! **Commands**
-//! * [`commands`]    — `stats`, `config`, `themes`, `presets` handlers.
-//! * [`completions`] — shell completions and the man page.
-//! * [`selfcmd`]     — `self update` / `self uninstall` lifecycle commands.
+//! * [`commands`]     — `stats`, `config`, `themes`, `presets`, `demo` handlers.
+//! * [`achievements`] — motivational badges derived from the statistics.
+//! * [`completions`]  — shell completions and the man page.
+//! * [`selfcmd`]      — `self update` / `self uninstall` lifecycle commands.
 
+pub mod achievements;
 pub mod app;
 pub mod charts;
 pub mod cli;
@@ -34,6 +37,7 @@ pub mod clock;
 pub mod commands;
 pub mod completions;
 pub mod config;
+pub mod demo;
 pub mod feedback;
 pub mod git;
 pub mod i18n;
@@ -46,6 +50,7 @@ pub mod session;
 pub mod stats;
 pub mod term;
 pub mod theme;
+pub mod ui;
 pub mod widgets;
 
 /// GitHub coordinates used by `self update` and the install scripts.

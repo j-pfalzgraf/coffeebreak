@@ -18,11 +18,12 @@ use crate::clock::PhaseTimer;
 use crate::feedback::Feedback;
 use crate::i18n::{I18n, Msg, Noun};
 use crate::input::{self, Control, WaitEvent};
-use crate::render::{Frame, Line, Renderer};
+use crate::render::{Frame, Renderer};
 use crate::session::Session;
 use crate::stats::{self, Stats};
 use crate::term::{self, TerminalSession};
-use crate::theme::{Rgb, Theme};
+use crate::theme::Theme;
+use crate::ui::LineBuf;
 use crate::widgets;
 use crate::{Phase, quotes};
 
@@ -89,6 +90,14 @@ impl App {
         let mut last_quote: Option<&str> = None;
         let mut frame: usize = 0;
         let mut quit = false;
+
+        // Optional "brewing" intro before the first focus block.
+        if session.brew && !self.brew_intro(&mut renderer, &mut frame)? {
+            return Ok(Outcome {
+                completed_focus: 0,
+                interrupted: true,
+            });
+        }
 
         'outer: for (idx, &(phase, duration)) in plan.iter().enumerate() {
             if idx != 0 {
@@ -177,6 +186,49 @@ impl App {
             completed_focus,
             interrupted: quit,
         })
+    }
+
+    /// The "brewing" intro animation shown before the first focus block when
+    /// enabled (`--brew` / `brew = true`). Any key skips it; the quit keys quit.
+    /// Returns `true` to continue into the session, `false` to quit.
+    fn brew_intro<W: Write>(&self, renderer: &mut Renderer<W>, frame: &mut usize) -> Result<bool> {
+        let theme = &self.theme;
+        let p = &theme.palette;
+        for f in 0..widgets::BREW_FRAMES {
+            let (w, h) = TerminalSession::size();
+            let (width, height) = (w as usize, h as usize);
+            // The cup needs room; on a tiny terminal skip straight to the timer.
+            if width < 26 || height < 19 {
+                return Ok(true);
+            }
+
+            let mut fr = Frame::new();
+            let mut head = LineBuf::new();
+            head.bold(
+                theme,
+                &format!("▌ {} ▐", self.i18n.t(Msg::Brewing)),
+                p.focus,
+            );
+            fr.push(head.into_line());
+            fr.push_blank();
+            fr.extend(widgets::brew_splash(theme, f));
+            fr.push_blank();
+            let mut hint = LineBuf::new();
+            hint.dim(theme, self.i18n.t(Msg::BrewSkipHint));
+            fr.push(hint.into_line());
+
+            renderer.present(&fr.position(width, height))?;
+            *frame = frame.wrapping_add(1);
+
+            match input::poll(self.frame_dt)? {
+                Some(Control::Quit) => return Ok(false),
+                Some(Control::Resize) => renderer.clear()?,
+                // Any other key skips the rest of the intro.
+                Some(_) => return Ok(true),
+                None => {}
+            }
+        }
+        Ok(true)
     }
 
     /// The animated "press any key to continue" screen shown between phases in
@@ -318,7 +370,15 @@ impl App {
             } else {
                 accent
             };
-            f.extend(widgets::big_time(theme, &time_str, color));
+            match session.indicator {
+                // The ring fills as the phase elapses, with the countdown centred.
+                crate::cli::Indicator::Ring => {
+                    f.extend(widgets::ring_gauge(theme, elapsed_frac, color, &time_str));
+                }
+                crate::cli::Indicator::Digits => {
+                    f.extend(widgets::big_time(theme, &time_str, color));
+                }
+            }
         } else {
             let mut t = LineBuf::new();
             t.bold(theme, &time_str, accent);
@@ -501,41 +561,6 @@ impl App {
             completed_focus,
             interrupted,
         })
-    }
-}
-
-/// A small builder for a styled line that tracks visible width as it goes.
-struct LineBuf {
-    s: String,
-    w: usize,
-}
-
-impl LineBuf {
-    fn new() -> LineBuf {
-        LineBuf {
-            s: String::new(),
-            w: 0,
-        }
-    }
-    fn plain(&mut self, _theme: &Theme, text: &str) {
-        self.s.push_str(text);
-        self.w += text.width();
-    }
-    fn color(&mut self, theme: &Theme, text: &str, rgb: Rgb) {
-        self.s.push_str(&theme.paint(text, rgb));
-        self.w += text.width();
-    }
-    fn bold(&mut self, theme: &Theme, text: &str, rgb: Rgb) {
-        self.s.push_str(&theme.bold(text, rgb));
-        self.w += text.width();
-    }
-    fn dim(&mut self, theme: &Theme, text: impl AsRef<str>) {
-        let t = text.as_ref();
-        self.s.push_str(&theme.dim(t));
-        self.w += t.width();
-    }
-    fn into_line(self) -> Line {
-        Line::styled(self.s, self.w)
     }
 }
 

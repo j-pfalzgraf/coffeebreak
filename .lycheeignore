@@ -1,0 +1,11 @@
+# Links lychee should not try to resolve.
+
+# The raw install/uninstall script URLs point at the `main` branch of the
+# canonical repo; on a feature branch or a fork before the scripts are published
+# there they 404, which is expected and not a real broken link.
+https://raw.githubusercontent.com/j-pfalzgraf/coffeebreak/main/install.sh
+https://raw.githubusercontent.com/j-pfalzgraf/coffeebreak/main/install.ps1
+https://raw.githubusercontent.com/j-pfalzgraf/coffeebreak/main/uninstall.sh
+
+# The Homebrew tap and crates.io page may not exist yet for a fresh fork.
+https://github.com/j-pfalzgraf/coffeebreak/releases

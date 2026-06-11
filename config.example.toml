@@ -30,9 +30,11 @@ long_break = false          # enable long breaks
 sound = true                # audible cue on phase change (terminal bell, or chime if built with sound)
 notifications = true        # show a desktop notification on phase change
 git_label = false           # use the current git branch name as the session label
-theme = "coffee"            # one of: coffee, ocean, forest, grape, mono, custom
+theme = "coffee"            # coffee, ocean, forest, grape, mono, dracula, nord, gruvbox, solarized, rose-pine, custom
 fps = 15                    # animation frames per second, 2..=60
-language = ""               # interface language: en, de, es, fr, it, pt ("" = auto-detect from $LANG)
+indicator = "digits"        # big countdown style: "digits" or "ring"
+brew = false                # play the brewing intro animation before the first focus block
+language = ""               # interface language: en, de, es, fr, it, pt, nl ("" = auto-detect from $LANG)
 daily_goal = 0              # daily pomodoro goal shown in the stats dashboard (0 = off)
 auto_advance = true         # start the next phase automatically (false / --wait waits for a keypress)
 

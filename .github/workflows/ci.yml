@@ -52,22 +52,34 @@ jobs:
 
   # ------------------------------------------------------------------- tests
   test:
-    name: test ${{ matrix.os }}
+    name: test ${{ matrix.os }} ${{ matrix.features && format('[{0}]', matrix.features) }}
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
       matrix:
         os: [ubuntu-latest, macos-latest, windows-latest]
+        # "" = default features; "sound" exercises the rodio chime backend, which
+        # was previously only ever *built* by clippy and never compiled into the
+        # test binary on any platform.
+        features: ["", "sound"]
     steps:
       - uses: actions/checkout@v6
       - name: Install Rust (stable)
         uses: dtolnay/rust-toolchain@stable
       - uses: Swatinem/rust-cache@v2
-      # Default features only: no ALSA needed, so the matrix stays uniform.
+      # The `sound` feature pulls in rodio, which needs the ALSA headers on
+      # Linux. macOS/Windows link their native audio backends with no extra
+      # packages, so this step is Linux-and-sound only.
+      - name: Install ALSA dev headers
+        if: matrix.os == 'ubuntu-latest' && matrix.features == 'sound'
+        run: sudo apt-get update && sudo apt-get install -y libasound2-dev
+      # `matrix.features && format(...)` yields "" when features is empty (an
+      # empty string is falsy in GitHub expressions), so the default build runs
+      # with no `--features` flag at all.
       - name: Build
-        run: cargo build --locked --all-targets
+        run: cargo build --locked --all-targets ${{ matrix.features && format('--features {0}', matrix.features) }}
       - name: Test
-        run: cargo test --locked
+        run: cargo test --locked ${{ matrix.features && format('--features {0}', matrix.features) }}
 
   # ----------------------------------------------------- minimum supported Rust
   msrv:

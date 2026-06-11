@@ -19,23 +19,7 @@ use crate::charts;
 use crate::i18n::{I18n, Msg, Noun};
 use crate::paths;
 use crate::theme::Theme;
-
-/// Hides the terminal cursor for the duration of the animated dashboard reveal
-/// and restores it on drop (normal return or panic-unwind).
-struct CursorGuard;
-
-impl CursorGuard {
-    fn hide() -> CursorGuard {
-        let _ = execute!(std::io::stdout(), cursor::Hide);
-        CursorGuard
-    }
-}
-
-impl Drop for CursorGuard {
-    fn drop(&mut self) {
-        let _ = execute!(std::io::stdout(), cursor::Show);
-    }
-}
+use crate::ui::CursorGuard;
 
 /// One day's tally.
 #[derive(Debug, Default, Clone, Copy, Serialize, Deserialize, PartialEq, Eq)]

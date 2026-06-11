@@ -117,7 +117,7 @@ pub struct Cli {
     pub git_label: bool,
 
     // --- Display options ----------------------------------------------------
-    /// Colour theme: coffee, ocean, forest, grape, mono.
+    /// Colour theme — see `coffeebreak themes` for previews.
     #[arg(
         long,
         global = true,
@@ -131,6 +131,20 @@ pub struct Cli {
     /// Animation frames per second (2–60; default 15).
     #[arg(long, value_name = "FPS", help_heading = "Display")]
     pub fps: Option<u32>,
+
+    /// Big countdown style: digits (default) or ring.
+    #[arg(
+        long,
+        value_enum,
+        ignore_case = true,
+        value_name = "STYLE",
+        help_heading = "Display"
+    )]
+    pub indicator: Option<Indicator>,
+
+    /// Play the brewing intro animation before the first focus block.
+    #[arg(long, help_heading = "Display")]
+    pub brew: bool,
 
     /// Interface language: en, de, es, fr, it, pt.
     #[arg(
@@ -173,6 +187,27 @@ pub struct Cli {
     pub command: Option<Command>,
 }
 
+/// The big-countdown indicator style for the live timer.
+#[derive(ValueEnum, Clone, Copy, Debug, Default, PartialEq, Eq)]
+pub enum Indicator {
+    /// Large block digits counting down `MM:SS` (default).
+    #[default]
+    Digits,
+    /// A circular gauge that fills as the phase elapses, with a percentage.
+    Ring,
+}
+
+impl Indicator {
+    /// Parse from a config string, defaulting to [`Indicator::Digits`] for an
+    /// empty or unrecognised value.
+    pub fn parse(s: &str) -> Indicator {
+        match s.trim().to_ascii_lowercase().as_str() {
+            "ring" => Indicator::Ring,
+            _ => Indicator::Digits,
+        }
+    }
+}
+
 /// Output format for `coffeebreak stats`.
 #[derive(ValueEnum, Clone, Copy, Debug, Default, PartialEq, Eq)]
 pub enum StatsFormat {
@@ -194,6 +229,9 @@ pub enum Command {
         format: StatsFormat,
     },
 
+    /// Show your earned badges and progress toward the next.
+    Achievements,
+
     /// Inspect or create the configuration file.
     Config {
         #[command(subcommand)]
@@ -208,6 +246,9 @@ pub enum Command {
 
     /// List the available interface languages.
     Languages,
+
+    /// Showcase every widget and animation, then exit.
+    Demo,
 
     /// Run environment diagnostics (terminal, locale, config, …).
     Doctor,
@@ -307,6 +348,8 @@ fn localized_command(i18n: &I18n) -> clap::Command {
         ("git_label", Msg::HelpGitLabel),
         ("theme", Msg::HelpTheme),
         ("fps", Msg::HelpFps),
+        ("indicator", Msg::HelpIndicator),
+        ("brew", Msg::HelpBrew),
         ("lang", Msg::HelpLang),
         ("plain", Msg::HelpPlain),
         ("no_color", Msg::HelpNoColor),
@@ -320,9 +363,11 @@ fn localized_command(i18n: &I18n) -> clap::Command {
 
     // Subcommand descriptions (and their own arguments/subcommands).
     let subs: &[(&str, Msg)] = &[
+        ("achievements", Msg::HelpAchievements),
         ("themes", Msg::HelpThemes),
         ("presets", Msg::HelpPresets),
         ("languages", Msg::HelpLanguages),
+        ("demo", Msg::HelpDemo),
         ("doctor", Msg::HelpDoctor),
         ("man", Msg::HelpMan),
     ];

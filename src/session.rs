@@ -32,6 +32,10 @@ pub struct Session {
     pub auto_advance: bool,
     pub theme: String,
     pub fps: u32,
+    /// Big-countdown indicator style (digits or ring).
+    pub indicator: crate::cli::Indicator,
+    /// Play the brewing intro animation before the first focus block.
+    pub brew: bool,
     /// Resolved interface language code (e.g. `"en"`, `"de"`).
     pub lang: String,
     pub label: Option<String>,
@@ -49,7 +53,15 @@ pub struct Preset {
 }
 
 /// All preset names, in display order.
-pub const PRESET_NAMES: &[&str] = &["classic", "deep", "short", "sprint"];
+pub const PRESET_NAMES: &[&str] = &[
+    "classic",
+    "deep",
+    "short",
+    "sprint",
+    "5217",
+    "flow",
+    "animedoro",
+];
 
 /// Look up a preset by name (case-insensitive).
 pub fn preset(name: &str) -> Option<Preset> {
@@ -88,6 +100,36 @@ pub fn preset(name: &str) -> Option<Preset> {
             long: 15,
             long_every: 4,
             cycles: 1,
+            long_enabled: false,
+        }),
+        // The "52/17 rule" (from the DeskTime productivity study): 52 minutes on,
+        // 17 minutes off.
+        "5217" => Some(Preset {
+            work: 52,
+            brk: 17,
+            long: 17,
+            long_every: 4,
+            cycles: 4,
+            long_enabled: false,
+        }),
+        // Ultradian "flow" blocks: long 90-minute focus stretches with generous
+        // breaks, capped by a 30-minute long break.
+        "flow" => Some(Preset {
+            work: 90,
+            brk: 20,
+            long: 30,
+            long_every: 2,
+            cycles: 2,
+            long_enabled: true,
+        }),
+        // "Animedoro": a longer focus block rewarded with a break the length of an
+        // anime episode.
+        "animedoro" => Some(Preset {
+            work: 60,
+            brk: 20,
+            long: 20,
+            long_every: 4,
+            cycles: 3,
             long_enabled: false,
         }),
         _ => None,
@@ -153,6 +195,10 @@ impl Session {
                 }
             }),
             fps: cli.fps.unwrap_or(config.fps),
+            indicator: cli
+                .indicator
+                .unwrap_or_else(|| crate::cli::Indicator::parse(&config.indicator)),
+            brew: cli.brew || config.brew,
             lang: crate::i18n::I18n::detect(cli.lang.as_deref(), Some(&config.language))
                 .code()
                 .to_string(),
@@ -213,6 +259,8 @@ mod tests {
             auto_advance: true,
             theme: "coffee".into(),
             fps: 15,
+            indicator: crate::cli::Indicator::Digits,
+            brew: false,
             lang: "en".into(),
             label: None,
         }
@@ -225,6 +273,17 @@ mod tests {
     #[test]
     fn single_cycle_has_no_trailing_break() {
         assert_eq!(kinds(&session(1, 4, true)), vec![Phase::Focus]);
+    }
+
+    #[test]
+    fn every_preset_name_resolves() {
+        // Each advertised preset must look up (and be case-insensitive), so the
+        // `--preset` value list and `preset()` can never drift apart.
+        for name in PRESET_NAMES {
+            assert!(preset(name).is_some(), "preset `{name}` does not resolve");
+            assert!(preset(&name.to_uppercase()).is_some());
+        }
+        assert!(preset("nope").is_none());
     }
 
     #[test]

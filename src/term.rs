@@ -20,8 +20,13 @@ impl TerminalSession {
     pub fn enter() -> Result<TerminalSession> {
         terminal::enable_raw_mode().context("failed to enable raw mode")?;
         let mut out = io::stdout();
-        execute!(out, terminal::EnterAlternateScreen, cursor::Hide)
-            .context("failed to enter alternate screen")?;
+        // If entering the alternate screen fails, raw mode is already on and the
+        // `TerminalSession` guard is never constructed — so undo raw mode here
+        // rather than leave the user's shell wedged (no echo, no line editing).
+        if let Err(e) = execute!(out, terminal::EnterAlternateScreen, cursor::Hide) {
+            let _ = terminal::disable_raw_mode();
+            return Err(e).context("failed to enter alternate screen");
+        }
         Ok(TerminalSession)
     }
 

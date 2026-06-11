@@ -46,6 +46,10 @@ pub struct Config {
     /// Automatically start the next phase. When false (or with `--wait`), the
     /// timer waits for a keypress between phases.
     pub auto_advance: bool,
+    /// Big-countdown indicator style for the live timer: `digits` or `ring`.
+    pub indicator: String,
+    /// Play the brewing intro animation before the first focus block.
+    pub brew: bool,
     /// Palette overrides for `--theme custom`: a map of palette-field name to a
     /// `#RRGGBB` hex colour (see `coffeebreak themes` / the docs for the keys).
     /// Unset fields fall back to the `coffee` palette.
@@ -70,6 +74,8 @@ impl Default for Config {
             language: String::new(),
             daily_goal: 0,
             auto_advance: true,
+            indicator: "digits".to_string(),
+            brew: false,
             custom_theme: BTreeMap::new(),
         }
     }

@@ -63,15 +63,23 @@ When stdout/stdin aren't TTYs (pipes, CI) — or with `--plain` — it drops to 
 
 #### Themes
 
-- Five truecolour themes: `coffee` (default), `ocean`, `forest`, `grape`, `mono`. Preview them with `coffeebreak themes`.
+- Ten truecolour themes: `coffee` (default), `ocean`, `forest`, `grape`, `mono`, `dracula`, `nord`, `gruvbox`, `solarized`, `rose-pine` — plus a `custom` palette. Preview them with `coffeebreak themes`.
 
 #### Presets
 
-- Four built-in cadences via `--preset NAME`: `classic`, `deep`, `short`, `sprint`. List them with `coffeebreak presets`.
+- Seven built-in cadences via `--preset NAME`: `classic`, `deep`, `short`, `sprint`, `5217`, `flow`, `animedoro`. List them with `coffeebreak presets`.
 
 #### Statistics & streaks
 
 - An animated dashboard: today, all-time, current & longest streak, a daily-goal bar, a 14-day bar chart, and a 12-week heatmap. View with `coffeebreak stats` or `--stats` (`~/.coffeebreak/stats.json`).
+
+#### Achievements
+
+- An animated badge board — 18 achievements across five tiers, derived from your own statistics (no extra saved state). View it with `coffeebreak achievements`.
+
+#### Animation showcase
+
+- See every widget and animation in one place with `coffeebreak demo` (respects `--theme` and `--lang`). Swap the countdown digits for a circular gauge with `--indicator ring`, or play a brewing intro with `--brew`.
 
 #### Long breaks
 
@@ -88,7 +96,7 @@ When stdout/stdin aren't TTYs (pipes, CI) — or with `--plain` — it drops to 
 
 #### Fully internationalised
 
-- English by default, with German, Spanish, French, Italian, and Portuguese translations (`--lang`, auto-detected from your locale).
+- English by default, with German, Spanish, French, Italian, Portuguese, and Dutch translations (`--lang`, auto-detected from your locale).
 
 #### Diagnostics, completions & man page
 
@@ -173,13 +181,15 @@ over the config file.
 | `--long`                | Enable a long break after every N focus blocks          |
 | `--long-break MIN`      | Long-break length, in minutes (implies `--long`)        |
 | `--long-every N`        | Focus blocks before a long break (default 4)            |
-| `--preset NAME`         | Use a built-in cadence: `classic`, `deep`, `short`, `sprint` |
-| `--theme NAME`          | Colour theme: `coffee`, `ocean`, `forest`, `grape`, `mono`   |
+| `--preset NAME`         | Built-in cadence: `classic`, `deep`, `short`, `sprint`, `5217`, `flow`, `animedoro` |
+| `--theme NAME`          | Colour theme (see [Themes](#themes)) — 10 built-ins plus `custom` |
 | `-l, --label TEXT`      | Session label shown in the status line                  |
 | `--git-label`           | Use the current git branch as the label                 |
 | `--plain`               | Force plain line output (no animated UI)                |
 | `--fps N`               | Animation frame rate, 2–60 (default 15)                 |
-| `--lang CODE`           | Interface language: `en`, `de`, `es`, `fr`, `it`, `pt`  |
+| `--indicator STYLE`     | Big countdown style: `digits` (default) or `ring`       |
+| `--brew`                | Play the brewing intro animation before the first focus block |
+| `--lang CODE`           | Interface language: `en`, `de`, `es`, `fr`, `it`, `pt`, `nl` |
 | `--stats`               | Show today / all-time / current streak / best day       |
 | `--no-sound`            | Mute the audible cue                                     |
 | `--no-notify`           | Disable desktop notifications                           |
@@ -191,6 +201,8 @@ over the config file.
 | Subcommand                              | Description                                                      |
 | --------------------------------------- | ---------------------------------------------------------------- |
 | `coffeebreak stats`                     | Show today / all-time / current streak / best day               |
+| `coffeebreak achievements`              | Show your earned badges and progress toward the next             |
+| `coffeebreak demo`                      | Showcase every widget and animation, then exit                   |
 | `coffeebreak config init`               | Write a starter config file with all defaults                    |
 | `coffeebreak config path`               | Print the resolved config file path                              |
 | `coffeebreak config show`              | Print the effective configuration                                |
@@ -246,7 +258,7 @@ coffeebreak --stats
 
 ## Themes
 
-Five truecolour themes are built in. Preview them all with `coffeebreak themes`,
+Ten truecolour themes are built in. Preview them all with `coffeebreak themes`,
 then select one with `--theme NAME` or the `theme` config key.
 
 - **coffee** — warm browns and creams (default)
@@ -254,6 +266,11 @@ then select one with `--theme NAME` or the `theme` config key.
 - **forest** — greens and earth tones
 - **grape** — purples and magentas
 - **mono** — grayscale, minimal
+- **dracula** — vivid purples and pinks on a dark backdrop
+- **nord** — calm, frosty arctic tones
+- **gruvbox** — warm, retro, high-contrast earth tones
+- **solarized** — the classic low-eye-strain palette (dark)
+- **rose-pine** — muted roses and irises
 
 ### Custom theme
 
@@ -279,19 +296,23 @@ coffee_top = "#8B5A2B"   # liquid surface
 Four cadences are built in. Use them with `--preset NAME`, or list them with
 `coffeebreak presets`.
 
-| Preset    | Cadence                                           |
-| --------- | ------------------------------------------------- |
-| `classic` | 4 × 25/5, finishing with a 15 min long break      |
-| `deep`    | 3 × 50/10, finishing with a 20 min long break     |
-| `short`   | 6 × 15/3, with a 10 min long break every 4 blocks |
-| `sprint`  | 1 × 20/5 (no long break)                          |
+| Preset      | Cadence                                           |
+| ----------- | ------------------------------------------------- |
+| `classic`   | 4 × 25/5, finishing with a 15 min long break      |
+| `deep`      | 3 × 50/10, finishing with a 20 min long break     |
+| `short`     | 6 × 15/3, with a 10 min long break every 4 blocks |
+| `sprint`    | 1 × 20/5 (no long break)                          |
+| `5217`      | 4 × 52/17 — the "52/17 rule" from a productivity study |
+| `flow`      | 2 × 90/20, finishing with a 30 min long break (ultradian) |
+| `animedoro` | 3 × 60/20 — a longer block rewarded with an episode-length break |
 
 ---
 
 ## Languages
 
 coffeebreak is fully localised and **defaults to English**. It ships interface
-translations for English, German, Spanish, French, Italian, and Portuguese.
+translations for English, German, Spanish, French, Italian, Portuguese, and
+Dutch.
 
 The language is chosen in this order: the `--lang` flag → the `language` config
 key → your `LC_ALL` / `LC_MESSAGES` / `LANG` / `LANGUAGE` environment → English.
@@ -311,6 +332,7 @@ LANG=es_ES.UTF-8 coffeebreak     # auto-detected from the environment
 | `fr` | Français   |
 | `it` | Italiano   |
 | `pt` | Português  |
+| `nl` | Nederlands |
 
 ---
 
@@ -340,9 +362,11 @@ long_break         = false    # enable long breaks
 sound              = true      # play the audible cue at phase changes
 notifications      = true      # send a desktop notification at phase changes
 git_label          = false    # label the session with the current git branch
-theme              = "coffee" # colour theme: coffee, ocean, forest, grape, mono
+theme              = "coffee" # colour theme (see `coffeebreak themes`)
 fps                = 15        # animation frame rate, 2-60
-language           = ""       # interface language: en, de, es, fr, it, pt ("" = auto-detect)
+indicator          = "digits" # big countdown style: digits or ring
+brew               = false    # brewing intro before the first focus block
+language           = ""       # interface language: en, de, es, fr, it, pt, nl ("" = auto-detect)
 daily_goal         = 0        # daily pomodoro goal shown in the stats dashboard (0 = off)
 ```
 
@@ -379,6 +403,41 @@ animation — pipe-friendly):
 coffeebreak stats --format json   # summary + full per-day history as JSON
 coffeebreak stats --format csv    # date,completed_pomodoros,focus_minutes
 ```
+
+---
+
+## Achievements
+
+`coffeebreak achievements` turns your statistics into a board of unlockable
+badges — a light, optional layer of motivation. There's **no new saved state**:
+every badge is computed from the same `stats.json` the dashboard uses, so your
+history is the only source of truth.
+
+Eighteen badges span five tiers:
+
+- **First steps** — your first pomodoro, then ten.
+- **Volume milestones** — 50, 100, 250, 500, 1000 lifetime pomodoros, and ten focus-hours.
+- **Streak milestones** — 3-, 7-, 14-, and 30-day streaks.
+- **Single-day feats** — 4, 8, and 12 pomodoros in one day.
+- **Consistency** — a weekend session, five active days in a week, and hitting today's goal.
+
+On a colour terminal the board reveals with a short animation (badges light up,
+a mastery bar fills, and a hint points at your next badge); piped or with
+`--no-color` it prints once.
+
+## Showcase
+
+Curious what the animations look like before committing to a session? Run:
+
+```sh
+coffeebreak demo                 # tour every widget and animation
+coffeebreak demo --theme nord    # ...in a specific theme
+coffeebreak --indicator ring     # a circular gauge instead of block digits
+coffeebreak --brew               # a brewing intro before the first focus block
+```
+
+The demo reuses the exact widgets the live timer draws, so it's a faithful
+preview. Any key exits.
 
 ---
 
@@ -460,7 +519,7 @@ Continuous integration runs on every push and pull request
 
 - **rustfmt** — `cargo fmt --all --check` (formatting is enforced)
 - **clippy** — `-D warnings`, with and without the `sound` feature
-- **tests** — on Linux, macOS, and Windows
+- **tests** — on Linux, macOS, and Windows, **with and without the `sound` feature**
 - **MSRV** — `cargo check` on Rust 1.88
 - **docs** — `cargo doc` with `-D warnings` (catches broken doc links)
 - **coverage** — `cargo-llvm-cov` ([`coverage.yml`](.github/workflows/coverage.yml)), lcov uploaded as an artifact
@@ -468,7 +527,12 @@ Continuous integration runs on every push and pull request
 Supply-chain and hygiene checks run too:
 [cargo-deny](.github/workflows/deny.yml) (advisories, licenses, bans, sources),
 a weekly [RustSec audit](.github/workflows/audit.yml),
-[`typos`](.github/workflows/spellcheck.yml) spell-checking, and
+[`typos`](.github/workflows/spellcheck.yml) spell-checking,
+[actionlint](.github/workflows/actionlint.yml) (lints the workflows themselves),
+[cargo-shear](.github/workflows/unused-deps.yml) (unused dependencies),
+[cargo-semver-checks](.github/workflows/semver.yml) (API-breakage on PRs),
+[lychee](.github/workflows/links.yml) (Markdown links),
+a scheduled [minimal-versions](.github/workflows/minimal-versions.yml) check, and
 [Dependabot](.github/dependabot.yml) for crate and Action updates. Pushing a
 `v*` tag runs the
 [release pipeline](.github/workflows/release.yml) (cross-builds, checksums,

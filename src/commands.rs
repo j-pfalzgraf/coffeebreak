@@ -27,6 +27,18 @@ pub fn stats(theme: &Theme, i18n: &I18n, goal: u64, format: StatsFormat) {
     }
 }
 
+/// `coffeebreak achievements` — show earned badges and progress toward the next,
+/// derived from the saved statistics.
+pub fn achievements(theme: &Theme, i18n: &I18n, goal: u64) {
+    let stats = Stats::load_or_default(i18n);
+    crate::achievements::print(&stats, theme, i18n, goal);
+}
+
+/// `coffeebreak demo` — run the animation showcase.
+pub fn demo(theme: &Theme, i18n: &I18n) -> Result<()> {
+    crate::demo::run(theme, i18n)
+}
+
 /// `coffeebreak doctor` — print localised environment diagnostics.
 pub fn doctor(theme: &Theme, i18n: &I18n) {
     let p = &theme.palette;
@@ -203,12 +215,15 @@ pub fn config(action: &ConfigAction, theme: &Theme, i18n: &I18n) -> Result<()> {
 /// `coffeebreak themes` — list themes with a colour swatch preview.
 pub fn themes(theme: &Theme, i18n: &I18n) {
     println!("\n{}\n", i18n.t(Msg::ThemesTitle));
+    // Size the name column to the widest theme name so the swatches line up no
+    // matter how many themes are registered.
+    let w = THEME_NAMES.iter().map(|n| n.len()).max().unwrap_or(8);
     for name in THEME_NAMES {
         let t = Theme::resolve(name, theme.color());
         let p = &t.palette;
         let sw = |c| t.paint("███", c);
         println!(
-            "  {name:<8} {}{}{}{}{}",
+            "  {name:<w$} {}{}{}{}{}",
             sw(p.focus),
             sw(p.short_break),
             sw(p.long_break),
@@ -222,6 +237,9 @@ pub fn themes(theme: &Theme, i18n: &I18n) {
 /// `coffeebreak presets` — list presets and what they configure.
 pub fn presets(theme: &Theme, i18n: &I18n) {
     println!("\n{}\n", i18n.t(Msg::PresetsTitle));
+    // Align the cadence column to the widest preset name (pad the plain name
+    // *before* styling so the ANSI escapes don't throw the width off).
+    let w = PRESET_NAMES.iter().map(|n| n.len()).max().unwrap_or(8);
     for name in PRESET_NAMES {
         if let Some(p) = session::preset(name) {
             let mut cadence = i18n.tf(
@@ -243,7 +261,7 @@ pub fn presets(theme: &Theme, i18n: &I18n) {
             }
             println!(
                 "  {} {}",
-                theme.bold(name, theme.palette.accent),
+                theme.bold(format!("{name:<w$}"), theme.palette.accent),
                 theme.dim(cadence)
             );
         }

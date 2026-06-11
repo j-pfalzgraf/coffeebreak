@@ -5,7 +5,10 @@
 //! command — never silently in the background.
 
 use std::fs;
-use std::io::{self, Write};
+use std::io::{self, IsTerminal, Write};
+use std::sync::Arc;
+use std::sync::atomic::{AtomicBool, Ordering};
+use std::time::Duration;
 
 use anyhow::{Context, Result, bail};
 
@@ -13,6 +16,38 @@ use crate::i18n::{I18n, Msg};
 use crate::{BIN_NAME, REPO_NAME, REPO_OWNER, paths};
 
 const CURRENT_VERSION: &str = env!("CARGO_PKG_VERSION");
+
+/// Run `task` while an animated spinner (with the localised `Checking` label)
+/// ticks on stderr, then clear the spinner line. The spinner runs only when
+/// stderr is a TTY, so piped/CI output stays clean. The blocking `task` stays on
+/// the calling thread (no `Send` requirement on its captured state); the spinner
+/// animates on a helper thread.
+fn with_spinner<T>(i18n: &I18n, task: impl FnOnce() -> T) -> T {
+    if !io::stderr().is_terminal() {
+        return task();
+    }
+    let done = Arc::new(AtomicBool::new(false));
+    let flag = done.clone();
+    let label = i18n.t(Msg::Checking).to_string();
+    let spinner = std::thread::spawn(move || {
+        const FRAMES: [char; 10] = ['⠋', '⠙', '⠹', '⠸', '⠼', '⠴', '⠦', '⠧', '⠇', '⠏'];
+        let mut err = io::stderr();
+        let mut i = 0usize;
+        while !flag.load(Ordering::Relaxed) {
+            let _ = write!(err, "\r{} {label}", FRAMES[i % FRAMES.len()]);
+            let _ = err.flush();
+            i += 1;
+            std::thread::sleep(Duration::from_millis(80));
+        }
+        // Erase the spinner line so it leaves no trace.
+        let _ = write!(err, "\r\x1b[2K");
+        let _ = err.flush();
+    });
+    let result = task();
+    done.store(true, Ordering::Relaxed);
+    let _ = spinner.join();
+    result
+}
 
 /// `coffeebreak self update [--check]`.
 pub fn update(check_only: bool, i18n: &I18n) -> Result<()> {
@@ -26,8 +61,7 @@ pub fn update(check_only: bool, i18n: &I18n) -> Result<()> {
         .context("failed to configure the updater")?;
 
     if check_only {
-        let latest = updater
-            .get_latest_release()
+        let latest = with_spinner(i18n, || updater.get_latest_release())
             .context("failed to query the latest release")?;
         if self_update::version::bump_is_greater(CURRENT_VERSION, &latest.version).unwrap_or(false)
         {

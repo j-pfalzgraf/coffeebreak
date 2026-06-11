@@ -10,6 +10,7 @@ extend-exclude = [
     "src/i18n/fr.rs",
     "src/i18n/it.rs",
     "src/i18n/pt.rs",
+    "src/i18n/nl.rs",
     "Cargo.lock",
 ]
 

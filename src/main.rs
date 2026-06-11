@@ -85,6 +85,11 @@ fn run() -> Result<()> {
                 commands::stats(&meta_theme, &i18n, goal, *format);
                 Ok(())
             }
+            Command::Achievements => {
+                commands::achievements(&meta_theme, &i18n, goal);
+                Ok(())
+            }
+            Command::Demo => commands::demo(&meta_theme, &i18n),
             Command::Doctor => {
                 commands::doctor(&meta_theme, &i18n);
                 Ok(())

@@ -7,6 +7,67 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+#### Achievements
+
+- **`coffeebreak achievements`** — a motivational badge board derived entirely
+  from your existing statistics (no new saved state). 18 badges across five
+  tiers (first steps, volume milestones, streak milestones, single-day feats,
+  consistency), with an animated reveal, a mastery bar, and a hint toward your
+  next badge. Fully localised.
+
+#### Animations & UI
+
+- **`coffeebreak demo`** — a guided showcase that cycles through every widget
+  and animation (brewing, the coffee cup, the countdown, the ring gauge, the
+  spinner, the charts, and the celebration). Respects `--theme` and `--lang`.
+- **Brewing intro** — opt-in pour-and-steam animation before the first focus
+  block (`--brew`, or `brew = true`). Any key skips it.
+- **Ring indicator** — `--indicator ring` (or `indicator = "ring"`) swaps the
+  big block digits for a circular gauge that fills as the phase elapses, with
+  the countdown centred inside.
+- **Organic steam** — the cup's steam plume is now a five-wisp system with a
+  per-wisp sway and out-of-phase flicker (still deterministic).
+- A reusable **spinner** now animates while `self update --check` queries GitHub.
+
+#### Themes & presets
+
+- Five new truecolour themes: **`dracula`**, **`nord`**, **`gruvbox`**,
+  **`solarized`**, **`rose-pine`** — preview them with `coffeebreak themes`.
+- Three new presets: **`5217`** (the 52/17 rule), **`flow`** (90-minute
+  ultradian blocks), and **`animedoro`** (60/20).
+
+#### Internationalisation
+
+- New interface language: **Dutch (`nl`, Nederlands)**.
+- Every new string (achievements, demo, brewing, the ring indicator) is
+  localised across all seven languages.
+
+### Changed
+
+- The `themes`/`presets` listings now size their columns to the widest name so
+  they stay aligned as the lists grow.
+
+### Internal
+
+- Extracted a shared `ui` module (`row_from_cells`, `LineBuf`, `CursorGuard`),
+  removing the duplicated row-builder that lived in both `widgets` and `charts`
+  and the cursor guard that lived in `stats`.
+- The coffee cup is now composed from reusable `steam_rows` + `cup_body` halves.
+- New tests: theme/preset name resolution, the new widgets' width invariants,
+  the achievements catalogue and rendering, a placeholder-integrity check across
+  every translated string, and integration coverage for the new commands.
+
+### CI
+
+- The test matrix now also builds and runs with the `sound` feature on all three
+  operating systems (previously `sound` was only ever built by clippy).
+- New workflows: **actionlint** (lint the workflows), **cargo-shear** (unused
+  dependencies), **cargo-semver-checks** (API breakage on PRs, advisory),
+  **lychee** (Markdown link checking — offline on PRs, a weekly online sweep),
+  and **direct-minimal-versions** (a scheduled lower-bound check).
+
 ## [1.0.0] - 2026-06-08
 
 coffeebreak's first stable release: a full-screen, animated terminal Pomodoro
