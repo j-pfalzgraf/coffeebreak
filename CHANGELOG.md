@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.1.0] - 2026-06-11
+
+A feature release that builds on the 1.0.0 core: a motivational **achievements**
+board, an animation **showcase** (`demo`), five new colour themes and three new
+presets, a circular **ring** countdown and an opt-in **brewing** intro, a new
+**Dutch** locale, and a broader CI suite — all backward compatible (no config or
+data migration needed).
+
 ### Added
 
 #### Achievements
@@ -193,5 +201,6 @@ well-tested codebase. The original Pomodoro core is included below.
   (gated on a `CARGO_REGISTRY_TOKEN` secret).
 - Added issue forms, a pull-request template, and `CONTRIBUTING.md`.
 
-[Unreleased]: https://github.com/j-pfalzgraf/coffeebreak/compare/v1.0.0...HEAD
+[Unreleased]: https://github.com/j-pfalzgraf/coffeebreak/compare/v1.1.0...HEAD
+[1.1.0]: https://github.com/j-pfalzgraf/coffeebreak/compare/v1.0.0...v1.1.0
 [1.0.0]: https://github.com/j-pfalzgraf/coffeebreak/releases/tag/v1.0.0
