@@ -27,7 +27,7 @@ jobs:
     name: shellcheck
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
       # shellcheck is preinstalled on GitHub's Ubuntu runners.
       - name: ShellCheck
         run: shellcheck install.sh uninstall.sh
@@ -36,7 +36,7 @@ jobs:
     name: PSScriptAnalyzer
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
       - name: Analyze install.ps1
         shell: pwsh
         run: |
