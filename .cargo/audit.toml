@@ -1,0 +1,19 @@
+# cargo-audit configuration — consumed by the `Security audit` workflow
+# (rustsec/audit-check) and by a local `cargo audit`.
+#
+# Keep the ignore list identical to `deny.toml`'s `[advisories].ignore`, with
+# the same justification, so the two supply-chain tools never disagree.
+
+[advisories]
+ignore = [
+    # quick-xml DoS advisories: quadratic attribute-duplicate check
+    # (RUSTSEC-2026-0194) and unbounded namespace-declaration allocation
+    # (RUSTSEC-2026-0195). Both require PARSING untrusted XML. coffeebreak
+    # never does: self_update is used only through its GitHub (JSON) backend,
+    # not the S3/XML one, and tauri-winrt-notification (Windows-only) merely
+    # serialises app-controlled toast XML. No stable dependency tree reaches
+    # quick-xml >= 0.41 yet (self_update 0.44 / notify-rust 4.18 still pin
+    # 0.38); revisit when self_update ships a stable fixed release.
+    "RUSTSEC-2026-0194",
+    "RUSTSEC-2026-0195",
+]

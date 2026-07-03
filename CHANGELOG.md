@@ -55,6 +55,18 @@ is off by default.
 - Sparklines render a zero as a blank cell again instead of the same glyph as
   the smallest non-zero value.
 
+### Security
+
+- Bumped `anyhow` to 1.0.103 (RUSTSEC-2026-0190, an `Error::downcast_mut`
+  unsoundness) and `quinn-proto` to 0.11.15 (RUSTSEC-2026-0185, a remote
+  memory-exhaustion DoS in a transitive dependency).
+- Documented, justified exceptions for two `quick-xml` DoS advisories
+  (RUSTSEC-2026-0194/0195) in `deny.toml` and a new `.cargo/audit.toml`:
+  both require parsing untrusted XML, which coffeebreak never does (only
+  `self_update`'s GitHub/JSON backend and app-controlled Windows toast XML
+  are used), and no stable dependency tree reaches the fixed `quick-xml`
+  0.41 yet.
+
 ### Internal
 
 - The timer's gradient progress bar and the stats goal bar now share one
