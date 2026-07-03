@@ -174,6 +174,10 @@ pub static ENTRIES: super::Table = &[
         "onleesbare statistieken worden genegeerd ({error})",
     ),
     (
+        super::Msg::WarnStatsQuarantined,
+        "het onleesbare statistiekenbestand is verplaatst naar {path} zodat het niet wordt overschreven",
+    ),
+    (
         super::Msg::WarnCtrlc,
         "Ctrl+C-handler kon niet worden geïnstalleerd ({error}); statistieken worden mogelijk niet opgeslagen als je de sessie onderbreekt",
     ),

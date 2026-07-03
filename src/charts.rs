@@ -31,7 +31,9 @@ pub fn sparkline(theme: &Theme, values: &[u64], color: Rgb) -> Line {
     let cells: Vec<(char, Option<Rgb>)> = values
         .iter()
         .map(|&v| {
-            let idx = if max == 0 {
+            let idx = if v == 0 || max == 0 {
+                // A zero stays blank so an idle day is distinguishable from the
+                // smallest non-zero one.
                 0
             } else {
                 // 1..=8 for any non-zero value so even small bars are visible.
@@ -153,6 +155,18 @@ mod tests {
     fn sparkline_width_matches_values() {
         let s = sparkline(&theme(), &[0, 1, 5, 3, 8], Rgb(1, 2, 3));
         assert_eq!(s.width(), 5);
+    }
+
+    #[test]
+    fn sparkline_keeps_zero_days_blank() {
+        // A zero must render as the empty glyph, not the same ▁ as the
+        // smallest non-zero value — otherwise idle days look active.
+        let t = Theme::resolve("coffee", false); // no colour → raw glyphs
+        let s = sparkline(&t, &[0, 1, 8], Rgb(1, 2, 3));
+        let text: Vec<char> = s.as_str().chars().collect();
+        assert_eq!(text[0], ' ', "zero should be blank, got {text:?}");
+        assert_ne!(text[1], ' ', "non-zero must be visible, got {text:?}");
+        assert_eq!(text[2], '█', "max should be full, got {text:?}");
     }
 
     #[test]

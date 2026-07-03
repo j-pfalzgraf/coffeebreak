@@ -4,7 +4,6 @@
 //! dispatch subcommands, otherwise resolve a session and run the timer. Stats are
 //! always saved on the way out, even after Ctrl+C or an error.
 
-use std::io::IsTerminal;
 use std::process::ExitCode;
 use std::sync::Arc;
 use std::sync::atomic::{AtomicBool, Ordering};
@@ -54,8 +53,7 @@ fn run() -> Result<()> {
     let i18n = I18n::detect(cli.lang.as_deref(), cfg_lang.as_deref());
 
     // Colour for non-timer output: honour --no-color, NO_COLOR, and tty-ness.
-    let color =
-        !cli.no_color && std::env::var_os("NO_COLOR").is_none() && std::io::stdout().is_terminal();
+    let color = coffeebreak::term::color_enabled(cli.no_color);
     let theme_name = cli
         .theme
         .clone()

@@ -159,6 +159,7 @@ pub enum Msg {
     WordError,
     WarnStatsSave,
     WarnStatsRead,
+    WarnStatsQuarantined,
     WarnCtrlc,
 
     // CLI help — top level.
@@ -379,6 +380,9 @@ impl Msg {
             WordError => "error",
             WarnStatsSave => "could not save stats ({error})",
             WarnStatsRead => "ignoring unreadable stats ({error})",
+            WarnStatsQuarantined => {
+                "the unreadable stats file was moved to {path} so it will not be overwritten"
+            }
             WarnCtrlc => {
                 "could not install Ctrl+C handler ({error}); stats may not be saved if you interrupt the session"
             }

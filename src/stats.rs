@@ -16,6 +16,7 @@ use crossterm::{cursor, execute};
 use serde::{Deserialize, Serialize};
 
 use crate::charts;
+use crate::fsutil::{self, FileKind};
 use crate::i18n::{I18n, Msg, Noun};
 use crate::paths;
 use crate::theme::Theme;
@@ -42,6 +43,19 @@ pub fn today() -> String {
     Local::now().format("%Y-%m-%d").to_string()
 }
 
+/// Move an unparseable stats file aside so a later save can't destroy it.
+/// Returns the backup path on success; best-effort (`None` on any failure —
+/// e.g. the file was unreadable rather than corrupt, or the rename failed).
+fn quarantine_corrupt_stats() -> Option<String> {
+    let path = paths::stats_file().ok()?;
+    if !path.exists() {
+        return None;
+    }
+    let backup = path.with_extension("json.corrupt");
+    fs::rename(&path, &backup).ok()?;
+    Some(backup.display().to_string())
+}
+
 impl Stats {
     /// Load stats, returning defaults if the file is missing.
     pub fn load() -> Result<Stats> {
@@ -56,6 +70,10 @@ impl Stats {
 
     /// Like [`Stats::load`] but never fails: a corrupt or unreadable file is
     /// reported to stderr (localised) and treated as empty.
+    ///
+    /// A file that exists but does not parse is first moved aside to
+    /// `stats.json.corrupt` — otherwise the next [`Stats::save`] would silently
+    /// overwrite the user's entire history with the empty fallback.
     pub fn load_or_default(i18n: &I18n) -> Stats {
         match Stats::load() {
             Ok(s) => s,
@@ -64,19 +82,25 @@ impl Stats {
                     "coffeebreak: {}",
                     i18n.tf(Msg::WarnStatsRead, &[("error", &format!("{e:#}"))])
                 );
+                if let Some(backup) = quarantine_corrupt_stats() {
+                    eprintln!(
+                        "coffeebreak: {}",
+                        i18n.tf(Msg::WarnStatsQuarantined, &[("path", &backup)])
+                    );
+                }
                 Stats::default()
             }
         }
     }
 
-    /// Persist to disk, creating the data directory if needed.
+    /// Persist to disk (atomically), creating the data directory if needed.
     pub fn save(&self) -> Result<()> {
         let dir = paths::data_dir()?;
         fs::create_dir_all(&dir)
             .with_context(|| format!("failed to create data dir {}", dir.display()))?;
         let path = paths::stats_file()?;
         let text = serde_json::to_string_pretty(self).context("failed to serialize stats")?;
-        fs::write(&path, text)
+        fsutil::write_atomic(&path, &text, FileKind::Private)
             .with_context(|| format!("failed to write stats to {}", path.display()))
     }
 
@@ -245,11 +269,18 @@ impl Stats {
         }
 
         let today_date = Local::now().date_naive();
-        let width = crossterm::terminal::size().map(|(w, _)| w).unwrap_or(80);
-        let animate = theme.color() && std::io::stdout().is_terminal() && width >= 60;
+        let (width, height) = crossterm::terminal::size().unwrap_or((80, 24));
+        let final_dashboard = self.dashboard_lines(theme, i18n, goal, today_date, 1.0);
+        // Animate only when the whole dashboard fits on screen: the in-place
+        // repaint walks back up with MoveToPreviousLine, which clamps at the top
+        // row — if the output scrolled, later frames would repaint wrong lines.
+        let animate = theme.color()
+            && std::io::stdout().is_terminal()
+            && width >= 60
+            && (height as usize) > final_dashboard.len();
 
         if !animate {
-            for line in self.dashboard_lines(theme, i18n, goal, today_date, 1.0) {
+            for line in final_dashboard {
                 println!("{line}");
             }
             return;

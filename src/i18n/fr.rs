@@ -169,6 +169,10 @@ pub static ENTRIES: super::Table = &[
         "statistiques illisibles ignorées ({error})",
     ),
     (
+        super::Msg::WarnStatsQuarantined,
+        "le fichier de statistiques illisible a été déplacé vers {path} pour ne pas être écrasé",
+    ),
+    (
         super::Msg::WarnCtrlc,
         "impossible d'installer le gestionnaire Ctrl+C ({error}) ; les statistiques peuvent ne pas être enregistrées si vous interrompez la session",
     ),

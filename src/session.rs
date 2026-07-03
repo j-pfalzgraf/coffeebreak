@@ -169,9 +169,7 @@ impl Session {
             }
         });
 
-        let color = !cli.no_color
-            && std::env::var_os("NO_COLOR").is_none()
-            && std::io::IsTerminal::is_terminal(&std::io::stdout());
+        let color = crate::term::color_enabled(cli.no_color);
 
         Session {
             work: dur(work),

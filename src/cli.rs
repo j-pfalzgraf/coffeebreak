@@ -26,17 +26,6 @@ fn help_styles() -> Styles {
         .error(AnsiColor::Red.on_default().effects(Effects::BOLD))
 }
 
-const AFTER_HELP: &str = "\x1b[1;33mExamples:\x1b[0m\n  \
-    coffeebreak                         Classic 25/5, one cycle\n  \
-    coffeebreak --preset classic        Four 25/5 rounds with a long break\n  \
-    coffeebreak -w 50 -b 10 --cycles 3  Deep work: three 50/10 rounds\n  \
-    coffeebreak --theme ocean           Use the ocean colour theme\n  \
-    coffeebreak --stats                 Show your focus statistics\n\n\
-    \x1b[1;33mDuring a session:\x1b[0m\n  \
-    space / p   pause or resume        s / n   skip the current phase\n  \
-    + / =       add a minute           - / _   remove a minute\n  \
-    q / Esc     quit (stats are saved)\n";
-
 #[derive(Parser, Debug)]
 #[command(
     name = "coffeebreak",
@@ -46,8 +35,6 @@ const AFTER_HELP: &str = "\x1b[1;33mExamples:\x1b[0m\n  \
                   cup whose steam and fill track the time, large countdown digits, a gradient \
                   progress bar, desktop notifications, and a developer quote at each break.",
     styles = help_styles(),
-    after_help = AFTER_HELP,
-    after_long_help = AFTER_HELP,
 )]
 pub struct Cli {
     // --- Timer options ------------------------------------------------------
@@ -297,11 +284,6 @@ pub enum SelfAction {
 }
 
 impl Cli {
-    /// Parse from the process arguments (English help).
-    pub fn parse_args() -> Cli {
-        Cli::parse()
-    }
-
     /// Parse from the process arguments with help/usage text localised via `i18n`.
     ///
     /// `--help`/`--version`/parse errors are handled by clap (it prints and
@@ -315,8 +297,14 @@ impl Cli {
     }
 
     /// Build the clap `Command` (used for completions and the man page).
+    ///
+    /// The examples/key-bindings epilogue comes from the canonical English
+    /// [`Msg::HelpAfter`] — the same text `--help` shows — so the man page and
+    /// the runtime help can never drift apart.
     pub fn command() -> clap::Command {
         <Cli as CommandFactory>::command()
+            .after_help(Msg::HelpAfter.en())
+            .after_long_help(Msg::HelpAfter.en())
     }
 }
 

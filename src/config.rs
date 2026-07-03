@@ -10,6 +10,7 @@ use std::fs;
 use anyhow::{Context, Result};
 use serde::{Deserialize, Serialize};
 
+use crate::fsutil::{self, FileKind};
 use crate::paths;
 
 /// Built-in defaults: the classic 25/5 Pomodoro, long break of 15 every 4
@@ -116,14 +117,15 @@ impl Config {
         }
     }
 
-    /// Write the current config to disk, creating the directory if needed.
+    /// Write the current config to disk (atomically), creating the directory if
+    /// needed.
     pub fn save(&self) -> Result<()> {
         let dir = paths::config_dir()?;
         fs::create_dir_all(&dir)
             .with_context(|| format!("failed to create config dir {}", dir.display()))?;
         let path = paths::config_file()?;
         let text = toml::to_string_pretty(self).context("failed to serialize config")?;
-        fs::write(&path, text)
+        fsutil::write_atomic(&path, &text, FileKind::Shareable)
             .with_context(|| format!("failed to write config to {}", path.display()))
     }
 }

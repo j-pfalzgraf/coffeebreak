@@ -172,6 +172,10 @@ pub static ENTRIES: super::Table = &[
         "statistiche illeggibili ignorate ({error})",
     ),
     (
+        super::Msg::WarnStatsQuarantined,
+        "il file delle statistiche illeggibile è stato spostato in {path} per non essere sovrascritto",
+    ),
+    (
         super::Msg::WarnCtrlc,
         "impossibile installare il gestore di Ctrl+C ({error}); le statistiche potrebbero non essere salvate se interrompi la sessione",
     ),

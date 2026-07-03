@@ -354,11 +354,18 @@ pub fn print(stats: &Stats, theme: &Theme, i18n: &I18n, goal: u64) {
         return;
     }
 
-    let width = crossterm::terminal::size().map(|(w, _)| w).unwrap_or(80);
-    let animate = theme.color() && std::io::stdout().is_terminal() && width >= 60;
+    let (width, height) = crossterm::terminal::size().unwrap_or((80, 24));
+    let final_board = board_lines(&snap, theme, i18n, 1.0);
+    // Animate only when the whole board fits on screen: the in-place repaint
+    // walks back up with MoveToPreviousLine, which clamps at the top row — if
+    // the board scrolled, every later frame would overwrite the wrong lines.
+    let animate = theme.color()
+        && std::io::stdout().is_terminal()
+        && width >= 60
+        && (height as usize) > final_board.len();
 
     if !animate {
-        for line in board_lines(&snap, theme, i18n, 1.0) {
+        for line in final_board {
             println!("{line}");
         }
         return;

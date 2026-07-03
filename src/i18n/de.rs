@@ -172,6 +172,10 @@ pub static ENTRIES: super::Table = &[
         "unlesbare Statistiken werden ignoriert ({error})",
     ),
     (
+        super::Msg::WarnStatsQuarantined,
+        "die unlesbare Statistikdatei wurde nach {path} verschoben, damit sie nicht überschrieben wird",
+    ),
+    (
         super::Msg::WarnCtrlc,
         "Ctrl+C-Handler konnte nicht installiert werden ({error}); Statistiken werden bei einem Abbruch der Sitzung möglicherweise nicht gespeichert",
     ),

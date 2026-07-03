@@ -10,6 +10,7 @@
 //! * [`stats`]   — daily statistics persisted to `~/.coffeebreak/stats.json`.
 //! * [`quotes`]  — developer quotes shown when a break begins.
 //! * [`paths`]   — XDG-aware locations for config and data.
+//! * [`fsutil`]  — atomic, permission-aware persistence helpers.
 //! * [`git`]     — best-effort current-branch detection for session labels.
 //!
 //! **Runtime / UI**
@@ -39,6 +40,7 @@ pub mod completions;
 pub mod config;
 pub mod demo;
 pub mod feedback;
+pub mod fsutil;
 pub mod git;
 pub mod i18n;
 pub mod input;

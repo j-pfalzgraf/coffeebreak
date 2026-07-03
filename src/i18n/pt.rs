@@ -166,6 +166,10 @@ pub static ENTRIES: super::Table = &[
         "a ignorar estatísticas ilegíveis ({error})",
     ),
     (
+        super::Msg::WarnStatsQuarantined,
+        "o ficheiro de estatísticas ilegível foi movido para {path} para não ser substituído",
+    ),
+    (
         super::Msg::WarnCtrlc,
         "não foi possível instalar o handler de Ctrl+C ({error}); as estatísticas podem não ser guardadas se interromper a sessão",
     ),

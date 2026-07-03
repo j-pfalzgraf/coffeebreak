@@ -85,7 +85,6 @@ impl App {
         let mut renderer = Renderer::new(io::BufWriter::new(io::stdout()));
 
         let plan = session.phases();
-        let work_minutes = session.work.as_secs() / 60;
         let mut completed_focus = 0u64;
         let mut last_quote: Option<&str> = None;
         let mut frame: usize = 0;
@@ -171,7 +170,10 @@ impl App {
 
             if phase.is_focus() && completed {
                 completed_focus += 1;
-                stats.record_pomodoro(work_minutes, &stats::today());
+                // Credit the minutes actually focused: the interactive +/-
+                // controls can lengthen or shorten a phase mid-run, so the
+                // timer's final total is the truthful figure, not the plan.
+                stats.record_pomodoro(timer.total().as_secs() / 60, &stats::today());
             }
             if quit {
                 break 'outer;

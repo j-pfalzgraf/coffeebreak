@@ -55,3 +55,17 @@ impl Drop for TerminalSession {
 pub fn is_interactive() -> bool {
     io::stdout().is_terminal() && io::stdin().is_terminal()
 }
+
+/// The single colour-output decision, shared by every command path.
+///
+/// Colour is on only when all of these hold: the user didn't pass `--no-color`,
+/// the `NO_COLOR` environment variable is unset **or empty** (per the
+/// <https://no-color.org> spec, an empty value does not disable colour), and
+/// stdout is a real terminal.
+pub fn color_enabled(no_color_flag: bool) -> bool {
+    if no_color_flag {
+        return false;
+    }
+    let no_color_env = std::env::var_os("NO_COLOR").is_some_and(|v| !v.is_empty());
+    !no_color_env && io::stdout().is_terminal()
+}

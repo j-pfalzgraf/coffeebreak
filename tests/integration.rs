@@ -334,6 +334,56 @@ fn stats_with_empty_home_reports_nothing_yet() {
 }
 
 #[test]
+fn corrupt_stats_are_quarantined_not_overwritten() {
+    let home = TempHome::new("corrupt-stats");
+    let data_dir = home.path().join(".coffeebreak");
+    std::fs::create_dir_all(&data_dir).unwrap();
+    let stats_path = data_dir.join("stats.json");
+    std::fs::write(&stats_path, "{ this is not json").unwrap();
+
+    // Reading stats must not fail the command, and the corrupt file must be
+    // preserved under a backup name rather than silently clobbered later.
+    let args = ["--stats"];
+    let out = run(&home, &args);
+    assert!(
+        out.status.success(),
+        "--stats should survive a corrupt stats file\n{}",
+        describe(&args, &out)
+    );
+    let backup = data_dir.join("stats.json.corrupt");
+    assert!(
+        backup.exists(),
+        "expected the corrupt file to be moved to {}\n{}",
+        backup.display(),
+        describe(&args, &out)
+    );
+    assert_eq!(
+        std::fs::read_to_string(&backup).unwrap(),
+        "{ this is not json",
+        "backup must preserve the original bytes"
+    );
+
+    // A subsequent run starts fresh and writes a valid stats file.
+    let run_args = [
+        "--plain",
+        "--seconds",
+        "-w",
+        "1",
+        "--cycles",
+        "1",
+        "--no-sound",
+        "--no-notify",
+    ];
+    let out = run(&home, &run_args);
+    assert!(out.status.success(), "{}", describe(&run_args, &out));
+    let contents = std::fs::read_to_string(&stats_path).unwrap_or_default();
+    assert!(
+        contents.contains("completed_pomodoros"),
+        "expected a fresh, valid stats.json after the quarantine, got:\n{contents}"
+    );
+}
+
+#[test]
 fn quick_plain_run_records_a_pomodoro() {
     let home = TempHome::new("quick-run");
     // `--seconds` reinterprets `-w 1` as a one-second focus block; one cycle has
