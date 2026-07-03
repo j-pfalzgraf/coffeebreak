@@ -28,6 +28,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   planned duration.
 - `NO_COLOR` handling now follows the [no-color.org](https://no-color.org)
   spec: an empty value no longer disables colour.
+- Statistics are now checkpointed to disk the moment each pomodoro completes
+  (atomically, at most once per focus block), so a crash or power loss
+  mid-session no longer loses the whole session's progress.
 
 ### Fixed
 

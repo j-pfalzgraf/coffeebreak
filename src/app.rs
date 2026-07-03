@@ -567,11 +567,18 @@ impl App {
     }
 }
 
-/// Credit one completed focus block: bump the in-memory stats and, when the
-/// opt-in session history is enabled, append one line to `history.jsonl`.
-/// The append is best-effort — the timer must never fail over logging.
+/// Credit one completed focus block: bump the in-memory stats, checkpoint
+/// them to disk, and — when the opt-in session history is enabled — append
+/// one line to `history.jsonl`.
+///
+/// The stats checkpoint makes a completed pomodoro durable the moment it is
+/// earned (atomic write, at most once per focus block), so a crash or power
+/// loss mid-session can no longer lose the whole session. Both writes are
+/// best-effort — the timer must never fail over persistence; the end-of-run
+/// save in `main` reports any lasting error.
 fn credit_focus(stats: &mut Stats, session: &Session, minutes: u64) {
     stats.record_pomodoro(minutes, &stats::today());
+    let _ = stats.save();
     if session.history {
         let _ = history::append(&HistoryEntry::completed_now(minutes, session.label.clone()));
     }
