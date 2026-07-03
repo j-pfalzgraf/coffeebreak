@@ -14,7 +14,7 @@
 //! file can be processed with standard line tools (`jq`, `grep`, `tail`).
 //!
 //! Reading mirrors [`crate::stats::Stats::load_or_default`]'s best-effort
-//! stance: a missing file is an empty history and an unparseable line is
+//! stance: a missing file is an empty history and an unparsable line is
 //! skipped, never a hard error.
 
 use std::fs;

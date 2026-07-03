@@ -43,7 +43,7 @@ pub fn today() -> String {
     Local::now().format("%Y-%m-%d").to_string()
 }
 
-/// Move an unparseable stats file aside so a later save can't destroy it.
+/// Move an unparsable stats file aside so a later save can't destroy it.
 /// Returns the backup path on success; best-effort (`None` on any failure —
 /// e.g. the file was unreadable rather than corrupt, or the rename failed).
 fn quarantine_corrupt_stats() -> Option<String> {
