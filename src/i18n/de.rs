@@ -258,6 +258,23 @@ pub static ENTRIES: super::Table = &[
         "Die effektive Konfiguration ausgeben",
     ),
     (
+        super::Msg::HelpConfigGet,
+        "Den Wert eines Konfigurationsschlüssels ausgeben",
+    ),
+    (
+        super::Msg::HelpConfigSet,
+        "Einen Konfigurationsschlüssel setzen und die Datei speichern",
+    ),
+    (
+        super::Msg::HelpConfigKey,
+        "Der zu lesende bzw. zu ändernde Schlüssel (alle Schlüssel: `coffeebreak config show`)",
+    ),
+    (
+        super::Msg::HelpConfigValue,
+        "Der neue Wert (wird vor dem Speichern validiert)",
+    ),
+    (super::Msg::ConfigSet, "{key} = {value} gespeichert"),
+    (
         super::Msg::HelpUpdateCheck,
         "Nur prüfen, ob eine neuere Version existiert; nicht installieren",
     ),

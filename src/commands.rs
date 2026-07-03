@@ -213,6 +213,23 @@ pub fn config(action: &ConfigAction, theme: &Theme, i18n: &I18n) -> Result<()> {
             let toml = toml::to_string_pretty(&cfg).context("failed to serialize config")?;
             print!("{toml}");
         }
+        ConfigAction::Get { key } => println!("{}", Config::load()?.get(key)?),
+        ConfigAction::Set { key, value } => {
+            let mut cfg = Config::load()?;
+            cfg.set(key, value)?;
+            cfg.save()?;
+            println!(
+                "{} {}",
+                theme.bold(
+                    i18n.tf(
+                        Msg::ConfigSet,
+                        &[("key", key.as_str()), ("value", &cfg.get(key)?)]
+                    ),
+                    theme.palette.success,
+                ),
+                theme.dim(Config::path()?.display().to_string()),
+            );
+        }
     }
     Ok(())
 }

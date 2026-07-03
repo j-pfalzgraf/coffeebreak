@@ -208,6 +208,8 @@ over the config file.
 | `coffeebreak config init`               | Write a starter config file with all defaults                    |
 | `coffeebreak config path`               | Print the resolved config file path                              |
 | `coffeebreak config show`              | Print the effective configuration                                |
+| `coffeebreak config get <key>`          | Print the value of one config key                                |
+| `coffeebreak config set <key> <value>`  | Change one config key (validated) and save the file              |
 | `coffeebreak themes`                    | Preview the five colour themes                                   |
 | `coffeebreak presets`                   | List the built-in presets and their timings                     |
 | `coffeebreak languages`                 | List the interface languages (marks the active one)             |
@@ -374,7 +376,16 @@ history            = false    # log each completed focus block to ~/.coffeebreak
 ```
 
 Use `coffeebreak config path` to see where the file is resolved, and
-`coffeebreak config show` to print the effective configuration.
+`coffeebreak config show` to print the effective configuration. Individual
+keys can be read and changed without opening an editor — values are validated
+(type and range) before anything is written, and the file is created on first
+use:
+
+```sh
+coffeebreak config set work_minutes 50
+coffeebreak config set theme nord
+coffeebreak config get theme
+```
 
 ---
 

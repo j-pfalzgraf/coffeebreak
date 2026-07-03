@@ -255,6 +255,23 @@ pub static ENTRIES: super::Table = &[
         "Afficher la configuration effective",
     ),
     (
+        super::Msg::HelpConfigGet,
+        "Afficher la valeur d'une clé de configuration",
+    ),
+    (
+        super::Msg::HelpConfigSet,
+        "Définir une clé de configuration et enregistrer le fichier",
+    ),
+    (
+        super::Msg::HelpConfigKey,
+        "La clé à lire ou à modifier (toutes les clés : `coffeebreak config show`)",
+    ),
+    (
+        super::Msg::HelpConfigValue,
+        "La nouvelle valeur (validée avant l'enregistrement)",
+    ),
+    (super::Msg::ConfigSet, "Enregistré {key} = {value}"),
+    (
         super::Msg::HelpUpdateCheck,
         "Vérifier seulement si une version plus récente existe ; ne pas installer",
     ),

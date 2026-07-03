@@ -257,6 +257,23 @@ pub static ENTRIES: super::Table = &[
         "Stampa la configurazione effettiva",
     ),
     (
+        super::Msg::HelpConfigGet,
+        "Stampa il valore di una chiave di configurazione",
+    ),
+    (
+        super::Msg::HelpConfigSet,
+        "Imposta una chiave di configurazione e salva il file",
+    ),
+    (
+        super::Msg::HelpConfigKey,
+        "La chiave da leggere o modificare (tutte le chiavi: `coffeebreak config show`)",
+    ),
+    (
+        super::Msg::HelpConfigValue,
+        "Il nuovo valore (validato prima del salvataggio)",
+    ),
+    (super::Msg::ConfigSet, "Salvato {key} = {value}"),
+    (
         super::Msg::HelpUpdateCheck,
         "Controlla solo se esiste una versione più recente; non installare",
     ),

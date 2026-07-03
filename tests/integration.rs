@@ -295,6 +295,59 @@ fn config_init_then_show_round_trips() {
 }
 
 #[test]
+fn config_set_and_get_round_trip() {
+    let home = TempHome::new("config-set");
+
+    // `set` creates the file on first use (no `init` required).
+    let set_args = ["config", "set", "work_minutes", "50"];
+    let out = run(&home, &set_args);
+    assert!(out.status.success(), "{}", describe(&set_args, &out));
+    assert!(
+        stdout(&out).contains("work_minutes = 50"),
+        "expected a confirmation\n{}",
+        describe(&set_args, &out)
+    );
+
+    let get_args = ["config", "get", "work_minutes"];
+    let out = run(&home, &get_args);
+    assert!(out.status.success(), "{}", describe(&get_args, &out));
+    assert_eq!(stdout(&out).trim(), "50", "{}", describe(&get_args, &out));
+
+    // The new value must drive the next run (visible in the plan summary).
+    let cfg = std::fs::read_to_string(home.path().join(".config/coffeebreak/config.toml"))
+        .expect("config.toml should exist after `config set`");
+    assert!(cfg.contains("work_minutes = 50"), "config was: {cfg}");
+}
+
+#[test]
+fn config_set_rejects_invalid_values() {
+    let home = TempHome::new("config-set-bad");
+    for bad in [
+        ["config", "set", "fps", "99"],
+        ["config", "set", "theme", "sepia"],
+        ["config", "set", "no_such_key", "1"],
+    ] {
+        let out = run(&home, &bad);
+        assert!(
+            !out.status.success(),
+            "expected failure\n{}",
+            describe(&bad, &out)
+        );
+        let combined = format!("{}{}", stdout(&out), text(&out.stderr));
+        assert!(
+            combined.contains("invalid value") || combined.contains("unknown config key"),
+            "{}",
+            describe(&bad, &out)
+        );
+    }
+    // A rejected set must not create or corrupt the config file.
+    assert!(
+        !home.path().join(".config/coffeebreak/config.toml").exists(),
+        "a failed `config set` must not write the config file"
+    );
+}
+
+#[test]
 fn invalid_preset_fails_with_message() {
     let home = TempHome::new("bad-preset");
     let args = ["--preset", "nope"];

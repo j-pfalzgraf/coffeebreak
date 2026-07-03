@@ -133,6 +133,7 @@ pub enum Msg {
     // config command.
     ConfigCreated,
     ConfigExists,
+    ConfigSet,
 
     // self update / uninstall.
     UpdateCurrent,
@@ -181,6 +182,10 @@ pub enum Msg {
     HelpConfigInit,
     HelpConfigPath,
     HelpConfigShow,
+    HelpConfigGet,
+    HelpConfigSet,
+    HelpConfigKey,
+    HelpConfigValue,
     HelpUpdateCheck,
     HelpUninstallYes,
     HelpCompletionsShell,
@@ -364,6 +369,7 @@ impl Msg {
 
             ConfigCreated => "Created config:",
             ConfigExists => "Config already exists at",
+            ConfigSet => "Saved {key} = {value}",
 
             UpdateCurrent => "Current version: {version}",
             UpdateSource => "Source: {url}",
@@ -429,6 +435,12 @@ impl Msg {
             HelpConfigInit => "Write a default config file (does nothing if one already exists)",
             HelpConfigPath => "Print the path to the config file",
             HelpConfigShow => "Print the effective configuration",
+            HelpConfigGet => "Print the value of one configuration key",
+            HelpConfigSet => "Set one configuration key and save the file",
+            HelpConfigKey => {
+                "The key to read or change (see `coffeebreak config show` for all keys)"
+            }
+            HelpConfigValue => "The new value (validated before saving)",
             HelpUpdateCheck => "Only check whether a newer version exists; do not install",
             HelpUninstallYes => "Skip the confirmation prompt",
             HelpCompletionsShell => "The shell to generate completions for",

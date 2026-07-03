@@ -272,6 +272,18 @@ pub enum ConfigAction {
     Path,
     /// Print the effective configuration.
     Show,
+    /// Print the value of one configuration key.
+    Get {
+        /// The key to read (e.g. work_minutes, theme, history).
+        key: String,
+    },
+    /// Set one configuration key and save the file.
+    Set {
+        /// The key to change (e.g. work_minutes, theme, history).
+        key: String,
+        /// The new value (validated before saving).
+        value: String,
+    },
 }
 
 #[derive(Subcommand, Debug)]
@@ -386,6 +398,15 @@ fn localized_command(i18n: &I18n) -> clap::Command {
             .mut_subcommand("init", |s| s.about(t(Msg::HelpConfigInit)))
             .mut_subcommand("path", |s| s.about(t(Msg::HelpConfigPath)))
             .mut_subcommand("show", |s| s.about(t(Msg::HelpConfigShow)))
+            .mut_subcommand("get", |s| {
+                s.about(t(Msg::HelpConfigGet))
+                    .mut_arg("key", |a| a.help(t(Msg::HelpConfigKey)))
+            })
+            .mut_subcommand("set", |s| {
+                s.about(t(Msg::HelpConfigSet))
+                    .mut_arg("key", |a| a.help(t(Msg::HelpConfigKey)))
+                    .mut_arg("value", |a| a.help(t(Msg::HelpConfigValue)))
+            })
     });
     cmd = cmd.mut_subcommand("self", |c| {
         c.about(t(Msg::HelpSelf))

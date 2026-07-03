@@ -15,6 +15,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   on Unix. New **`coffeebreak history [--limit N]`** subcommand renders the log
   as a table (`--limit 0` shows everything). A missing file is an empty
   history and a torn/corrupt line is skipped, never an error. Fully localised.
+- **`coffeebreak config get <key>`** and **`coffeebreak config set <key>
+  <value>`** — read and change individual config keys from the command line.
+  Values are validated (type, range, and domain — themes, languages, and
+  indicators are checked against the shipped lists) before anything is
+  written, and `set` creates the config file on first use.
 
 ### Changed
 

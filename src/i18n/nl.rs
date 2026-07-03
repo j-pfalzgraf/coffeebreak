@@ -260,6 +260,23 @@ pub static ENTRIES: super::Table = &[
         "De effectieve configuratie tonen",
     ),
     (
+        super::Msg::HelpConfigGet,
+        "De waarde van één configuratiesleutel tonen",
+    ),
+    (
+        super::Msg::HelpConfigSet,
+        "Eén configuratiesleutel instellen en het bestand opslaan",
+    ),
+    (
+        super::Msg::HelpConfigKey,
+        "De sleutel om te lezen of te wijzigen (alle sleutels: `coffeebreak config show`)",
+    ),
+    (
+        super::Msg::HelpConfigValue,
+        "De nieuwe waarde (gevalideerd vóór het opslaan)",
+    ),
+    (super::Msg::ConfigSet, "{key} = {value} opgeslagen"),
+    (
         super::Msg::HelpUpdateCheck,
         "Alleen controleren of er een nieuwere versie bestaat; niet installeren",
     ),
