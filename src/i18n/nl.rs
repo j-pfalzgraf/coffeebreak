@@ -361,6 +361,25 @@ pub static ENTRIES: super::Table = &[
         super::Msg::HelpBrew,
         "De zet-introanimatie afspelen vóór het eerste focusblok",
     ),
+    (
+        super::Msg::HelpHistory,
+        "Toon het sessielogboek (schakel in met `history = true` in de configuratie)",
+    ),
+    (
+        super::Msg::HelpHistoryLimit,
+        "Toon hoogstens de laatste N sessies (0 = alle)",
+    ),
+    (
+        super::Msg::HistoryTitle,
+        "☕ coffeebreak — sessiegeschiedenis",
+    ),
+    (
+        super::Msg::HistoryEmpty,
+        "Nog geen sessies gelogd. Zet `history = true` in de configuratie en voltooi een focusblok. ☕",
+    ),
+    (super::Msg::HistoryColWhen, "Wanneer"),
+    (super::Msg::HistoryColMinutes, "Min"),
+    (super::Msg::HistoryColLabel, "Label"),
     (super::Msg::AchTitle, "🏅 coffeebreak — prestaties"),
     (
         super::Msg::AchEmpty,

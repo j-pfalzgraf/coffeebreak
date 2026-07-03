@@ -7,6 +7,36 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- **Opt-in session history** (`history = true` in the config): every completed
+  focus block is appended to `~/.coffeebreak/history.jsonl` — one JSON object
+  per line (`ts`, `work_min`, `label`, `completed`), created owner-only (0600)
+  on Unix. New **`coffeebreak history [--limit N]`** subcommand renders the log
+  as a table (`--limit 0` shows everything). A missing file is an empty
+  history and a torn/corrupt line is skipped, never an error. Fully localised.
+
+### Changed
+
+- Completed focus blocks now credit the minutes **actually focused** — the
+  interactive `+`/`-` controls can resize a phase mid-run — instead of the
+  planned duration.
+- `NO_COLOR` handling now follows the [no-color.org](https://no-color.org)
+  spec: an empty value no longer disables colour.
+
+### Fixed
+
+- **Data safety:** all saves (`stats.json`, `config.toml`) are now atomic
+  (temp file + rename), so a crash or full disk can never leave a torn file;
+  personal data files are created owner-only (0600) on Unix. A corrupt
+  `stats.json` is quarantined to `stats.json.corrupt` (and reported) instead
+  of being silently overwritten by the next save.
+- The stats dashboard and achievements reveal animations now also check the
+  terminal **height**; previously a short terminal scrolled the output and the
+  in-place repaint garbled it.
+- Sparklines render a zero as a blank cell again instead of the same glyph as
+  the smallest non-zero value.
+
 ## [1.1.0] - 2026-06-11
 
 A feature release that builds on the 1.0.0 core: a motivational **achievements**

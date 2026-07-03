@@ -367,6 +367,25 @@ pub static ENTRIES: super::Table = &[
         super::Msg::HelpBrew,
         "Jouer l'animation d'intro d'infusion avant le premier bloc de concentration",
     ),
+    (
+        super::Msg::HelpHistory,
+        "Afficher le journal des sessions (activez-le avec `history = true` dans la configuration)",
+    ),
+    (
+        super::Msg::HelpHistoryLimit,
+        "Afficher au plus les N dernières sessions (0 = toutes)",
+    ),
+    (
+        super::Msg::HistoryTitle,
+        "☕ coffeebreak — historique des sessions",
+    ),
+    (
+        super::Msg::HistoryEmpty,
+        "Aucune session enregistrée pour l'instant. Mettez `history = true` dans la configuration, puis terminez un bloc de concentration. ☕",
+    ),
+    (super::Msg::HistoryColWhen, "Quand"),
+    (super::Msg::HistoryColMinutes, "Min"),
+    (super::Msg::HistoryColLabel, "Libellé"),
     (super::Msg::AchTitle, "🏅 coffeebreak — accomplissements"),
     (
         super::Msg::AchEmpty,

@@ -8,6 +8,7 @@
 //! * [`config`]  — persisted defaults (`config.toml`).
 //! * [`session`] — the resolved run plan: durations, presets, display prefs.
 //! * [`stats`]   — daily statistics persisted to `~/.coffeebreak/stats.json`.
+//! * [`history`] — opt-in per-session log (`~/.coffeebreak/history.jsonl`).
 //! * [`quotes`]  — developer quotes shown when a break begins.
 //! * [`paths`]   — XDG-aware locations for config and data.
 //! * [`fsutil`]  — atomic, permission-aware persistence helpers.
@@ -42,6 +43,7 @@ pub mod demo;
 pub mod feedback;
 pub mod fsutil;
 pub mod git;
+pub mod history;
 pub mod i18n;
 pub mod input;
 pub mod paths;

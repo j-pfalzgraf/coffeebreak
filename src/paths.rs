@@ -64,3 +64,8 @@ pub fn data_dir() -> Result<PathBuf> {
 pub fn stats_file() -> Result<PathBuf> {
     Ok(data_dir()?.join("stats.json"))
 }
+
+/// Full path to the per-session history log (`history.jsonl`).
+pub fn history_file() -> Result<PathBuf> {
+    Ok(data_dir()?.join("history.jsonl"))
+}

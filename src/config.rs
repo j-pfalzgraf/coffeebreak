@@ -44,6 +44,9 @@ pub struct Config {
     pub language: String,
     /// Daily pomodoro goal shown in the stats dashboard (0 = disabled).
     pub daily_goal: u64,
+    /// Log every completed focus block to `~/.coffeebreak/history.jsonl`
+    /// (viewable with `coffeebreak history`). Off by default.
+    pub history: bool,
     /// Automatically start the next phase. When false (or with `--wait`), the
     /// timer waits for a keypress between phases.
     pub auto_advance: bool,
@@ -74,6 +77,7 @@ impl Default for Config {
             // Empty means "auto-detect from the environment, default English".
             language: String::new(),
             daily_goal: 0,
+            history: false,
             auto_advance: true,
             indicator: "digits".to_string(),
             brew: false,

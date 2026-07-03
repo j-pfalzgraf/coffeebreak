@@ -370,6 +370,22 @@ pub static ENTRIES: super::Table = &[
         super::Msg::HelpBrew,
         "Die Brüh-Intro-Animation vor dem ersten Fokusblock abspielen",
     ),
+    (
+        super::Msg::HelpHistory,
+        "Das Sitzungsprotokoll anzeigen (mit `history = true` in der Konfiguration aktivieren)",
+    ),
+    (
+        super::Msg::HelpHistoryLimit,
+        "Höchstens die letzten N Sitzungen anzeigen (0 = alle)",
+    ),
+    (super::Msg::HistoryTitle, "☕ coffeebreak — Sitzungsverlauf"),
+    (
+        super::Msg::HistoryEmpty,
+        "Noch keine Sitzungen protokolliert. Setze `history = true` in der Konfiguration und schließe einen Fokusblock ab. ☕",
+    ),
+    (super::Msg::HistoryColWhen, "Wann"),
+    (super::Msg::HistoryColMinutes, "Min"),
+    (super::Msg::HistoryColLabel, "Label"),
     (super::Msg::AchTitle, "🏅 coffeebreak — Erfolge"),
     (
         super::Msg::AchEmpty,

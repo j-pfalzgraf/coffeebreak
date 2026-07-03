@@ -34,6 +34,11 @@ pub fn achievements(theme: &Theme, i18n: &I18n, goal: u64) {
     crate::achievements::print(&stats, theme, i18n, goal);
 }
 
+/// `coffeebreak history` — show the last `limit` logged sessions (0 = all).
+pub fn history(theme: &Theme, i18n: &I18n, limit: usize) {
+    crate::history::print(theme, i18n, limit);
+}
+
 /// `coffeebreak demo` — run the animation showcase.
 pub fn demo(theme: &Theme, i18n: &I18n) -> Result<()> {
     crate::demo::run(theme, i18n)

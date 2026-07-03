@@ -372,6 +372,25 @@ pub static ENTRIES: super::Table = &[
         super::Msg::HelpBrew,
         "Reproduce la animación de preparación antes del primer bloque de concentración",
     ),
+    (
+        super::Msg::HelpHistory,
+        "Muestra el registro de sesiones (actívalo con `history = true` en la configuración)",
+    ),
+    (
+        super::Msg::HelpHistoryLimit,
+        "Muestra como máximo las últimas N sesiones (0 = todas)",
+    ),
+    (
+        super::Msg::HistoryTitle,
+        "☕ coffeebreak — historial de sesiones",
+    ),
+    (
+        super::Msg::HistoryEmpty,
+        "Aún no hay sesiones registradas. Pon `history = true` en la configuración y completa un bloque de concentración. ☕",
+    ),
+    (super::Msg::HistoryColWhen, "Cuándo"),
+    (super::Msg::HistoryColMinutes, "Min"),
+    (super::Msg::HistoryColLabel, "Etiqueta"),
     (super::Msg::AchTitle, "🏅 coffeebreak — logros"),
     (
         super::Msg::AchEmpty,

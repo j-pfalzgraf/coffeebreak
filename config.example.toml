@@ -36,6 +36,7 @@ indicator = "digits"        # big countdown style: "digits" or "ring"
 brew = false                # play the brewing intro animation before the first focus block
 language = ""               # interface language: en, de, es, fr, it, pt, nl ("" = auto-detect from $LANG)
 daily_goal = 0              # daily pomodoro goal shown in the stats dashboard (0 = off)
+history = false             # log each completed focus block to ~/.coffeebreak/history.jsonl (see: coffeebreak history)
 auto_advance = true         # start the next phase automatically (false / --wait waits for a keypress)
 
 # Define your own palette, used when `theme = "custom"` (or `--theme custom`).

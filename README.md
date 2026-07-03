@@ -72,6 +72,7 @@ When stdout/stdin aren't TTYs (pipes, CI) — or with `--plain` — it drops to 
 #### Statistics & streaks
 
 - An animated dashboard: today, all-time, current & longest streak, a daily-goal bar, a 14-day bar chart, and a 12-week heatmap. View with `coffeebreak stats` or `--stats` (`~/.coffeebreak/stats.json`).
+- An opt-in per-session log (`history = true` in the config): every completed focus block is appended to `~/.coffeebreak/history.jsonl` with its timestamp, minutes, and label. View with `coffeebreak history`.
 
 #### Achievements
 
@@ -202,6 +203,7 @@ over the config file.
 | --------------------------------------- | ---------------------------------------------------------------- |
 | `coffeebreak stats`                     | Show today / all-time / current streak / best day               |
 | `coffeebreak achievements`              | Show your earned badges and progress toward the next             |
+| `coffeebreak history [--limit N]`       | Show the opt-in per-session log (`history = true` in the config) |
 | `coffeebreak demo`                      | Showcase every widget and animation, then exit                   |
 | `coffeebreak config init`               | Write a starter config file with all defaults                    |
 | `coffeebreak config path`               | Print the resolved config file path                              |
@@ -368,6 +370,7 @@ indicator          = "digits" # big countdown style: digits or ring
 brew               = false    # brewing intro before the first focus block
 language           = ""       # interface language: en, de, es, fr, it, pt, nl ("" = auto-detect)
 daily_goal         = 0        # daily pomodoro goal shown in the stats dashboard (0 = off)
+history            = false    # log each completed focus block to ~/.coffeebreak/history.jsonl
 ```
 
 Use `coffeebreak config path` to see where the file is resolved, and
@@ -403,6 +406,17 @@ animation — pipe-friendly):
 coffeebreak stats --format json   # summary + full per-day history as JSON
 coffeebreak stats --format csv    # date,completed_pomodoros,focus_minutes
 ```
+
+### Session history (opt-in)
+
+Set `history = true` in the config and every completed focus block is appended
+to `~/.coffeebreak/history.jsonl` — one JSON object per line with the finish
+timestamp, the focus minutes credited, the session label (if any), and a
+`completed` flag. Because it is plain JSONL, it composes with standard tools
+(`jq`, `grep`, `tail -f`), and `coffeebreak history [--limit N]` renders it as
+a table (`--limit 0` shows everything). The file is created owner-only (0600)
+on Unix, and the feature is off by default so nothing changes unless you ask
+for it.
 
 ---
 

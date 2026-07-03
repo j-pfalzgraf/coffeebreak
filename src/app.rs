@@ -16,6 +16,7 @@ use unicode_width::UnicodeWidthStr;
 
 use crate::clock::PhaseTimer;
 use crate::feedback::Feedback;
+use crate::history::{self, HistoryEntry};
 use crate::i18n::{I18n, Msg, Noun};
 use crate::input::{self, Control, WaitEvent};
 use crate::render::{Frame, Renderer};
@@ -173,7 +174,7 @@ impl App {
                 // Credit the minutes actually focused: the interactive +/-
                 // controls can lengthen or shorten a phase mid-run, so the
                 // timer's final total is the truthful figure, not the plan.
-                stats.record_pomodoro(timer.total().as_secs() / 60, &stats::today());
+                credit_focus(stats, session, timer.total().as_secs() / 60);
             }
             if quit {
                 break 'outer;
@@ -552,7 +553,7 @@ impl App {
 
             if phase.is_focus() && completed {
                 completed_focus += 1;
-                stats.record_pomodoro(work_minutes, &stats::today());
+                credit_focus(stats, session, work_minutes);
             }
             if interrupted {
                 break 'outer;
@@ -563,6 +564,16 @@ impl App {
             completed_focus,
             interrupted,
         })
+    }
+}
+
+/// Credit one completed focus block: bump the in-memory stats and, when the
+/// opt-in session history is enabled, append one line to `history.jsonl`.
+/// The append is best-effort — the timer must never fail over logging.
+fn credit_focus(stats: &mut Stats, session: &Session, minutes: u64) {
+    stats.record_pomodoro(minutes, &stats::today());
+    if session.history {
+        let _ = history::append(&HistoryEntry::completed_now(minutes, session.label.clone()));
     }
 }
 

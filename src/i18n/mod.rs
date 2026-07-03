@@ -209,6 +209,15 @@ pub enum Msg {
     HelpDemo,
     HelpIndicator,
     HelpBrew,
+    HelpHistory,
+    HelpHistoryLimit,
+
+    // history command.
+    HistoryTitle,
+    HistoryEmpty,
+    HistoryColWhen,
+    HistoryColMinutes,
+    HistoryColLabel,
 
     // Achievements — chrome.
     AchTitle,
@@ -450,6 +459,18 @@ impl Msg {
             HelpDemo => "Showcase every widget and animation, then exit",
             HelpIndicator => "Big countdown style: digits (default) or ring",
             HelpBrew => "Play the brewing intro animation before the first focus block",
+            HelpHistory => {
+                "Show the per-session history log (enable with `history = true` in the config)"
+            }
+            HelpHistoryLimit => "Show at most the last N sessions (0 = all)",
+
+            HistoryTitle => "☕ coffeebreak — session history",
+            HistoryEmpty => {
+                "No sessions logged yet. Set `history = true` in the config, then complete a focus block. ☕"
+            }
+            HistoryColWhen => "When",
+            HistoryColMinutes => "Min",
+            HistoryColLabel => "Label",
 
             AchTitle => "🏅 coffeebreak — achievements",
             AchEmpty => "No badges yet — run `coffeebreak` to earn your first! ☕",

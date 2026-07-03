@@ -39,6 +39,8 @@ pub struct Session {
     /// Resolved interface language code (e.g. `"en"`, `"de"`).
     pub lang: String,
     pub label: Option<String>,
+    /// Append completed focus blocks to the history log (config `history`).
+    pub history: bool,
 }
 
 /// A named bundle of timer defaults selectable with `--preset`.
@@ -201,6 +203,7 @@ impl Session {
                 .code()
                 .to_string(),
             label,
+            history: config.history,
         }
     }
 
@@ -261,6 +264,7 @@ mod tests {
             brew: false,
             lang: "en".into(),
             label: None,
+            history: false,
         }
     }
 

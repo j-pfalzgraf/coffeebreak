@@ -219,6 +219,13 @@ pub enum Command {
     /// Show your earned badges and progress toward the next.
     Achievements,
 
+    /// Show the per-session history log (needs `history = true` in the config).
+    History {
+        /// Show at most the last N sessions (0 = all).
+        #[arg(long, value_name = "N", default_value_t = 20)]
+        limit: usize,
+    },
+
     /// Inspect or create the configuration file.
     Config {
         #[command(subcommand)]
@@ -365,6 +372,10 @@ fn localized_command(i18n: &I18n) -> clap::Command {
     cmd = cmd.mut_subcommand("stats", |c| {
         c.about(t(Msg::HelpStats))
             .mut_arg("format", |a| a.help(t(Msg::HelpFormat)))
+    });
+    cmd = cmd.mut_subcommand("history", |c| {
+        c.about(t(Msg::HelpHistory))
+            .mut_arg("limit", |a| a.help(t(Msg::HelpHistoryLimit)))
     });
     cmd = cmd.mut_subcommand("completions", |c| {
         c.about(t(Msg::HelpCompletions))

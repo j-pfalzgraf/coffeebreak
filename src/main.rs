@@ -87,6 +87,10 @@ fn run() -> Result<()> {
                 commands::achievements(&meta_theme, &i18n, goal);
                 Ok(())
             }
+            Command::History { limit } => {
+                commands::history(&meta_theme, &i18n, *limit);
+                Ok(())
+            }
             Command::Demo => commands::demo(&meta_theme, &i18n),
             Command::Doctor => {
                 commands::doctor(&meta_theme, &i18n);

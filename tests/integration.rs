@@ -719,6 +719,101 @@ fn stats_invalid_format_is_rejected() {
     );
 }
 
+// --- Session history ---------------------------------------------------------
+
+#[test]
+fn history_is_off_by_default() {
+    let home = TempHome::new("hist-off");
+    let run_args = [
+        "--plain",
+        "--seconds",
+        "-w",
+        "1",
+        "--cycles",
+        "1",
+        "--no-sound",
+        "--no-notify",
+    ];
+    assert!(run(&home, &run_args).status.success());
+    assert!(
+        !home.path().join(".coffeebreak/history.jsonl").exists(),
+        "history.jsonl must not be created unless history = true is configured"
+    );
+
+    // The command still works, with a friendly empty state.
+    let args = ["history", "--no-color"];
+    let out = run(&home, &args);
+    assert!(out.status.success(), "{}", describe(&args, &out));
+    assert!(
+        stdout(&out).contains("history = true"),
+        "empty history should hint at the config key\n{}",
+        describe(&args, &out)
+    );
+}
+
+#[test]
+fn history_logs_and_renders_when_enabled() {
+    let home = TempHome::new("hist-on");
+    let cfg_dir = home.path().join(".config/coffeebreak");
+    std::fs::create_dir_all(&cfg_dir).unwrap();
+    std::fs::write(cfg_dir.join("config.toml"), "history = true\n").unwrap();
+
+    let run_args = [
+        "--plain",
+        "--seconds",
+        "-w",
+        "1",
+        "--cycles",
+        "1",
+        "--no-sound",
+        "--no-notify",
+        "--label",
+        "api-refactor",
+    ];
+    let out = run(&home, &run_args);
+    assert!(out.status.success(), "{}", describe(&run_args, &out));
+
+    let log_path = home.path().join(".coffeebreak/history.jsonl");
+    let log = std::fs::read_to_string(&log_path)
+        .unwrap_or_else(|e| panic!("expected {} to exist: {e}", log_path.display()));
+    assert_eq!(
+        log.lines().count(),
+        1,
+        "one completed block → one line: {log}"
+    );
+    for needle in [
+        "\"ts\"",
+        "\"work_min\"",
+        "\"api-refactor\"",
+        "\"completed\":true",
+    ] {
+        assert!(
+            needle.is_empty() || log.contains(needle),
+            "log missing {needle}: {log}"
+        );
+    }
+
+    // A torn/corrupt trailing line (crash mid-append) must not break the view.
+    {
+        use std::io::Write;
+        let mut f = std::fs::OpenOptions::new()
+            .append(true)
+            .open(&log_path)
+            .unwrap();
+        write!(f, "{{ torn line").unwrap();
+    }
+
+    let args = ["history", "--no-color"];
+    let out = run(&home, &args);
+    assert!(out.status.success(), "{}", describe(&args, &out));
+    let s = stdout(&out);
+    assert!(
+        s.contains("api-refactor") && s.contains("1 pomodoro"),
+        "history table should show the logged session\n{}",
+        describe(&args, &out)
+    );
+}
+
 // --- Achievements, demo, and the new themes/presets/indicator ---------------
 
 #[test]
