@@ -42,6 +42,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Sparklines render a zero as a blank cell again instead of the same glyph as
   the smallest non-zero value.
 
+### Internal
+
+- The timer's gradient progress bar and the stats goal bar now share one
+  `ui::bar_line` primitive instead of duplicating the fill/track loop.
+- New guard test: every key advertised in `PALETTE_KEYS` must actually be
+  overridable via `[custom_theme]`, so the two lists can't drift apart.
+
 ## [1.1.0] - 2026-06-11
 
 A feature release that builds on the 1.0.0 core: a motivational **achievements**

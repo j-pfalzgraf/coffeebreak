@@ -131,16 +131,7 @@ pub fn goal_bar(theme: &Theme, done: u64, goal: u64, width: usize, color: Rgb) -
     } else {
         color
     };
-
-    let mut cells = Vec::with_capacity(width);
-    for i in 0..width {
-        if i < filled {
-            cells.push(('█', Some(bar_color)));
-        } else {
-            cells.push(('░', Some(theme.palette.muted.shade(0.6))));
-        }
-    }
-    row(theme, &cells)
+    crate::ui::bar_line(theme, filled, width, |_| bar_color)
 }
 
 #[cfg(test)]

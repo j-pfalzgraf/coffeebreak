@@ -59,6 +59,25 @@ pub fn row_from_cells(theme: &Theme, cells: &[(char, Option<Rgb>)]) -> Line {
     Line::styled(s, cells.len())
 }
 
+/// Build a horizontal bar `width` cells wide: the first `filled` cells are
+/// solid blocks coloured per cell by `fill`, the rest are the shared dim track.
+///
+/// This is the one place the bar look (`█`/`░` and the track shade) is defined;
+/// the timer's gradient progress bar and the stats goal bar both delegate here
+/// and differ only in their fill-colour function.
+pub fn bar_line(theme: &Theme, filled: usize, width: usize, fill: impl Fn(usize) -> Rgb) -> Line {
+    let track = theme.palette.muted.shade(0.6);
+    let mut cells = Vec::with_capacity(width);
+    for i in 0..width {
+        if i < filled {
+            cells.push(('█', Some(fill(i))));
+        } else {
+            cells.push(('░', Some(track)));
+        }
+    }
+    row_from_cells(theme, &cells)
+}
+
 /// A small builder for a single styled line that tracks visible width as spans
 /// are appended.
 ///

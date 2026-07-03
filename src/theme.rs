@@ -519,6 +519,21 @@ mod tests {
     }
 
     #[test]
+    fn every_advertised_palette_key_is_actually_overridable() {
+        // PALETTE_KEYS (what the docs/config advertise) and the match arms in
+        // `Palette::with_overrides` are parallel lists; this guards against a
+        // future palette field being documented but silently un-overridable.
+        for key in PALETTE_KEYS {
+            let base = format!("{COFFEE:?}");
+            let overridden = format!("{:?}", COFFEE.with_overrides([(*key, "#010203")]));
+            assert_ne!(
+                base, overridden,
+                "palette key `{key}` is listed in PALETTE_KEYS but has no effect"
+            );
+        }
+    }
+
+    #[test]
     fn build_uses_custom_palette_when_named() {
         let custom = custom_palette([("focus", "#112233")]);
         let t = Theme::build("custom", true, Some(custom));

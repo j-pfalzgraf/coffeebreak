@@ -227,20 +227,14 @@ pub fn big_time(theme: &Theme, text: &str, color: Rgb) -> Vec<Line> {
 pub fn progress_bar(theme: &Theme, elapsed: f64, width: usize, from: Rgb, to: Rgb) -> Line {
     let elapsed = elapsed.clamp(0.0, 1.0);
     let filled = (elapsed * width as f64).round() as usize;
-    let mut cells = Vec::with_capacity(width);
-    for i in 0..width {
-        if i < filled {
-            let t = if width > 1 {
-                i as f64 / (width - 1) as f64
-            } else {
-                0.0
-            };
-            cells.push(('█', Some(from.lerp(to, t))));
+    crate::ui::bar_line(theme, filled, width, |i| {
+        let t = if width > 1 {
+            i as f64 / (width - 1) as f64
         } else {
-            cells.push(('░', Some(theme.palette.muted.shade(0.6))));
-        }
-    }
-    row_from_cells(theme, &cells)
+            0.0
+        };
+        from.lerp(to, t)
+    })
 }
 
 // ---------------------------------------------------------------------------
