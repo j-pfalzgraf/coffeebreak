@@ -1,6 +1,6 @@
 [package]
 name = "coffeebreak-cli"
-version = "1.1.0"
+version = "1.2.0"
 edition = "2024"
 rust-version = "1.88"
 description = "A Pomodoro focus timer for your terminal — ASCII coffee cup, live countdown, and dev quotes."

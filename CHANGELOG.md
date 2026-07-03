@@ -7,6 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.2.0] - 2026-07-03
+
+A safety-and-control release. Persistence is now crash-safe end to end: every
+save is atomic, completed pomodoros are checkpointed the moment they are earned,
+and a corrupt stats file is quarantined rather than overwritten. Two new
+opt-in/quality-of-life features — a per-session **history** log and
+**`config get`/`config set`** — plus a batch of rendering and correctness fixes.
+Backward compatible: no config or data migration needed, and the new history log
+is off by default.
+
 ### Added
 
 - **Opt-in session history** (`history = true` in the config): every completed
@@ -246,6 +256,7 @@ well-tested codebase. The original Pomodoro core is included below.
   (gated on a `CARGO_REGISTRY_TOKEN` secret).
 - Added issue forms, a pull-request template, and `CONTRIBUTING.md`.
 
-[Unreleased]: https://github.com/j-pfalzgraf/coffeebreak/compare/v1.1.0...HEAD
+[Unreleased]: https://github.com/j-pfalzgraf/coffeebreak/compare/v1.2.0...HEAD
+[1.2.0]: https://github.com/j-pfalzgraf/coffeebreak/compare/v1.1.0...v1.2.0
 [1.1.0]: https://github.com/j-pfalzgraf/coffeebreak/compare/v1.0.0...v1.1.0
 [1.0.0]: https://github.com/j-pfalzgraf/coffeebreak/releases/tag/v1.0.0
