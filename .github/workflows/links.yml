@@ -37,7 +37,7 @@ jobs:
     if: github.event_name != 'schedule'
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
       - name: lychee (offline)
         uses: lycheeverse/lychee-action@v2
         with:
@@ -53,7 +53,7 @@ jobs:
       contents: read
       issues: write
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
       - name: lychee (online)
         id: lychee
         uses: lycheeverse/lychee-action@v2
@@ -62,7 +62,7 @@ jobs:
           fail: false
       - name: Open an issue on broken links
         if: steps.lychee.outputs.exit_code != 0
-        uses: peter-evans/create-issue-from-file@v5
+        uses: peter-evans/create-issue-from-file@v6
         with:
           title: Broken links found by the weekly lychee sweep
           content-filepath: ./lychee/out.md

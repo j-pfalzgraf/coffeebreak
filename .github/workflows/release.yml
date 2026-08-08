@@ -34,7 +34,7 @@ jobs:
     name: pre-release checks
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
       - uses: dtolnay/rust-toolchain@stable
         with:
           components: rustfmt, clippy
@@ -92,7 +92,7 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
 
       # Pinned stable Rust toolchain; install the requested target triple too.
       - name: Install Rust toolchain
@@ -102,7 +102,7 @@ jobs:
 
       # Cache cargo registry/git and the target dir to speed up rebuilds.
       - name: Cache cargo
-        uses: actions/cache@v5
+        uses: actions/cache@v6
         with:
           path: |
             ~/.cargo/registry
@@ -177,7 +177,7 @@ jobs:
     steps:
       # Checkout so we can read CHANGELOG.md for the release notes.
       - name: Checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
 
       # Download every build job's artifact into ./dist, flattening the
       # per-artifact subdirectories so all archives sit side by side.
@@ -278,7 +278,7 @@ jobs:
     env:
       CARGO_REGISTRY_TOKEN: ${{ secrets.CARGO_REGISTRY_TOKEN }}
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
       - uses: dtolnay/rust-toolchain@stable
       - uses: Swatinem/rust-cache@v2
       - name: Publish (skips if no token)
